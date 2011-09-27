@@ -172,6 +172,40 @@ en_AU =>
 		two_default_day   => 0,
 		two_default_month => 0,
 		},
+		'To 25 Dec 2011' => # Missing escape defaults to Gregorian.
+		{
+		one               => DateTime::Infinite::Past -> new,
+		one_ambiguous     => 0,
+		one_bc            => 0,
+		one_date          => '-inf',
+		one_default_day   => 0,
+		one_default_month => 0,
+		phrase            => '',
+		prefix            => 'to',
+		two               => DateTime -> new(year => 2011, month => 12, day => 25),
+		two_ambiguous     => 0,
+		two_bc            => 0,
+		two_date          => DateTime -> new(year => 2011, month => 12, day => 25),
+		two_default_day   => 0,
+		two_default_month => 0,
+		},
+		'To @#DGregorian@ 25 Dec 2011' =>
+		{
+		one               => DateTime::Infinite::Past -> new,
+		one_ambiguous     => 0,
+		one_bc            => 0,
+		one_date          => '-inf',
+		one_default_day   => 0,
+		one_default_month => 0,
+		phrase            => '',
+		prefix            => 'to',
+		two               => DateTime -> new(year => 2011, month => 12, day => 25),
+		two_ambiguous     => 0,
+		two_bc            => 0,
+		two_date          => DateTime -> new(year => 2011, month => 12, day => 25),
+		two_default_day   => 0,
+		two_default_month => 0,
+		},
 }
 );
 

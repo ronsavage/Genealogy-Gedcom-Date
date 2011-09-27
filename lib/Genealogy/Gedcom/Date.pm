@@ -543,7 +543,7 @@ sub process_date_escape
 	my(%escape) =
 		(
 		 offset   => -1,
-		 language => '',
+		 language => 'gregorian', # The default.
 		);
 
 	for my $i (0 .. $#field)
@@ -557,13 +557,13 @@ sub process_date_escape
 		}
 	}
 
-	# Phase 2: Convert month full names or abbreviations into integers 1 .. 12, to make parsing easier.
+	# Phase 2: Convert month full names or abbreviations into the strings 01 .. 12, to make parsing easier.
 
 	 if ($escape{language})
 	 {
 		 # Remove the date escape expression itself.
 
-		 splice(@field, $escape{offset}, 1);
+		 splice(@field, $escape{offset}, 1) if ($escape{offset} >= 0);
 
 		 # Convert month names into Gregorian abbreviations.
 
