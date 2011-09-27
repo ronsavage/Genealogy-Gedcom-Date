@@ -40,12 +40,14 @@ sub _init_flags
 
 	for my $key (qw/one two/)
 	{
-		$flags{$key}               = $key eq 'one' ? DateTime::Infinite::Past -> new : DateTime::Infinite::Future -> new;
-		$flags{"${key}_ambiguous"} = 0;
-		$flags{"${key}_bc"}        = 0;
-		$flags{"${key}_date"}      = $flags{$key};
-		$flags{phrase}             = '';
-		$flags{prefix}             = '';
+		$flags{$key}                   = $key eq 'one' ? DateTime::Infinite::Past -> new : DateTime::Infinite::Future -> new;
+		$flags{"${key}_ambiguous"}     = 0;
+		$flags{"${key}_bc"}            = 0;
+		$flags{"${key}_date"}          = $flags{$key};
+		$flags{"${key}_default_day"}   = 0;
+		$flags{"${key}_default_month"} = 0;
+		$flags{phrase}                 = '';
+		$flags{prefix}                 = '';
 	}
 
 	return {%flags};
@@ -91,10 +93,10 @@ sub parse_approximate_date
 
 	$prefix = [map{lc} @$prefix];
 
-	# Phase 2: Split the date on '-' or spaces, so we can check for prefixes.
+	# Phase 2: Split the date so we can check for prefixes.
 	# Expected format is something like 'cal 21 jun 1950'.
 
-	my(@field) = split(/[-\s]+/, $date);
+	my(@field) = split(/[-\s\/]+/, $date);
 
 	if ( ($field[0] eq $$prefix[0]) || ($field[0] eq $$prefix[1]) || ($field[0] eq $$prefix[2]) )
 	{
@@ -132,10 +134,10 @@ sub parse_date_period
 
 	$from_to = [map{lc} @$from_to];
 
-	# Phase 2: Split the date on '-' or spaces, so we can check for 'from' and 'to'.
+	# Phase 2: Split the date so we can check for 'from' and 'to'.
 	# Expected format is something like 'from 21 jun 1950 to 21 jun 2011'.
 
-	my(@field)  = split(/[-\s]+/, $date);
+	my(@field)  = split(/[-\s\/]+/, $date);
 	my($prefix) = '';
 
 	if ($field[0] eq $$from_to[0])
@@ -180,10 +182,10 @@ sub parse_date_range
 	$$from_to[0] = [map{lc} @{$$from_to[0]}];
 	$$from_to[1] = lc $$from_to[1];
 
-	# Phase 2: Split the date on '-' or spaces, so we can check for ranges.
+	# Phase 2: Split the date so we can check for ranges.
 	# Expected format is something like 'bet 21 jun 1950 and 21 jun 2011'.
 
-	my(@field) = split(/[-\s]+/, $date);
+	my(@field) = split(/[-\s\/]+/, $date);
 
 	# This code allows ranges to be:
 	# o Legal, with 'Bet 1999 and 2000'.
@@ -260,7 +262,7 @@ sub parse_datetime
 
 	# We rig the $from_to parameter so the same call works from within parse_date_range() etc.
 
-	return $self -> _parse_1or2_dates([ ['' , '', ''], ''], split(/[-\s]+/, $date) );
+	return $self -> _parse_1or2_dates([ ['' , '', ''], ''], split(/[-\s\/]+/, $date) );
 
 } # End of parse_datetime.
 
@@ -279,10 +281,10 @@ sub parse_interpreted_date
 	die "No value for the 'date' key\n"   if (length($date) == 0);
 	die "No value for the 'prefix' key\n" if (length($prefix) == 0);
 
-	# Phase 2: Split the date on '-' or spaces, so we can check for prefixes.
+	# Phase 2: Split the date so we can check for prefixes.
 	# Expected format is something like 'int 21 jun 1950 (more or less)'.
 
-	my(@field) = split(/[-\s]+/, $date);
+	my(@field) = split(/[-\s\/]+/, $date);
 
 	if ( ($field[0] eq $prefix) || ($field[0] =~ /^\(/) )
 	{
@@ -320,7 +322,7 @@ sub parse_interpreted_date
 		my($length)                         = length($phrase) + 2; # + 2 to zap the '(' and ')'.
 		substr($date, $open_paren, $length) = '';
 		$date                               =~ s/\s+$//; # Zap any spaces before the '(' in 'Int 2000 (Guesswork)'..
-		@field                              = split(/[-\s]+/, $date);
+		@field                              = split(/[-\s\/]+/, $date);
 	}
 
 	# Special case: '(Unknown date and time)' reduced to ''.
@@ -482,17 +484,20 @@ sub _parse_1_date
 	{
 		# This assumes the year is the last and only input field.
 
-		$field[2] = $field[0];
-		$field[1] = 1; # Month.
-		$field[0] = 1; # Day.
+		$field[2]                         = $field[0];
+		$field[1]                         = 1; # Fabricate month.
+		$field[0]                         = 1; # Fabricate day.
+		$$flags{"${which}_default_day"}   = 1;
+		$$flags{"${which}_default_month"} = 1;
 	}
 	elsif ($#field == 1)
 	{
 		# This assumes the year is the last input field, and the month is first.
 
-		$field[2] = $field[1];
-		$field[1] = $field[0]; # Month.
-		$field[0] = 1;         # Day.
+		$field[2]                       = $field[1];
+		$field[1]                       = $field[0]; # Month.
+		$field[0]                       = 1;         # Fabricate day.
+		$$flags{"${which}_default_day"} = 1;
 	}
 
 	# Phase 3: Check that the day and year are numeric.
@@ -513,18 +518,17 @@ sub _parse_1_date
 	}
 
 	my($candidate)           = join('-', @field);
-	$$flags{"${which}_date"} = $self -> formatter -> parse_datetime($candidate);
+	$$flags{"${which}_date"} = DateTime -> new(year => $field[2], month => $field[1], day => $field[0]);
 	$$flags{$which}          = qq|$$flags{"${which}_date"}|;
-
-	die "Unable to parse date: $candidate\n" if (! $self -> formatter -> success);
 
 	# Phase 5: Replace leading 1 with 0 if we rigged a 4-digit year.
 
 	substr($$flags{$which}, 0, 1) = '0' if (! $four_digit_year);
 
 	# Phase 6: Check is the day is <= 12, in which case it could be a month.
+	# But, if the month and day are the same, the date is not ambiguous.
 
-	$$flags{"${which}_ambiguous"} = 1 if (substr($$flags{$which}, 8, 2) <= '12');
+	$$flags{"${which}_ambiguous"} = 1 if ( (substr($$flags{$which}, 8, 2) <= '12') && (substr($$flags{$which}, 5, 2) != substr($$flags{$which}, 8, 2) ) );
 
 } # End of _parse_1_date.
 
@@ -533,6 +537,8 @@ sub _parse_1_date
 sub process_date_escape
 {
 	my($self, @field) = @_;
+
+	print STDERR '# Entered process_date_escape: ', join(', ', @field), ". \n";
 
 	# Phase 1: Check for a date escape.
 
@@ -553,8 +559,7 @@ sub process_date_escape
 		}
 	}
 
-	# Phase 2: Convert month full names or abbreviations into Gregorian abbreviations,
-	# as required by DateTime::Format::Natural.
+	# Phase 2: Convert month full names or abbreviations into integers 1 .. 12, to make parsing easier.
 
 	 if ($escape{language})
 	 {
@@ -568,13 +573,19 @@ sub process_date_escape
 
 		 my(%name);
 
-		 @name{@{$$month_names[0]} } = @{$$month_names[1]};
+		 for my $i (0 .. 11)
+		 {
+			 $name{$$month_names[0][$i]} = sprintf('%02i', $i + 1);
+			 $name{$$month_names[1][$i]} = sprintf('%02i', $i + 1);
+		 }
 
 		 for my $i (0 .. $#field)
 		 {
 			 $field[$i] = $name{$field[$i]} if ($name{$field[$i]});
 		 }
 	 }
+
+	print STDERR '# Leaving process_date_escape: ', join(', ', @field), ". \n";
 
 	return @field;
 
@@ -963,15 +974,15 @@ Also in the returned hashref, the key 'phrase' will have the value of the text b
 
 =head2 process_date_escape(@field)
 
-Parse the fields of the date, split on ' ' and '-', and return the fields as an array.
+Parse the fields of the date, already split on ' ', '-' and '/', and return the fields as an array.
 
-In the process, convert month full names and abbreviations to Gregorian abbreviations, because that's what L<DateTime::Format::Natural> expects.
+In the process, convert month full names and abbreviations to Gregorian abbreviations, to make parsing easier.
 
-Languages:
+Supported calendars:
 
 =over 4
 
-=item o Gregorian, using the escape @#DGregorian#@
+=item o Gregorian, using the escape @#DGregorian@
 
 =back
 
@@ -979,9 +990,9 @@ Notes:
 
 =over 4
 
-=item o Non-Gregorian date escapes are ignored
+=item o Non-Gregorian date escapes are ignored at this stage
 
-=item o See t/escape.t for details
+=item o See t/escape.t for sample code
 
 =back
 
@@ -1038,7 +1049,7 @@ Default: 0.
 
 =item o one_date => $a_date_object
 
-This object is of type L<DateTime::Format::Natural>, which will actually be an object of type L<DateTime>.
+This object is of type L<DateTime>.
 
 Warning: Since these objects only accept 4-digit years, any year 0 .. 999 will have 1000 added to it.
 Of course, the value for the 'one' key will I<not> have 1000 added it.
@@ -1049,6 +1060,18 @@ This means that if the value of the 'one' key does not match the stringified val
 Alternately, if the stringified value of the 'one_date' key is '-inf', the period supplied did not have a 'From' date.
 
 Default: DateTime::Infinite::Past -> new, which stringifies to '-inf'.
+
+=item o one_default_day => $Boolean
+
+Returns 1 if the input date had no value for the first date's day. The code sets the default day to 1.
+
+Default: 0.
+
+=item o one_default_month => $Boolean
+
+Returns 1 if the input date had no value for the first date's month. The code sets the default month to 1.
+
+Default: 0.
 
 =item o phrase => $string
 
@@ -1129,7 +1152,7 @@ Default: 0.
 
 =item o two_date => $a_date_object
 
-This object is of type L<DateTime::Format::Natural>, which will actually be an object of type L<DateTime>.
+This object is of type L<DateTime>.
 
 Warning: Since these objects only accept 4-digit years, any year 0 .. 999 will have 1000 added to it.
 Of course, the value for the 'two' key will I<not> have 1000 added it.
@@ -1141,7 +1164,43 @@ Alternately, if the stringified value of the 'two_date' key is 'inf', the period
 
 Default: DateTime::Infinite::Future -> new, which stringifies to 'inf'.
 
+=item o two_default_day => $Boolean
+
+Returns 1 if the input date had no value for the second date's day. The code sets the default day to 1.
+
+Default: 0.
+
+=item o two_default_month => $Boolean
+
+Returns 1 if the input date had no value for the second date's month. The code sets the default month to 1.
+
+Default: 0.
+
 =back
+
+=head2 How do I format dates for output?
+
+Use the hashref keys 'one' and 'two', to get dates in the form 2011-06-21. Re-format as necessary.
+
+Such a hashref is returned from all parse_*() methods.
+
+=head2 Does this module handle non-Gregorian calendars?
+
+No, not yet. See L</process_date_escape(@field)> for more details.
+
+=head2 How are the various date formats handled?
+
+Incoming dates are split on ' ', '-' and '/', and the resultant fields are parsed one at a time.
+
+=head2 How are incomplete date handled?
+
+A missing month is set to 1 and a missing day is set to 1.
+
+Further, in the hashref returned by the parse_*() methods, the flags one_default_month, one_default_day,
+two_default_month and two_default_day are set to 1, as appropriate, so you can tell that the code supplied
+the value.
+
+Note: These flags take a Boolean value; it is only by coincidence that they can take the value of the default month or day.
 
 =head2 Why are dates returned as objects of type L<DateTime>?
 
@@ -1163,13 +1222,21 @@ Then the returned hashref will have:
 
 Clearly then, the code I<does not> reorder the dates.
 
-=head2 Why did you choose L<Hash::FieldHash> over L<Moose>?
+=head2 Why was this module renamed from DateTime::Format::Gedcom?
+
+The L<DateTime> suite of modules aren't designed, IMHO, for GEDCOM-like applications. It was a mistake to use that name in the first place.
+
+By releasing under the Genealogy::Gedcom::* namespace, I can be much more targeted in the data types I choose as method return values.
+
+=head2 Why did you choose Hash::FieldHash over Moose?
 
 My policy is to use the lightweight L<Hash::FieldHash> for stand-alone modules and L<Moose> for applications.
 
 =head1 TODO
 
 =over 4
+
+=item o Comparisons between dates
 
 =item o Handle Gregorian years of the form 1699/00
 
