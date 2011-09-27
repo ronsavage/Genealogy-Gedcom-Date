@@ -12,7 +12,7 @@ my($locale) = 'en_AU';
 
 DateTime -> DefaultLocale($locale);
 
-my($parser) = Genealogy::Gedcom::Date -> new(debug => 1);
+my($parser) = Genealogy::Gedcom::Date -> new(debug => 0);
 
 isa_ok($parser, 'Genealogy::Gedcom::Date');
 
@@ -87,46 +87,12 @@ my(%date_period) =
 (
 en_AU =>
 {
-		'From @#DGregorian@ 2 January 2000' =>
-		{
-		one               => DateTime -> new(year => 2000, month => 1, day => 2),
-		one_ambiguous     => 1,
-		one_bc            => 0,
-		one_date          => DateTime -> new(year => 2000, month => 1, day => 2),
-		one_default_day   => 0,
-		one_default_month => 0,
-		phrase            => '',
-		prefix            => 'from',
-		two               => DateTime::Infinite::Future -> new,
-		two_ambiguous     => 0,
-		two_bc            => 0,
-		two_date          => DateTime::Infinite::Future -> new,
-		two_default_day   => 0,
-		two_default_month => 0,
-		},
 		'From @#DGregorian@ 2 Jan 2000' =>
 		{
 		one               => DateTime -> new(year => 2000, month => 1, day => 2),
 		one_ambiguous     => 1,
 		one_bc            => 0,
 		one_date          => DateTime -> new(year => 2000, month => 1, day => 2),
-		one_default_day   => 0,
-		one_default_month => 0,
-		phrase            => '',
-		prefix            => 'from',
-		two               => DateTime::Infinite::Future -> new,
-		two_ambiguous     => 0,
-		two_bc            => 0,
-		two_date          => DateTime::Infinite::Future -> new,
-		two_default_day   => 0,
-		two_default_month => 0,
-		},
-		'From @#DGregorian@ 2 January 2011' =>
-		{
-		one               => DateTime -> new(year => 2011, month => 1, day => 2),
-		one_ambiguous     => 1,
-		one_bc            => 0,
-		one_date          => DateTime -> new(year => 2011, month => 1, day => 2),
 		one_default_day   => 0,
 		one_default_month => 0,
 		phrase            => '',
@@ -152,6 +118,40 @@ en_AU =>
 		two_ambiguous     => 0,
 		two_bc            => 0,
 		two_date          => DateTime -> new(year => 2011, month => 3, day => 3),
+		two_default_day   => 0,
+		two_default_month => 0,
+		},
+		'From @#DGregorian@ 1 January 2000' =>
+		{
+		one               => DateTime -> new(year => 2000, month => 1, day => 1),
+		one_ambiguous     => 0,
+		one_bc            => 0,
+		one_date          => DateTime -> new(year => 2000, month => 1, day => 1),
+		one_default_day   => 0,
+		one_default_month => 0,
+		phrase            => '',
+		prefix            => 'from',
+		two               => DateTime::Infinite::Future -> new,
+		two_ambiguous     => 0,
+		two_bc            => 0,
+		two_date          => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
+		},
+		'From @#DGregorian@ 2 January 2011' =>
+		{
+		one               => DateTime -> new(year => 2011, month => 1, day => 2),
+		one_ambiguous     => 1,
+		one_bc            => 0,
+		one_date          => DateTime -> new(year => 2011, month => 1, day => 2),
+		one_default_day   => 0,
+		one_default_month => 0,
+		phrase            => '',
+		prefix            => 'from',
+		two               => DateTime::Infinite::Future -> new,
+		two_ambiguous     => 0,
+		two_bc            => 0,
+		two_date          => DateTime::Infinite::Future -> new,
 		two_default_day   => 0,
 		two_default_month => 0,
 		},
