@@ -538,8 +538,6 @@ sub process_date_escape
 {
 	my($self, @field) = @_;
 
-	print STDERR '# Entered process_date_escape: ', join(', ', @field), ". \n";
-
 	# Phase 1: Check for a date escape.
 
 	my(%escape) =
@@ -584,8 +582,6 @@ sub process_date_escape
 			 $field[$i] = $name{$field[$i]} if ($name{$field[$i]});
 		 }
 	 }
-
-	print STDERR '# Leaving process_date_escape: ', join(', ', @field), ". \n";
 
 	return @field;
 
