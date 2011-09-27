@@ -13,6 +13,7 @@ use Try::Tiny;
 fieldhash my %date         => 'date';
 fieldhash my %debug        => 'debug';
 fieldhash my %method_index => 'method_index';
+fieldhash my %style        => 'style';
 
 our $VERSION = '1.02';
 
@@ -21,9 +22,10 @@ our $VERSION = '1.02';
 sub _init
 {
 	my($self, $arg)     = @_;
-	$$arg{date}         ||= ''; # Caller can set.
-	$$arg{debug}        ||= 0;  # Caller can set.
-	$$arg{method_index} = 0;    # See parse_date_value.
+	$$arg{date}         ||= '';        # Caller can set.
+	$$arg{debug}        ||= 0;         # Caller can set.
+	$$arg{method_index} = 0;           # See parse_date_value.
+	$$arg{style}        ||= 'english'; # Caller can set.
 	$self               = from_hash($self, $arg);
 
 	return $self;
@@ -85,6 +87,7 @@ sub parse_approximate_date
 	$date           =~ s/^\s+//;
 	$date           =~ s/\s+$//;
 	my($prefix)     = $arg{prefix} || ['abt', 'cal', 'est'];
+	my($style)      = lc ($arg{style} || $self -> style);
 
 	# Phase 1: Validate parameters.
 
@@ -113,7 +116,7 @@ sub parse_approximate_date
 
 	# We rig the $from_to parameter so the same call works from within parse_date_range() etc.
 
-	return $self -> _parse_1or2_dates([ [$$prefix[0], $$prefix[1], $$prefix[2] ], ''], @field);
+	return $self -> _parse_1or2_dates([ [$$prefix[0], $$prefix[1], $$prefix[2] ], ''], $style, @field);
 
 } # End of parse_approximate_date.
 
@@ -126,6 +129,7 @@ sub parse_date_period
 	$date           =~ s/^\s+//;
 	$date           =~ s/\s+$//;
 	my($from_to)    = $arg{from_to} || ['from', 'to'];
+	my($style)      = lc ($arg{style} || $self -> style);
 
 	# Phase 1: Validate parameters.
 
@@ -160,7 +164,7 @@ sub parse_date_period
 
 	# We rig the $from_to parameter so the same call works from within parse_date_range() etc.
 
-	return $self -> _parse_1or2_dates([ [$$from_to[0], $$from_to[0], $$from_to[0] ], $$from_to[1] ], @field);
+	return $self -> _parse_1or2_dates([ [$$from_to[0], $$from_to[0], $$from_to[0] ], $$from_to[1] ], $style, @field);
 
 } # End of parse_date_period.
 
@@ -173,6 +177,7 @@ sub parse_date_range
 	$date           =~ s/^\s+//;
 	$date           =~ s/\s+$//;
 	my($from_to)    = $arg{from_to} || [ ['Aft', 'Bef', 'Bet'], 'And'];
+	my($style)      = lc ($arg{style} || $self -> style);
 
 	# Phase 1: Validate parameters.
 
@@ -206,7 +211,7 @@ sub parse_date_range
 
 	@field = $self -> process_date_escape(@field);
 
-	return $self -> _parse_1or2_dates($from_to, @field);
+	return $self -> _parse_1or2_dates($from_to, $style, @field);
 
 } # End of parse_date_range.
 
@@ -251,18 +256,26 @@ sub parse_datetime
 {
 	my($self, $date) = @_;
 
-	# Allow the caller to use $parser -> parse_datetime(date => $date).
+	# Allow the caller to use $parser -> parse_datetime(date => $date, style => $style).
 
-	$date = $$date{date} if (defined $date && ref $date && (ref $date eq 'HASH') && defined $$date{date});
-	$date = lc ($date || $self -> date);
-	$date =~ s/^\s+//;
-	$date =~ s/\s+$//;
+	my($style) = $self -> style;
+
+	if (defined $date && ref $date && (ref $date eq 'HASH') )
+	{
+		$style = $$date{style} if (defined $$date{style});
+		$date  = $$date{date}  if (defined $$date{date});
+	}
+
+	$date  = lc ($date || $self -> date);
+	$date  =~ s/^\s+//;
+	$date  =~ s/\s+$//;
+	$style = lc $style;
 
 	die "No date provided\n" if (length($date) == 0);
 
 	# We rig the $from_to parameter so the same call works from within parse_date_range() etc.
 
-	return $self -> _parse_1or2_dates([ ['' , '', ''], ''], split(/[-\s\/]+/, $date) );
+	return $self -> _parse_1or2_dates([ ['' , '', ''], ''], $style, split(/[-\s\/]+/, $date) );
 
 } # End of parse_datetime.
 
@@ -275,6 +288,7 @@ sub parse_interpreted_date
 	$date           =~ s/^\s+//;
 	$date           =~ s/\s+$//;
 	my($prefix)     = lc ($arg{prefix} || 'int');
+	my($style)      = lc ($arg{style} || $self -> style);
 
 	# Phase 1: Validate parameters.
 
@@ -341,7 +355,7 @@ sub parse_interpreted_date
 
 	# We rig the $from_to parameter so the same call works from within parse_date_range() etc.
 
-	my($flags)      = $self -> _parse_1or2_dates([ [$prefix, $prefix, $prefix], ''], @field);
+	my($flags)      = $self -> _parse_1or2_dates([ [$prefix, $prefix, $prefix], ''], $style, @field);
 	$$flags{phrase} = $phrase;
 
 	return $flags;
@@ -352,7 +366,7 @@ sub parse_interpreted_date
 
 sub _parse_1or2_dates
 {
-	my($self, $from_to, @field) = @_;
+	my($self, $from_to, $style, @field) = @_;
 	my($flags) = $self -> _init_flags;
 
 	# Phase 1: Check for embedded 'to', as in 'from date.1 to date.2'.
@@ -447,21 +461,21 @@ sub _parse_1or2_dates
 	{
 		my($end) = $offset{two} >= 0 ? $offset{two} - 1 : $#field;
 
-		$self -> _parse_1_date('one',  $flags, @field[($offset{one} + 1) .. $end]);
+		$self -> _parse_1_date('one', $flags, $style, @field[($offset{one} + 1) .. $end]);
 	}
 
 	if ($offset{two} >= 0)
 	{
 		my($start) = $offset{two} >= 0 ? $offset{two} + 1 : 0;
 
-		$self -> _parse_1_date('two', $flags, @field[$start .. $#field]);
+		$self -> _parse_1_date('two', $flags, $style, @field[$start .. $#field]);
 	}
 
 	# When called from parse_datetime, there will be just 1 date...
 
 	if ( ($offset{one} < 0) && ($offset{two} < 0) )
 	{
-		$self -> _parse_1_date('one', $flags, @field);
+		$self -> _parse_1_date('one', $flags, $style, @field);
 	}
 
 	return $flags;
@@ -472,19 +486,26 @@ sub _parse_1or2_dates
 
 sub _parse_1_date
 {
-	my($self, $which, $flags, @field) = @_;
+	my($self, $which, $flags, $style, @field) = @_;
+
+	# Phase 1: Validate style.
+
+	my(%valid_style) = (american => 1, english => 1, standard => 1);
+
+	die "Style '$style' must be one of ", join(', ', sort keys %valid_style), ". \n" if (! $valid_style{$style});
 
 	# Phase 1: Flag an isolated year or a year with a month.
 
-	$$flags{"${which}_ambiguous"} = $#field < 2 ? 1 : 0;
+####	$$flags{"${which}_ambiguous"} = $#field < 2 ? 1 : 0;
 
 	# Phase 2: Handle missing data.
 
 	if ($#field == 0)
 	{
-		# This assumes the year is the last and only input field.
+		# This assumes the year is the only input field.
+		# Generate a date of the form (d, m, y).
 
-		$field[2]                         = $field[0];
+		$field[2]                         = $field[0]; # Year.
 		$field[1]                         = 1; # Fabricate month.
 		$field[0]                         = 1; # Fabricate day.
 		$$flags{"${which}_default_day"}   = 1;
@@ -492,18 +513,25 @@ sub _parse_1_date
 	}
 	elsif ($#field == 1)
 	{
-		# This assumes the year is the last input field, and the month is first.
+		if ( ($style eq 'american') || ($style eq 'english') )
+		{
+			$field[2] = $field[1]; # Year.
+			$field[1] = $field[0]; # Month.
+		}
+		else
+		{
+			$field[2] = $field[0]; # Year.
+			$field[1] = $field[1]; # Month.
+		}
 
-		$field[2]                       = $field[1];
-		$field[1]                       = $field[0]; # Month.
-		$field[0]                       = 1;         # Fabricate day.
+		$field[0]                       = 1; # Fabricate day.
 		$$flags{"${which}_default_day"} = 1;
 	}
 
 	# Phase 3: Check that the day and year are numeric.
 	# Brute force calls via parse_datetime() will fail this test.
 
-	die "Day - '$field[0]' - and year - '$field[2]' - must be numeric\n" if ( ($field[0] !~ /^\d+$/) || ($field[2] !~ /^\d+$/) );
+	die "Day ($field[0]), month ($field[1]) and year ($field[2]) must be numeric\n" if ( ($field[0] !~ /^\d+$/) || ($field[1] !~ /^\d+$/) || ($field[2] !~ /^\d+$/) );
 
 	# Phase 4: Hand over analysis to our slave.
 
@@ -1234,27 +1262,23 @@ My policy is to use the lightweight L<Hash::FieldHash> for stand-alone modules a
 
 =item o Comparisons between dates
 
+Sample code to overload '<' and '>' is in L<Gedcom::Date>.
+
 =item o Handle Gregorian years of the form 1699/00
 
 See p. 65 of L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
 
-=item o Test input file for binary
-
-=item o Test input file for non-ASCII character sets
-
-=item o Test input file for size 0
-
-=item o Tighten validation
-
 =back
+
+=head1 See Also
+
+L<Genealogy::Gedcom>.
+
+L<Gedcom::Date>.
 
 =head1 References
 
-L<The GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
-
-L<Month names in various languages|http://wordinfo.info/unit/3233?letter=C&spage=2>.
-
-L<The DateTime family of modules|http://datetime.perl.org/wiki/datetime/dashboard>.
+See L<Genealogy::Gedcom::Reader::Lexer/References>.
 
 =head1 Machine-Readable Change Log
 
