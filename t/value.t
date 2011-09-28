@@ -12,7 +12,7 @@ my($locale) = 'en_AU';
 
 DateTime -> DefaultLocale($locale);
 
-my($parser) = Genealogy::Gedcom::Date -> new(debug => 0);
+my($parser) = Genealogy::Gedcom::Date -> new(debug => 1);
 
 isa_ok($parser, 'Genealogy::Gedcom::Date');
 
@@ -30,55 +30,71 @@ en_AU =>
 {
 		'(Unknown date)' => # Use parse_interpreted_date().
 		{
-		one           => DateTime::Infinite::Past -> new,
-		one_ambiguous => 0,
-		one_bc        => 0,
-		one_date      => DateTime::Infinite::Past -> new,
-		phrase        => 'unknown date',
-		prefix        => '',
-		two           => DateTime::Infinite::Future -> new,
-		two_ambiguous => 0,
-		two_bc        => 0,
-		two_date      => DateTime::Infinite::Future -> new,
+		one               => DateTime::Infinite::Past -> new,
+		one_ambiguous     => 0,
+		one_bc            => 0,
+		one_date          => DateTime::Infinite::Past -> new,
+		one_default_day   => 0,
+		one_default_month => 0,
+		phrase            => 'unknown date',
+		prefix            => '',
+		two               => DateTime::Infinite::Future -> new,
+		two_ambiguous     => 0,
+		two_bc            => 0,
+		two_date          => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'Abt 1 Jan 2001' => # use parse_approximate_date().
 		{
-		one           => DateTime -> new(year => 2001, month => 1, day => 1),
-		one_ambiguous => 1,
-		one_bc        => 0,
-		one_date      => DateTime -> new(year => 2001, month => 1, day => 1),
-		phrase        => '',
-		prefix        => 'abt',
-		two           => DateTime::Infinite::Future -> new,
-		two_ambiguous => 0,
-		two_bc        => 0,
-		two_date      => DateTime::Infinite::Future -> new,
+		one               => DateTime -> new(year => 2001, month => 1, day => 1),
+		one_ambiguous     => 0,
+		one_bc            => 0,
+		one_date          => DateTime -> new(year => 2001, month => 1, day => 1),
+		one_default_day   => 0,
+		one_default_month => 0,
+		phrase            => '',
+		prefix            => 'abt',
+		two               => DateTime::Infinite::Future -> new,
+		two_ambiguous     => 0,
+		two_bc            => 0,
+		two_date          => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'Aft 1 Jan 2001' => # Use parse_date_range().
 		{
-		one           => DateTime -> new(year => 2001, month => 1, day => 1),
-		one_ambiguous => 1,
-		one_bc        => 0,
-		one_date      => DateTime -> new(year => 2001, month => 1, day => 1),
-		phrase        => '',
-		prefix        => 'aft',
-		two           => DateTime::Infinite::Future -> new,
-		two_ambiguous => 0,
-		two_bc        => 0,
-		two_date      => DateTime::Infinite::Future -> new,
+		one               => DateTime -> new(year => 2001, month => 1, day => 1),
+		one_ambiguous     => 0,
+		one_bc            => 0,
+		one_date          => DateTime -> new(year => 2001, month => 1, day => 1),
+		one_default_day   => 0,
+		one_default_month => 0,
+		phrase            => '',
+		prefix            => 'aft',
+		two               => DateTime::Infinite::Future -> new,
+		two_ambiguous     => 0,
+		two_bc            => 0,
+		two_date          => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'From 0' => # Use parse_date_period().
 		{
-		one           => '0000-01-01T00:00:00',
-		one_ambiguous => 1,
-		one_bc        => 0,
-		one_date      => DateTime -> new(year => 1000),
-		phrase        => '',
-		prefix        => 'from',
-		two           => DateTime::Infinite::Future -> new,
-		two_ambiguous => 0,
-		two_bc        => 0,
-		two_date      => DateTime::Infinite::Future -> new,
+		one               => '0000-01-01T00:00:00',
+		one_ambiguous     => 0,
+		one_bc            => 0,
+		one_date          => DateTime -> new(year => 1000),
+		one_default_day   => 1,
+		one_default_month => 1,
+		phrase            => '',
+		prefix            => 'from',
+		two               => DateTime::Infinite::Future -> new,
+		two_ambiguous     => 0,
+		two_bc            => 0,
+		two_date          => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 }
 );
@@ -92,8 +108,10 @@ for my $candidate (sort keys %{$value{$locale} })
 
 		if ($parser -> debug)
 		{
-				diag "In:  $in_string.";
-				diag "Out: $out_string";
+				for my $key (sort keys %$date)
+				{
+						diag "$key: In: $value{$locale}{$candidate}{$key}. Out: $$date{$key}." if ($value{$locale}{$candidate}{$key} ne $$date{$key});
+				}
 		}
 
 		ok($in_string eq $out_string, "Testing: $candidate");

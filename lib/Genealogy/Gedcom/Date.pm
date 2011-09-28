@@ -256,7 +256,7 @@ sub parse_datetime
 {
 	my($self, $date) = @_;
 
-	# Allow the caller to use $parser -> parse_datetime(date => $date, style => $style).
+	# Phase 1: Allow the caller to use $parser -> parse_datetime(date => $date, style => $style).
 
 	my($style) = $self -> style;
 
@@ -273,9 +273,14 @@ sub parse_datetime
 
 	die "No date provided\n" if (length($date) == 0);
 
+	# Phase 2: Handle the date escape, which is not expected.
+	# Really, just convert month names to numbers.
+
+	my(@field) = $self -> process_date_escape(split(/[-\s\/]+/, $date) );
+
 	# We rig the $from_to parameter so the same call works from within parse_date_range() etc.
 
-	return $self -> _parse_1or2_dates([ ['' , '', ''], ''], $style, split(/[-\s\/]+/, $date) );
+	return $self -> _parse_1or2_dates([ ['' , '', ''], ''], $style, @field);
 
 } # End of parse_datetime.
 
@@ -412,7 +417,7 @@ sub _parse_1or2_dates
 		{
 			# Remove BC. Allow for year 0 with defined().
 
-			if (defined($1) && $1)
+			if (defined $1 && length $1)
 			{
 				$field[$i] = $1;
 			}
@@ -440,9 +445,11 @@ sub _parse_1or2_dates
 
 	if ($#offset_of_bc >= 0)
 	{
-		# Discard 1st BC.
+		# Discard 1st BC. Adjust Offset two.
 
 		splice(@field, $offset_of_bc[0], 1);
+
+		$offset{two} -= 1 if ( ($offset{one} >= 0) && ($offset{two} >= 0) );
 
 		# Is there another BC?
 
@@ -494,16 +501,12 @@ sub _parse_1_date
 
 	die "Style '$style' must be one of ", join(', ', sort keys %valid_style), ". \n" if (! $valid_style{$style});
 
-	# Phase 1: Flag an isolated year or a year with a month.
-
-####	$$flags{"${which}_ambiguous"} = $#field < 2 ? 1 : 0;
-
-	# Phase 2: Handle missing data.
+	# Phase 2: Handle missing data or oddly-formatted (not d-m-y :-) data.
+	# Generate a date of the form (d, m, y).
 
 	if ($#field == 0)
 	{
 		# This assumes the year is the only input field.
-		# Generate a date of the form (d, m, y).
 
 		$field[2]                         = $field[0]; # Year.
 		$field[1]                         = 1; # Fabricate month.
@@ -515,17 +518,41 @@ sub _parse_1_date
 	{
 		if ( ($style eq 'american') || ($style eq 'english') )
 		{
+			# This assumes the 2 fields are month and year, in that order.
+
 			$field[2] = $field[1]; # Year.
 			$field[1] = $field[0]; # Month.
 		}
-		else
+		else # style is 'standard'.
 		{
+			# This assumes the 2 fields are year and month, in that order.
+
 			$field[2] = $field[0]; # Year.
-			$field[1] = $field[1]; # Month.
 		}
 
 		$field[0]                       = 1; # Fabricate day.
 		$$flags{"${which}_default_day"} = 1;
+	}
+	else
+	{
+		my($temp);
+
+		if ($style eq 'american')
+		{
+			# This assumes the 3 fields are month, day and year, in that order.
+
+			$temp     = $field[0]; # Month.
+			$field[0] = $field[1]; # Day.
+			$field[1] = $temp;     # Month.
+		}
+		elsif ($style eq 'standard')
+		{
+			# This assumes the 2 fields are year, month and day, in that order.
+
+			my($temp) = $field[0]; # Year.
+			$field[0] = $field[2]; # Day.
+			$field[2] = $temp;     # Year.
+		}
 	}
 
 	# Phase 3: Check that the day and year are numeric.
@@ -1259,6 +1286,8 @@ My policy is to use the lightweight L<Hash::FieldHash> for stand-alone modules a
 =head1 TODO
 
 =over 4
+
+=item o Handle BC and BCE
 
 =item o Comparisons between dates
 

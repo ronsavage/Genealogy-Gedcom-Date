@@ -12,7 +12,7 @@ my($locale) = 'en_AU';
 
 DateTime -> DefaultLocale($locale);
 
-my($parser) = Genealogy::Gedcom::Date -> new(debug => 0);
+my($parser) = Genealogy::Gedcom::Date -> new(debug => 1);
 
 isa_ok($parser, 'Genealogy::Gedcom::Date');
 
@@ -31,41 +31,53 @@ en_AU =>
 		'Abt 1 Jan 2001' =>
 		{
 		one           => DateTime -> new(year => 2001, month => 1, day => 1),
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 2001, month => 1, day => 1),
+		one_default_day   => 0,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => 'abt',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'Abt 4000 BC' =>
 		{
 		one           => DateTime -> new(year => 4000, month => 1, day => 1),
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 1,
 		one_date      => DateTime -> new(year => 4000, month => 1, day => 1),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => '',
 		prefix        => 'abt',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'Cal 2345 BC' =>
 		{
 		one           => DateTime -> new(year => 2345, month => 1, day => 1),
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 1,
 		one_date      => DateTime -> new(year => 2345, month => 1, day => 1),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => '',
 		prefix        => 'cal',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'Cal 31 Dec 2000' =>
 		{
@@ -73,38 +85,50 @@ en_AU =>
 		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 2000, month => 12, day => 31),
+		one_default_day   => 0,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => 'cal',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'Est 1 Jan 2001' =>
 		{
 		one           => DateTime -> new(year => 2001, month => 1, day => 1),
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 2001, month =>  1, day => 1),
+		one_default_day   => 0,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => 'est',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'Est 1234BC' =>
 		{
 		one           => DateTime -> new(year => 1234, month => 1, day => 1),
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 1,
 		one_date      => DateTime -> new(year => 1234, month => 1, day => 1),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => '',
 		prefix        => 'est',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 }
 );
@@ -118,8 +142,10 @@ for my $candidate (sort keys %{$approximate{$locale} })
 
 		if ($parser -> debug)
 		{
-				diag "In:  $in_string.";
-				diag "Out: $out_string";
+				for my $key (sort keys %$date)
+				{
+						diag "$key: In: $approximate{$locale}{$candidate}{$key}. Out: $$date{$key}." if ($approximate{$locale}{$candidate}{$key} ne $$date{$key});
+				}
 		}
 
 		ok($in_string eq $out_string, "Testing: $candidate");
@@ -134,54 +160,70 @@ en_AU =>
 		'From 0' =>
 		{
 		one           => '0000-01-01T00:00:00',
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 1000),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => '',
 		prefix        => 'from',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'From 0 BC' =>
 		{
 		one           => '0000-01-01T00:00:00',
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 1,
 		one_date      => DateTime -> new(year => 1000),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => '',
 		prefix        => 'from',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'From 0 to 99' =>
 		{
 		one           => '0000-01-01T00:00:00',
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 1000),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => '',
 		prefix        => 'from',
 		two           => '0099-01-01T00:00:00',
-		two_ambiguous => 1,
+		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime -> new(year => 1099),
+		two_default_day   => 1,
+		two_default_month => 1,
 		},
 		'From 1 Jan 2001 to 25 Dec 2002' =>
 		{
 		one           => DateTime -> new(year => 2001, month => 1, day => 1),
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 2001, month =>  1, day => 1),
+		one_default_day   => 0,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => 'from',
 		two           => DateTime -> new(year => 2002, month => 12, day => 25),
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime -> new(year => 2002, month => 12, day => 25),
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'From 25 Dec 2002 to 1 Jan 2001' => # A retrograde example.
 		{
@@ -189,25 +231,33 @@ en_AU =>
 		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 2002, month => 12, day => 25),
+		one_default_day   => 0,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => 'from',
 		two           => DateTime -> new(year => 2001, month =>  1, day => 1),
-		two_ambiguous => 1,
+		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime -> new(year => 2001, month => 1, day => 1),
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'From 2011' =>
 		{
 		one           => DateTime -> new(year => 2011),
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 2011),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => '',
 		prefix        => 'from',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'From 21 Jun 6004BC.' =>
 		{
@@ -215,77 +265,101 @@ en_AU =>
 		one_ambiguous => 0,
 		one_bc        => 1,
 		one_date      => DateTime -> new(year => 6004, month => 6, day => 21),
+		one_default_day   => 0,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => 'from',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'From 500B.C.' =>
 		{
 		one           => '0500-01-01T00:00:00',
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 1,
 		one_date      => DateTime -> new(year => 1500),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => '',
 		prefix        => 'from',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'From 500BC' =>
 		{
 		one           => '0500-01-01T00:00:00',
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 1,
 		one_date      => DateTime -> new(year => 1500),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => '',
 		prefix        => 'from',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
-		},
-		'From 500BC.' =>
-		{
-		one           => '0500-01-01T00:00:00',
-		one_ambiguous => 1,
-		one_bc        => 1,
-		one_date      => DateTime -> new(year => 1500),
-		phrase        => '',
-		prefix        => 'from',
-		two           => DateTime::Infinite::Future -> new,
-		two_ambiguous => 0,
-		two_bc        => 0,
-		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'From 500BC to 400' =>
 		{
 		one           => '0500-01-01T00:00:00',
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 1,
 		one_date      => DateTime -> new(year => 1500),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => '',
 		prefix        => 'from',
 		two           => '0400-01-01T00:00:00',
-		two_ambiguous => 1,
+		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime -> new(year => 1400),
+		two_default_day   => 1,
+		two_default_month => 1,
 		},
 		'From 500BC to 400BC' =>
 		{
 		one           => '0500-01-01T00:00:00',
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 1,
 		one_date      => DateTime -> new(year => 1500),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => '',
 		prefix        => 'from',
 		two           => '0400-01-01T00:00:00',
-		two_ambiguous => 1,
+		two_ambiguous => 0,
 		two_bc        => 1,
 		two_date      => DateTime -> new(year => 1400),
+		two_default_day   => 1,
+		two_default_month => 1,
+		},
+		'From 500BC.' =>
+		{
+		one           => '0500-01-01T00:00:00',
+		one_ambiguous => 0,
+		one_bc        => 1,
+		one_date      => DateTime -> new(year => 1500),
+		one_default_day   => 1,
+		one_default_month => 1,
+		phrase        => '',
+		prefix        => 'from',
+		two           => DateTime::Infinite::Future -> new,
+		two_ambiguous => 0,
+		two_bc        => 0,
+		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'From Nov 2011 to Dec 2011' =>
 		{
@@ -293,12 +367,16 @@ en_AU =>
 		one_ambiguous => 1,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 2011, month => 11, day => 1),
+		one_default_day   => 1,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => 'from',
 		two           => DateTime -> new(year => 2011, month => 12, day => 1),
 		two_ambiguous => 1,
 		two_bc        => 0,
 		two_date      => DateTime -> new(year => 2011, month => 12, day => 1),
+		two_default_day   => 1,
+		two_default_month => 0,
 		},
 		'To 2011' =>
 		{
@@ -306,12 +384,16 @@ en_AU =>
 		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime::Infinite::Past -> new,
+		one_default_day   => 0,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => 'to',
 		two           => DateTime -> new(year => 2011),
-		two_ambiguous => 1,
+		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime -> new(year => 2011),
+		two_default_day   => 1,
+		two_default_month => 1,
 		},
 		'To 500 BC' =>
 		{
@@ -319,12 +401,16 @@ en_AU =>
 		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime::Infinite::Past -> new,
+		one_default_day   => 0,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => 'to',
 		two           => '0500-01-01T00:00:00',
-		two_ambiguous => 1,
+		two_ambiguous => 0,
 		two_bc        => 1,
 		two_date      => DateTime -> new(year => 1500),
+		two_default_day   => 1,
+		two_default_month => 1,
 		},
 }
 );
@@ -337,8 +423,10 @@ for my $candidate (sort keys %{$period{$locale} })
 
 		if ($parser -> debug)
 		{
-				diag "In:  $in_string.";
-				diag "Out: $out_string";
+				for my $key (sort keys %$date)
+				{
+						diag "$key: In: $period{$locale}{$candidate}{$key}. Out: $$date{$key}." if ($period{$locale}{$candidate}{$key} ne $$date{$key});
+				}
 		}
 
 		ok($in_string eq $out_string, "Testing: $candidate");
@@ -353,41 +441,53 @@ en_AU =>
 		'Aft 1 Jan 2001' =>
 		{
 		one           => DateTime -> new(year => 2001, month => 1, day => 1),
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 2001, month => 1, day => 1),
+		one_default_day   => 0,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => 'aft',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'Aft 4000 BC' =>
 		{
 		one           => DateTime -> new(year => 4000, month => 1, day => 1),
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 1,
 		one_date      => DateTime -> new(year => 4000, month => 1, day => 1),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => '',
 		prefix        => 'aft',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'Bef 2345 BC' =>
 		{
 		one           => DateTime -> new(year => 2345, month => 1, day => 1),
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 1,
 		one_date      => DateTime -> new(year => 2345, month => 1, day => 1),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => '',
 		prefix        => 'bef',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'Bef 31 Dec 2000' =>
 		{
@@ -395,38 +495,50 @@ en_AU =>
 		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 2000, month => 12, day => 31),
+		one_default_day   => 0,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => 'bef',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'Bet 1 Jan 2001 and 25 Dec 2002' =>
 		{
 		one           => DateTime -> new(year => 2001, month => 1, day => 1),
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 2001, month =>  1, day => 1),
+		one_default_day   => 0,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => 'bet',
 		two           => DateTime -> new(year => 2002, month => 12, day => 25),
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime -> new(year => 2002, month => 12, day => 25),
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'Bet 1234BC and 5678' =>
 		{
 		one           => DateTime -> new(year => 1234, month => 1, day => 1),
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 1,
 		one_date      => DateTime -> new(year => 1234, month => 1, day => 1),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => '',
 		prefix        => 'bet',
 		two           => DateTime -> new(year => 5678, month => 1, day => 1),
-		two_ambiguous => 1,
+		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime -> new(year => 5678, month => 1, day => 1),
+		two_default_day   => 1,
+		two_default_month => 1,
 		},
 		'Bet Nov 2011 and Dec 2011' =>
 		{
@@ -434,12 +546,16 @@ en_AU =>
 		one_ambiguous => 1,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 2011, month => 11, day => 1),
+		one_default_day   => 1,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => 'bet',
 		two           => DateTime -> new(year => 2011, month => 12, day => 1),
 		two_ambiguous => 1,
 		two_bc        => 0,
 		two_date      => DateTime -> new(year => 2011, month => 12, day => 1),
+		two_default_day   => 1,
+		two_default_month => 0,
 		},
 }
 );
@@ -453,8 +569,10 @@ for my $candidate (sort keys %{$range{$locale} })
 
 		if ($parser -> debug)
 		{
-				diag "In:  $in_string.";
-				diag "Out: $out_string";
+				for my $key (sort keys %$date)
+				{
+						diag "$key: In: $range{$locale}{$candidate}{$key}. Out: $$date{$key}." if ($range{$locale}{$candidate}{$key} ne $$date{$key});
+				}
 		}
 
 		ok($in_string eq $out_string, "Testing: $candidate");
@@ -472,12 +590,16 @@ en_AU =>
 		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 1950, month => 6, day => 21),
+		one_default_day   => 0,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => '',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 }
 );
@@ -491,8 +613,10 @@ for my $candidate (sort keys %{$datetime{$locale} })
 
 		if ($parser -> debug)
 		{
-				diag "In:  $in_string.";
-				diag "Out: $out_string";
+				for my $key (sort keys %$date)
+				{
+						diag "$key: In: $datetime{$locale}{$candidate}{$key}. Out: $$date{$key}." if ($datetime{$locale}{$candidate}{$key} ne $$date{$key});
+				}
 		}
 
 		ok($in_string eq $out_string, "Testing: $candidate");
@@ -510,38 +634,50 @@ en_AU =>
 		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime::Infinite::Past -> new,
+		one_default_day   => 0,
+		one_default_month => 0,
 		phrase        => 'unknown date',
 		prefix        => '',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'Int 1 Jan 2001' =>
 		{
 		one           => DateTime -> new(year => 2001, month => 1, day => 1),
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 0,
 		one_date      => DateTime -> new(year => 2001, month => 1, day => 1),
+		one_default_day   => 0,
+		one_default_month => 0,
 		phrase        => '',
 		prefix        => 'int',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 		'int 4000 BC (more or less)' =>
 		{
 		one           => DateTime -> new(year => 4000, month => 1, day => 1),
-		one_ambiguous => 1,
+		one_ambiguous => 0,
 		one_bc        => 1,
 		one_date      => DateTime -> new(year => 4000, month => 1, day => 1),
+		one_default_day   => 1,
+		one_default_month => 1,
 		phrase        => 'more or less',
 		prefix        => 'int',
 		two           => DateTime::Infinite::Future -> new,
 		two_ambiguous => 0,
 		two_bc        => 0,
 		two_date      => DateTime::Infinite::Future -> new,
+		two_default_day   => 0,
+		two_default_month => 0,
 		},
 }
 );
@@ -555,8 +691,10 @@ for my $candidate (sort keys %{$interpreted{$locale} })
 
 		if ($parser -> debug)
 		{
-				diag "In:  $in_string.";
-				diag "Out: $out_string";
+				for my $key (sort keys %$date)
+				{
+						diag "$key: In: $interpreted{$locale}{$candidate}{$key}. Out: $$date{$key}." if ($interpreted{$locale}{$candidate}{$key} ne $$date{$key});
+				}
 		}
 
 		ok($in_string eq $out_string, "Testing: $candidate");

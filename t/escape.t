@@ -74,8 +74,10 @@ for my $candidate (sort keys %{$approximate{$locale} })
 
 		if ($parser -> debug)
 		{
-				diag "In:  $in_string.";
-				diag "Out: $out_string";
+				for my $key (sort keys %$date)
+				{
+						diag "$key: In: $approximate{$locale}{$candidate}{$key}. Out: $$date{$key}." if ($approximate{$locale}{$candidate}{$key} ne $$date{$key});
+				}
 		}
 
 		ok($in_string eq $out_string, "Testing: $candidate");
