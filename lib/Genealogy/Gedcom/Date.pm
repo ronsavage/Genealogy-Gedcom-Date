@@ -86,6 +86,7 @@ sub parse_approximate_date
 	my($date)       = lc ($arg{date} || $self -> date);
 	$date           =~ s/^\s+//;
 	$date           =~ s/\s+$//;
+	$date           =~ tr/,//d;
 	my($prefix)     = $arg{prefix} || ['abt', 'cal', 'est'];
 	my($style)      = lc ($arg{style} || $self -> style);
 
@@ -128,6 +129,7 @@ sub parse_date_period
 	my($date)       = lc ($arg{date} || $self -> date);
 	$date           =~ s/^\s+//;
 	$date           =~ s/\s+$//;
+	$date           =~ tr/,//d;
 	my($from_to)    = $arg{from_to} || ['from', 'to'];
 	my($style)      = lc ($arg{style} || $self -> style);
 
@@ -176,6 +178,7 @@ sub parse_date_range
 	my($date)       = lc ($arg{date} || $self -> date);
 	$date           =~ s/^\s+//;
 	$date           =~ s/\s+$//;
+	$date           =~ tr/,//d;
 	my($from_to)    = $arg{from_to} || [ ['Aft', 'Bef', 'Bet'], 'And'];
 	my($style)      = lc ($arg{style} || $self -> style);
 
@@ -269,6 +272,7 @@ sub parse_datetime
 	$date  = lc ($date || $self -> date);
 	$date  =~ s/^\s+//;
 	$date  =~ s/\s+$//;
+	$date  =~ tr/,//d;
 	$style = lc $style;
 
 	die "No date provided\n" if (length($date) == 0);
@@ -292,6 +296,7 @@ sub parse_interpreted_date
 	my($date)       = lc ($arg{date} || $self -> date);
 	$date           =~ s/^\s+//;
 	$date           =~ s/\s+$//;
+	$date           =~ tr/,//d;
 	my($prefix)     = lc ($arg{prefix} || 'int');
 	my($style)      = lc ($arg{style} || $self -> style);
 
@@ -413,7 +418,7 @@ sub _parse_1or2_dates
 	{
 		# Note: The field might contain just BC or something like 500BC.
 
-		if ($field[$i] =~ /^(\d*)b\.?c\.?$/)
+		if ($field[$i] =~ /^(\d*)b\.?c\.?(e\.?)?$/)
 		{
 			# Remove BC. Allow for year 0 with defined().
 
@@ -809,6 +814,14 @@ Note: These arrayref elements are I<not> the same as used by L<parse_date_period
 
 These strings are always converted to lower case before being processed.
 
+=item o style => /^american|english|standard$/
+
+This key is explained in the L</FAQ>.
+
+The string in parse_approximate_date(style => $a_string) takes precedence over the one in new(style => $a_string).
+
+Default: 'english'.
+
 =back
 
 The return value is a hashref as described in the L</FAQ>'s first QA.
@@ -870,6 +883,14 @@ Note: These arrayref elements are I<not> the same as used by L<parse_approximate
 
 These strings are always converted to lower case before being processed.
 
+=item o style => /^american|english|standard$/
+
+This key is explained in the L</FAQ>.
+
+The string in parse_date_period(style => $a_string) takes precedence over the one in new(style => $a_string).
+
+Default: 'english'.
+
 =back
 
 The return value is a hashref as described in the L</FAQ>'s first Q and A.
@@ -928,6 +949,14 @@ Note: These arrayref elements are I<not> the same as used by L<parse_approximate
 
 These strings are always converted to lower case before being processed.
 
+=item o style => /^american|english|standard$/
+
+This key is explained in the L</FAQ>.
+
+The string in parse_date_range(style => $a_string) takes precedence over the one in new(style => $a_string).
+
+Default: 'english'.
+
 =back
 
 The return value is a hashref as described in the L</FAQ>'s first Q and A.
@@ -972,9 +1001,15 @@ The string in parse_datetime($a_string) takes precedence over the one in new(dat
 
 The date is expected to be an exact date as per p. 45 of L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
 
-The string is mandatory.
+The date string is mandatory.
 
-Throw an exception if the string cannot be parsed.
+Throw an exception if the date string cannot be parsed.
+
+Further, the 'style' key can be passed in as parse_datetime(date => $a_string, style => 'standard').
+
+The string in parse_datetime(style => $a_string) takes precedence over the one in new(style => $a_string).
+
+Default: 'english'.
 
 =head2 parse_interpreted_date([%arg])
 
@@ -1013,6 +1048,14 @@ This parameter is optional. If supplied, it must be a string meaning 'Int'.
 This string is always converted to lower case before being processed.
 
 Default: 'Int'.
+
+=item o style => /^american|english|standard$/
+
+This key is explained in the L</FAQ>.
+
+The string in parse_interpreted_date(style => $a_string) takes precedence over the one in new(style => $a_string).
+
+Default: 'english'.
 
 =back
 
@@ -1092,7 +1135,8 @@ Default: 0.
 
 =item o one_bc => $Boolean
 
-Returns 1 if the first date is followed by one of (case-insensitive): 'B.C.', 'BC.' or 'BC'.
+Returns 1 if the first date is followed by one of (case-insensitive): 'B.C.', 'BC.' or 'BC'. 'BC' may be written as 'BCE',
+with or without full-stops.
 
 In the input, this suffix can be separated from the year by spaces, so both '500BC' and '500 B.C.' are accepted.
 
@@ -1195,7 +1239,8 @@ Default: 0.
 
 =item o two_bc => $Boolean
 
-Returns 1 if the second date is followed by one of (case-insensitive): 'B.C.', 'BC.' or 'BC'.
+Returns 1 if the second date is followed by one of (case-insensitive): 'B.C.', 'BC.' or 'BC'. 'BC' may be written as 'BCE',
+with or without full-stops.
 
 In the input, this suffix can be separated from the year by spaces, so both '500BC' and '500 B.C.' are accepted.
 
@@ -1229,6 +1274,30 @@ Default: 0.
 
 =back
 
+=head2 What is the meaning of the 'style' key in calls to the new() and parse_*() methods?
+
+Possible values:
+
+=over 4
+
+=item o style => 'american'
+
+Expect dates in 'month day year' format, as in From Jan 2 2011 BC to Mar 4 2011.
+
+=item o style => 'english'
+
+Expect dates in 'day month year' format, as in From 1 Jan 2001 to 25 Dec 2002.
+
+This is the default.
+
+=item o style => 'standard'
+
+Expect dates in 'year month day' format, as in 2011-01-02 to 2011-03-04.
+
+=back
+
+The string in parse_*(style => $a_string) takes precedence over the one in new(style => $a_string).
+
 =head2 How do I format dates for output?
 
 Use the hashref keys 'one' and 'two', to get dates in the form 2011-06-21. Re-format as necessary.
@@ -1241,9 +1310,13 @@ No, not yet. See L</process_date_escape(@field)> for more details.
 
 =head2 How are the various date formats handled?
 
-Incoming dates are split on ' ', '-' and '/', and the resultant fields are parsed one at a time.
+Firstly, all commas are deleted from incoming dates.
 
-=head2 How are incomplete date handled?
+Then, dates are split on ' ', '-' and '/', and the resultant fields are analyzed one at a time.
+
+The 'style' key can be used to force the code to assume a certain type of date format. This option is explained above, in this FAQ.
+
+=head2 How are incomplete dates handled?
 
 A missing month is set to 1 and a missing day is set to 1.
 
@@ -1286,8 +1359,6 @@ My policy is to use the lightweight L<Hash::FieldHash> for stand-alone modules a
 =head1 TODO
 
 =over 4
-
-=item o Handle BC and BCE
 
 =item o Comparisons between dates
 

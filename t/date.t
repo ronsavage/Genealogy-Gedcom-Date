@@ -327,7 +327,7 @@ en_AU =>
 		two_default_day   => 1,
 		two_default_month => 1,
 		},
-		'From 500BC to 400BC' =>
+		'From 500BC to 400BCE' =>
 		{
 		one           => '0500-01-01T00:00:00',
 		one_ambiguous => 0,
