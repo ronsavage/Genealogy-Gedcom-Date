@@ -19,7 +19,7 @@ Module::Build -> new
  {
 	 DateTime           => 0.70,
 	 DateTime::Infinite => 0.70,
-	 Hash::FieldHash    => 0.10,
+	 Hash::FieldHash    => 0.12,
 	 Try::Tiny          => 0.11,
  },
 ) -> create_build_script();

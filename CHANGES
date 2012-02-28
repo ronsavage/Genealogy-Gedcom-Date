@@ -1,5 +1,10 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+1.01  Wed Feb 29 09:35:00 2012
+	  - No code changes.
+	  - Update pre-req Hash::FieldHash from V 0.10 to V 0.12, in presumably hopeless attempt to rectify a CPAN Tester report about failure under MS Windows.
+	  	See: http://www.cpantesters.org/cpan/report/9c177958-6ca0-1014-a634-88fc0063837e. The code tests perfectly on my Debian stable system.
+
 1.00  Thu Sep 20 13:47:00 2011
 	  - Initial release. This is an updated version of DateTime::Format::Gedcom V 1.00.
 	  	This latter module is deprecated. Details in the FAQ.

@@ -29,7 +29,7 @@
          "requires" : {
             "DateTime" : "0.7",
             "DateTime::Infinite" : "0.7",
-            "Hash::FieldHash" : "0.1",
+            "Hash::FieldHash" : "0.12",
             "Try::Tiny" : "0.11"
          }
       }

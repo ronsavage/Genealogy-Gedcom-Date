@@ -15,7 +15,7 @@ fieldhash my %debug        => 'debug';
 fieldhash my %method_index => 'method_index';
 fieldhash my %style        => 'style';
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 # --------------------------------------------------
 
