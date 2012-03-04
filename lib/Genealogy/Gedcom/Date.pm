@@ -655,7 +655,7 @@ sub process_date_escape
 
 =head1 NAME
 
-L<Genealogy::Gedcom::Date> - Parse GEDCOM dates
+Genealogy::Gedcom::Date - Parse GEDCOM dates
 
 =head1 Synopsis
 
