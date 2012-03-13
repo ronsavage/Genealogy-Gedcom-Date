@@ -1114,6 +1114,8 @@ A missing month defaults to 01. A missing day defaults to 01.
 
 Default: DateTime::Infinite::Past -> new, which stringifies to '-inf'.
 
+Note: On some systems, DateTime::Infinite::Past -> new stringifies to '-1.#INF', but, as of V 1.02, the code changes this to '-inf'.
+
 The default value does I<not> set the one_ambiguous and one_bc flags.
 
 =item o one_ambiguous => $Boolean
@@ -1159,6 +1161,8 @@ This means that if the value of the 'one' key does not match the stringified val
 Alternately, if the stringified value of the 'one_date' key is '-inf', the period supplied did not have a 'From' date.
 
 Default: DateTime::Infinite::Past -> new, which stringifies to '-inf'.
+
+Note: On some systems, DateTime::Infinite::Past -> new stringifies to '-1.#INF', but, as of V 1.02, the code changes this to '-inf'.
 
 =item o one_default_day => $Boolean
 

@@ -5,6 +5,7 @@ Revision history for Perl extension Genealogy::Gedcom::Date.
 	- Fix sub _init_flags() for systems where DateTime::Infinite::Past is returned as '-1.#INF' instead of '-inf'.
 		For testing, this only affects the 2 tests in t/escape.t where we expect '-inf' as the output for one_date.
 		For end users of course, the change in sub _init_flags() is what matters.
+	- Update the docs to explain that '-inf' is returned even when the system returns '-1.#INF'.
 
 1.01  Wed Feb 29 09:35:00 2012
 	  - No code changes.
