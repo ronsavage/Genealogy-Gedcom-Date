@@ -17,8 +17,8 @@ Module::Build -> new
  },
  requires =>
  {
-	 DateTime           => 0.70,
-	 DateTime::Infinite => 0.70,
+	 DateTime           => 0.72,
+	 DateTime::Infinite => 0.72,
 	 Hash::FieldHash    => 0.12,
 	 Try::Tiny          => 0.11,
  },

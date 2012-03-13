@@ -24,8 +24,8 @@ WriteMakefile
  PL_FILES  => {},
  PREREQ_PM =>
  {
-	 DateTime           => 0.70,
-	 DateTime::Infinite => 0.70,
+	 DateTime           => 0.72,
+	 DateTime::Infinite => 0.72,
 	 Hash::FieldHash    => 0.12,
 	 Test::More         => 0.94,
 	 Test::Pod          => 1.44,

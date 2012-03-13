@@ -1,5 +1,11 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+1.02  Tue Mar 13 08:57:00 2012
+	- Bump pre-reqs for DateTime and DateTime::Inifinite from V 0.70 to V 0.72, since these are the latest (today).
+	- Fix sub _init_flags() for systems where DateTime::Infinite::Past is returned as '-1.#INF' instead of '-inf'.
+		For testing, this only affects the 2 tests in t/escape.t where we expect '-inf' as the output for one_date.
+		For end users of course, the change in sub _init_flags() is what matters.
+
 1.01  Wed Feb 29 09:35:00 2012
 	  - No code changes.
 	  - Update pre-req Hash::FieldHash from V 0.10 to V 0.12, in presumably hopeless attempt to rectify a CPAN Tester report about failure under MS Windows.
