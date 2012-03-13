@@ -27,8 +27,8 @@
       },
       "runtime" : {
          "requires" : {
-            "DateTime" : "0.7",
-            "DateTime::Infinite" : "0.7",
+            "DateTime" : "0.72",
+            "DateTime::Infinite" : "0.72",
             "Hash::FieldHash" : "0.12",
             "Try::Tiny" : "0.11"
          }
