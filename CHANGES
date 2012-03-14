@@ -1,5 +1,11 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+1.03  Wed Mar 14 17:16:00 2012
+	- Add complexity to the fix for problems to Data::Infinite::(Past, Future) for OSes:
+		o Win32::GetOSName = Win7
+		o Win32::GetOSName = WinXP/.Net
+		o osname=solaris, osvers=2.11
+
 1.02  Tue Mar 13 08:57:00 2012
 	- Bump pre-reqs for DateTime and DateTime::Inifinite from V 0.70 to V 0.72, since these are the latest (today).
 	- Fix sub _init_flags() for systems where DateTime::Infinite::Past is returned as '-1.#INF' instead of '-inf'.

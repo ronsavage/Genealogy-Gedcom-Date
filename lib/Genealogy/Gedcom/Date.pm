@@ -15,7 +15,7 @@ fieldhash my %debug        => 'debug';
 fieldhash my %method_index => 'method_index';
 fieldhash my %style        => 'style';
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 # --------------------------------------------------
 
@@ -53,8 +53,14 @@ sub _init_flags
 	}
 
 	# Fix systems where DateTime::Infinite::Past is returned as '-1.#INF' instead of '-inf'.
+	# Likewise a fix for DateTime::Infinite::Future allegedly being '1.#INF' instead of 'inf'.
+	# This applies to OSes reported by CPAN Testers as:
+	# o Win32::GetOSName = Win7
+	# o Win32::GetOSName = WinXP/.Net
+	# o osname=solaris, osvers=2.11
 
-	$flags{one} = '-inf' if ($flags{one} eq '-1.#INF$');
+	$flags{one} = $flags{one_date} = '-inf' if ($flags{one} eq '-1.#INF');
+	$flags{two} = $flags{two_date} = 'inf'  if ($flags{two} eq '1.#INF');
 
 	return {%flags};
 
@@ -1222,6 +1228,8 @@ A missing month defaults to 01. A missing day defaults to 01.
 
 Default: DateTime::Infinite::Future -> new, which stringifies to 'inf'.
 
+Note: On some systems, DateTime::Infinite::Future -> new stringifies to '1.#INF', but, as of V 1.03, the code changes this to 'inf'.
+
 The default value does I<not> set the two_ambiguous and two_bc flags.
 
 =item o two_ambiguous => $Boolean
@@ -1268,6 +1276,8 @@ Alternately, if the stringified value of the 'two_date' key is 'inf', the period
 
 Default: DateTime::Infinite::Future -> new, which stringifies to 'inf'.
 
+Note: On some systems, DateTime::Infinite::Future -> new stringifies to '1.#INF', but, as of V 1.03, the code changes this to 'inf'.
+
 =item o two_default_day => $Boolean
 
 Returns 1 if the input date had no value for the second date's day. The code sets the default day to 1.
@@ -1279,6 +1289,20 @@ Default: 0.
 Returns 1 if the input date had no value for the second date's month. The code sets the default month to 1.
 
 Default: 0.
+
+=back
+
+=head2 On what systems do DateTime::Inifinite::(Past, Future) return '-1.#INF' and '1.#INF'?
+
+So far (as reported by CPAN Testers):
+
+=over 4
+
+=item o Win32::GetOSName = Win7
+
+=item o Win32::GetOSName = WinXP/.Net
+
+=item o osname=solaris, osvers=2.11
 
 =back
 
