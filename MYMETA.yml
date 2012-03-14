@@ -17,7 +17,7 @@ name: Genealogy-Gedcom-Date
 provides:
   Genealogy::Gedcom::Date:
     file: lib/Genealogy/Gedcom/Date.pm
-    version: 1.02
+    version: 1.03
 requires:
   DateTime: 0.72
   DateTime::Infinite: 0.72
@@ -25,4 +25,4 @@ requires:
   Try::Tiny: 0.11
 resources:
   license: http://opensource.org/licenses/artistic-license.php
-version: 1.02
+version: 1.03
