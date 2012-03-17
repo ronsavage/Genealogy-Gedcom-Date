@@ -1,5 +1,8 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+1.05  Sat Mar 17 17:29:00 2012
+	- CPAN testing showed more cases where the patches in V 1.02 had to be applied.
+
 1.04  Fri Mae 16 14:37:00 2012
 	- Aggghhhh. Fix tests to match fix in V 1.03. Tests worked under Debian of course.
 

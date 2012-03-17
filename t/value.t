@@ -12,6 +12,10 @@ my($locale) = 'en_AU';
 
 DateTime -> DefaultLocale($locale);
 
+my($past)   = DateTime::Infinite::Past -> new;
+$past       = '-inf' if ($past eq '-1.#INF');
+my($future) = DateTime::Infinite::Future -> new;
+$future     = 'inf' if ($future eq '1.#INF');
 my($parser) = Genealogy::Gedcom::Date -> new(debug => 1);
 
 isa_ok($parser, 'Genealogy::Gedcom::Date');
@@ -30,18 +34,18 @@ en_AU =>
 {
 		'(Unknown date)' => # Use parse_interpreted_date().
 		{
-		one               => DateTime::Infinite::Past -> new,
+		one               => $past,
 		one_ambiguous     => 0,
 		one_bc            => 0,
-		one_date          => DateTime::Infinite::Past -> new,
+		one_date          => $past,
 		one_default_day   => 0,
 		one_default_month => 0,
 		phrase            => 'unknown date',
 		prefix            => '',
-		two               => DateTime::Infinite::Future -> new,
+		two               => $future,
 		two_ambiguous     => 0,
 		two_bc            => 0,
-		two_date          => DateTime::Infinite::Future -> new,
+		two_date          => $future,
 		two_default_day   => 0,
 		two_default_month => 0,
 		},
@@ -55,10 +59,10 @@ en_AU =>
 		one_default_month => 0,
 		phrase            => '',
 		prefix            => 'abt',
-		two               => DateTime::Infinite::Future -> new,
+		two               => $future,
 		two_ambiguous     => 0,
 		two_bc            => 0,
-		two_date          => DateTime::Infinite::Future -> new,
+		two_date          => $future,
 		two_default_day   => 0,
 		two_default_month => 0,
 		},
@@ -72,10 +76,10 @@ en_AU =>
 		one_default_month => 0,
 		phrase            => '',
 		prefix            => 'aft',
-		two               => DateTime::Infinite::Future -> new,
+		two               => $future,
 		two_ambiguous     => 0,
 		two_bc            => 0,
-		two_date          => DateTime::Infinite::Future -> new,
+		two_date          => $future,
 		two_default_day   => 0,
 		two_default_month => 0,
 		},
@@ -89,10 +93,10 @@ en_AU =>
 		one_default_month => 1,
 		phrase            => '',
 		prefix            => 'from',
-		two               => DateTime::Infinite::Future -> new,
+		two               => $future,
 		two_ambiguous     => 0,
 		two_bc            => 0,
-		two_date          => DateTime::Infinite::Future -> new,
+		two_date          => $future,
 		two_default_day   => 0,
 		two_default_month => 0,
 		},
