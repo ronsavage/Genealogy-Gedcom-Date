@@ -1,5 +1,14 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+1.06  Thu Mar 22 09:18:00 2012
+	- No code changes. No need to upgrade.
+	- The only patch is that debug is enabled in all test scripts. The point is to report as much information
+		as possible when CPAN Testers using Solaris run tests. Unfortunately, no CPAN Tester in this situation
+		has responded to my direct emails, so I'm using this mechanism to get the info I need. This is all part
+		of the mess MS Windows and Solaris make when failing to handle Data::Infinite::(Past, Future).
+		The next version will of course just have debug turned off again, along with a Solaris fix.
+		After that, I never want to hear about this problem again.
+
 1.05  Sat Mar 17 17:29:00 2012
 	- CPAN testing showed more cases where the patches in V 1.02 had to be applied.
 

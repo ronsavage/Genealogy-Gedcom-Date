@@ -16,7 +16,7 @@ my($past)   = DateTime::Infinite::Past -> new;
 $past       = '-inf' if ($past eq '-1.#INF');
 my($future) = DateTime::Infinite::Future -> new;
 $future     = 'inf' if ($future eq '1.#INF');
-my($parser) = Genealogy::Gedcom::Date -> new(debug => 0);
+my($parser) = Genealogy::Gedcom::Date -> new(debug => 1);
 
 isa_ok($parser, 'Genealogy::Gedcom::Date');
 
