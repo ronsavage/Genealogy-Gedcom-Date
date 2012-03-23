@@ -15,7 +15,7 @@ fieldhash my %debug        => 'debug';
 fieldhash my %method_index => 'method_index';
 fieldhash my %style        => 'style';
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 # --------------------------------------------------
 
@@ -52,15 +52,15 @@ sub _init_flags
 		$flags{prefix}                 = '';
 	}
 
-	# Fix systems where DateTime::Infinite::Past is returned as '-1.#INF' instead of '-inf'.
-	# Likewise a fix for DateTime::Infinite::Future allegedly being '1.#INF' instead of 'inf'.
+	# Fix systems where DateTime::Infinite::Past is returned as '-1.#INF' etc instead of '-inf'.
+	# Likewise a fix for DateTime::Infinite::Future allegedly being '1.#INF' etc instead of 'inf'.
 	# This applies to OSes reported by CPAN Testers as:
-	# o Win32::GetOSName = Win7
-	# o Win32::GetOSName = WinXP/.Net
-	# o osname=solaris, osvers=2.11
+	# o Win32::GetOSName = Win7.       $date =~ /-?1\.#INF/.
+	# o Win32::GetOSName = WinXP/.Net. $date =~ /-?1\.#INF/.
+	# o osname=solaris, osvers=2.11.   $date =~ /-?Infinity/.
 
-	$flags{one} = $flags{one_date} = '-inf' if ($flags{one} eq '-1.#INF');
-	$flags{two} = $flags{two_date} = 'inf'  if ($flags{two} eq '1.#INF');
+	$flags{one} = $flags{one_date} = '-inf' if ( ($flags{one} eq '-1.#INF') || ($flags{one} eq '-Infinity') );
+	$flags{two} = $flags{two_date} = 'inf'  if ( ($flags{two} eq '1.#INF')  || ($flags{two} eq 'Infinity') );
 
 	return {%flags};
 
@@ -1120,7 +1120,8 @@ A missing month defaults to 01. A missing day defaults to 01.
 
 Default: DateTime::Infinite::Past -> new, which stringifies to '-inf'.
 
-Note: On some systems, DateTime::Infinite::Past -> new stringifies to '-1.#INF', but, as of V 1.02, the code changes this to '-inf'.
+Note: On some systems (MS Windows), DateTime::Infinite::Past -> new stringifies to '-1.#INF', but, as of V 1.02, the code changes this to '-inf'.
+Likewise, on some systems (Solaris), DateTime::Infinite::Past -> new stringifies to '-Infinity', but, as of V 1.07, the code changes this to '-inf'.
 
 The default value does I<not> set the one_ambiguous and one_bc flags.
 
@@ -1168,7 +1169,8 @@ Alternately, if the stringified value of the 'one_date' key is '-inf', the perio
 
 Default: DateTime::Infinite::Past -> new, which stringifies to '-inf'.
 
-Note: On some systems, DateTime::Infinite::Past -> new stringifies to '-1.#INF', but, as of V 1.02, the code changes this to '-inf'.
+Note: On some systems (MS Windows), DateTime::Infinite::Past -> new stringifies to '-1.#INF', but, as of V 1.02, the code changes this to '-inf'.
+Likewise, on some systems (Solaris), DateTime::Infinite::Past -> new stringifies to '-Infinity', but, as of V 1.07, the code changes this to '-inf'.
 
 =item o one_default_day => $Boolean
 
@@ -1228,7 +1230,8 @@ A missing month defaults to 01. A missing day defaults to 01.
 
 Default: DateTime::Infinite::Future -> new, which stringifies to 'inf'.
 
-Note: On some systems, DateTime::Infinite::Future -> new stringifies to '1.#INF', but, as of V 1.03, the code changes this to 'inf'.
+Note: On some systems (MS Windows), DateTime::Infinite::Future -> new stringifies to '1.#INF', but, as of V 1.03, the code changes this to 'inf'.
+Likewise, on some systems (Solaris), DateTime::Infinite::Future -> new stringifies to 'Infinity', but, as of V 1.07, the code changes this to 'inf'.
 
 The default value does I<not> set the two_ambiguous and two_bc flags.
 
@@ -1276,7 +1279,8 @@ Alternately, if the stringified value of the 'two_date' key is 'inf', the period
 
 Default: DateTime::Infinite::Future -> new, which stringifies to 'inf'.
 
-Note: On some systems, DateTime::Infinite::Future -> new stringifies to '1.#INF', but, as of V 1.03, the code changes this to 'inf'.
+Note: On some systems (MS Windows), DateTime::Infinite::Future -> new stringifies to '1.#INF', but, as of V 1.03, the code changes this to 'inf'.
+Likewise, on some systems (Solaris), DateTime::Infinite::Future -> new stringifies to 'Infinity', but, as of V 1.07, the code changes this to 'inf'.
 
 =item o two_default_day => $Boolean
 
@@ -1301,6 +1305,12 @@ So far (as reported by CPAN Testers):
 =item o Win32::GetOSName = Win7
 
 =item o Win32::GetOSName = WinXP/.Net
+
+=head2 On what systems do DateTime::Inifinite::(Past, Future) return '-Infinity' and 'Infinity'?
+
+So far (as reported by CPAN Testers):
+
+=over 4
 
 =item o osname=solaris, osvers=2.11
 
