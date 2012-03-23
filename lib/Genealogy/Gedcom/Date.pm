@@ -1306,6 +1306,8 @@ So far (as reported by CPAN Testers):
 
 =item o Win32::GetOSName = WinXP/.Net
 
+=back
+
 =head2 On what systems do DateTime::Inifinite::(Past, Future) return '-Infinity' and 'Infinity'?
 
 So far (as reported by CPAN Testers):
