@@ -21,6 +21,7 @@ WriteMakefile
  },
  DISTNAME  => 'Genealogy-Gedcom-Date',
  NAME      => 'Genealogy::Gedcom::Date',
+	LICENSE   => 'perl_5',
  PL_FILES  => {},
  PREREQ_PM =>
  {
