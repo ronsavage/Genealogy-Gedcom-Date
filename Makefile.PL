@@ -28,7 +28,7 @@ WriteMakefile
 	 DateTime           => 0.72,
 	 DateTime::Infinite => 0.72,
 	 Hash::FieldHash    => 0.12,
-	 Test::Simple       => 0.94,
+	 Test::More       => 0.94,
 	 Test::Pod          => 1.45,
 	 Try::Tiny          => 0.11,
  },
