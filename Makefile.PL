@@ -29,7 +29,7 @@ WriteMakefile
 	 DateTime::Infinite => 0.72,
 	 Hash::FieldHash    => 0.12,
 	 Test::More       => 0.94,
-	 Test::Pod          => 1.45,
+#	 Test::Pod          => 1.45, # Make it optional. See t/pod.t
 	 Try::Tiny          => 0.11,
  },
  VERSION_FROM => 'lib/Genealogy/Gedcom/Date.pm',
