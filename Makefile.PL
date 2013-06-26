@@ -9,7 +9,7 @@ WriteMakefile
 	(
 		AUTHOR   => 'Ron Savage (ron@savage.net.au)',
 		ABSTRACT => 'Parse GEDCOM dates',
-		  ) : (),
+	) : (),
 	clean =>
 	{
 		FILES => 'blib/* Makefile MANIFEST Genealogy-Gedcom-Date-*'
