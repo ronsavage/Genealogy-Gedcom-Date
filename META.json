@@ -38,7 +38,7 @@
    "provides" : {
       "Genealogy::Gedcom::Date" : {
          "file" : "lib/Genealogy/Gedcom/Date.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       }
    },
    "release_status" : "stable",
@@ -47,5 +47,5 @@
          "http://www.perlfoundation.org/artistic_license_2_0"
       ]
    },
-   "version" : "1.07"
+   "version" : "1.08"
 }

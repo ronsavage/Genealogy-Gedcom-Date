@@ -16,7 +16,7 @@ name: Genealogy-Gedcom-Date
 provides:
   Genealogy::Gedcom::Date:
     file: lib/Genealogy/Gedcom/Date.pm
-    version: 1.07
+    version: 1.08
 requires:
   DateTime: 1.03
   DateTime::Infinite: 1.03
@@ -26,4 +26,4 @@ requires:
   warnings: 0
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
-version: 1.07
+version: 1.08
