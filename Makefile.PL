@@ -1,5 +1,7 @@
 use ExtUtils::MakeMaker;
 
+# ----------------
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
@@ -25,14 +27,14 @@ WriteMakefile
 	PL_FILES  => {},
 	PREREQ_PM =>
 	{
-		DateTime           => 1.03,
-		DateTime::Infinite => 1.03,
-		Hash::FieldHash    => 0.14,
-		strict             => 0,
-		Test::More         => 0.98,
-#		Test::Pod          => 1.45, # Make it optional. See t/pod.t
-		Try::Tiny          => 0.12,
-		warnings           => 0,
+		'DateTime' => 1.03,
+		'DateTime::Infinite' => 1.03,
+		'Hash::FieldHash' => 0.14,
+		'strict' => 0,
+		'Test::More' => 1.001014,
+		'Test::Pod' => 1.48,
+		'Try::Tiny' => 0.12,
+		'warnings' => 0,
 	},
 	VERSION_FROM => 'lib/Genealogy/Gedcom/Date.pm',
 );
