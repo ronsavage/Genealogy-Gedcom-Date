@@ -1,12 +1,12 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
 1.09  Tue Apr 28 11:14:20 2015
-	- Switch from Hash::FieldHash to Moo and Types::Standard (i.e. Type::Tiny).
+	- Test under Perl V 5.21.11. See RT#103959.
 	- Deal with test failures relating to Inf under Perl V 5.21.11.
 		This involves using 'Inf' instead of 'inf', and '-Inf' instead of '-inf'.
-	- Move t/pod.t to xt/author/pod.t.
-	- Add github repo Genealogy-Gedcom-Date.
-		This involves updating Build.PL and Makefile.PL.
+	- Switch from Hash::FieldHash to Moo and Types::Standard (i.e. Type::Tiny).
+	- Add github repo Genealogy-Gedcom-Date. This involves updating Build.PL and Makefile.PL.
+	- Move t/pod.t to xt/author/pod.t. This involves making Test::Pod optional.
 
 1.08  Wed Jun 26 11:00:00 2013
 	- Rename CHANGES to Changes as per CPAN::Changes::SPEC.
