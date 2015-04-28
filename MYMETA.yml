@@ -3,11 +3,13 @@ abstract: 'Parse GEDCOM dates'
 author:
   - 'Ron Savage <ron@savage.net.au>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001014'
+  Test::Pod: '1.48'
+  Test::Version: '1.002003'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.4211'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +22,9 @@ provides:
 requires:
   DateTime: '1.03'
   DateTime::Infinite: '1.03'
-  Hash::FieldHash: '0.14'
-  Test::More: '1.001014'
-  Test::Pod: '1.48'
+  Moo: '2.000001'
   Try::Tiny: '0.12'
+  Type::Tiny: '1.000005'
   strict: '0'
   warnings: '0'
 resources:

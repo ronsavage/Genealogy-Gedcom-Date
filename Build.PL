@@ -34,7 +34,6 @@ $class -> new
 	{
 		'Test::More' => 1.001014,
 		'Test::Pod' => 1.48,
-		'Test::Version' => 1.002003,
 	},
 	configure_requires =>
 	{
