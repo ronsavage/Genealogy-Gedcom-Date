@@ -40,7 +40,7 @@
    "provides" : {
       "Genealogy::Gedcom::Date" : {
          "file" : "lib/Genealogy/Gedcom/Date.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       }
    },
    "release_status" : "stable",
@@ -52,5 +52,5 @@
          "url" : "https://github.com/ronsavage/Genealogy-Gedcom-Date"
       }
    },
-   "version" : "1.09"
+   "version" : "1.10"
 }
