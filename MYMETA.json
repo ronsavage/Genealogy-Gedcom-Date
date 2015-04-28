@@ -40,14 +40,17 @@
    "provides" : {
       "Genealogy::Gedcom::Date" : {
          "file" : "lib/Genealogy/Gedcom/Date.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/ronsavage/Genealogy-Gedcom-Date"
+      }
    },
-   "version" : "1.08"
+   "version" : "1.09"
 }

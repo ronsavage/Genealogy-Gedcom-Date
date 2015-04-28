@@ -1,5 +1,8 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+1.10  Tue Apr 28 16:06:00 2015
+	- Update META.json and META.yml.
+
 1.09  Tue Apr 28 11:14:20 2015
 	- Test under Perl V 5.21.11. See RT#103959.
 	- Deal with test failures relating to Inf under Perl V 5.21.11.

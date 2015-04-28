@@ -44,12 +44,7 @@ has style =>
 	required => 0,
 );
 
-#fieldhash my %date         => 'date';
-#fieldhash my %debug        => 'debug';
-#fieldhash my %method_index => 'method_index';
-#fieldhash my %style        => 'style';
-
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 # --------------------------------------------------
 
