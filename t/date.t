@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 
+use Config;
+
 use DateTime;
 use DateTime::Infinite;
 
@@ -12,11 +14,13 @@ my($locale) = 'en_AU';
 
 DateTime -> DefaultLocale($locale);
 
-my($past)   = DateTime::Infinite::Past -> new;
-$past       = '-Inf' if ( ($past eq '-1.#INF') || ($past eq '-Infinity') );
-my($future) = DateTime::Infinite::Future -> new;
-$future     = 'Inf' if ( ($future eq '1.#INF') || ($future eq 'Infinity') );
-my($parser) = Genealogy::Gedcom::Date -> new(debug => 0);
+my($minus_infinity) = $Config{version} ge '5.21.11' ? '-Inf' : '-inf';
+my($plus_infinity)  = $Config{version} ge '5.21.11' ? 'Inf'  : 'inf';
+my($past)           = DateTime::Infinite::Past -> new;
+$past               = $minus_infinity if ( ($past eq '-1.#INF') || ($past eq '-Infinity') );
+my($future)         = DateTime::Infinite::Future -> new;
+$future             = $plus_infinity if ( ($future eq '1.#INF') || ($future eq 'Infinity') );
+my($parser)         = Genealogy::Gedcom::Date -> new(debug => 0);
 
 isa_ok($parser, 'Genealogy::Gedcom::Date');
 

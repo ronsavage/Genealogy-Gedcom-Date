@@ -1,5 +1,9 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+1.11  Tue Apr 28 17:14:00 2015
+	- Use Config.pm to tell us which version of Perl is being used, and if it's >= 5.21.11,
+		then use 'Inf' and '-Inf', otherwise use 'inf' and '-inf'.
+
 1.10  Tue Apr 28 16:06:00 2015
 	- Update META.json and META.yml.
 

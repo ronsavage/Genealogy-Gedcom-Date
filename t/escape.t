@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 
+use Config;
+
 use DateTime;
 use DateTime::Infinite;
 
@@ -88,6 +90,9 @@ for my $candidate (sort keys %{$approximate{$locale} })
 }
 
 diag 'Start testing parse_date_period(...)';
+
+my($minus_infinity) = $Config{version} ge '5.21.11' ? '-Inf' : '-inf';
+my($plus_infinity)  = $Config{version} ge '5.21.11' ? 'Inf'  : 'inf';
 
 my(%date_period) =
 (
@@ -183,7 +188,7 @@ en_AU =>
 		one               => $past,
 		one_ambiguous     => 0,
 		one_bc            => 0,
-		one_date          => '-Inf',
+		one_date          => $minus_infinity,
 		one_default_day   => 0,
 		one_default_month => 0,
 		phrase            => '',
@@ -200,7 +205,7 @@ en_AU =>
 		one               => $past,
 		one_ambiguous     => 0,
 		one_bc            => 0,
-		one_date          => '-Inf',
+		one_date          => $minus_infinity,
 		one_default_day   => 0,
 		one_default_month => 0,
 		phrase            => '',

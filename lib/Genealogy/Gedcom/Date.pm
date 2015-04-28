@@ -3,6 +3,8 @@ package Genealogy::Gedcom::Date;
 use strict;
 use warnings;
 
+use Config;
+
 use DateTime;
 use DateTime::Infinite;
 
@@ -44,7 +46,7 @@ has style =>
 	required => 0,
 );
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 # --------------------------------------------------
 
@@ -73,8 +75,11 @@ sub _init_flags
 	# o Win32::GetOSName = WinXP/.Net. $date =~ /-?1\.#INF/.
 	# o osname=solaris, osvers=2.11.   $date =~ /-?Infinity/.
 
-	$flags{one} = $flags{one_date} = '-Inf' if ( ($flags{one} eq '-1.#INF') || ($flags{one} eq '-Infinity') );
-	$flags{two} = $flags{two_date} = 'Inf'  if ( ($flags{two} eq '1.#INF')  || ($flags{two} eq 'Infinity') );
+	my($minus_infinity) = $Config{version} ge '5.21.11' ? '-Inf' : '-inf';
+	my($plus_infinity)  = $Config{version} ge '5.21.11' ? 'Inf'  : 'inf';
+
+	$flags{one} = $flags{one_date} = $minus_infinity if ( ($flags{one} eq '-1.#INF') || ($flags{one} eq '-Infinity') );
+	$flags{two} = $flags{two_date} = $plus_infinity  if ( ($flags{two} eq '1.#INF')  || ($flags{two} eq 'Infinity') );
 
 	return {%flags};
 
