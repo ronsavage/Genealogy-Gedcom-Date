@@ -3,11 +3,12 @@ abstract: 'Parse GEDCOM dates'
 author:
   - 'Ron Savage <ron@savage.net.au>'
 build_requires:
-  Test::More: '0.98'
+  Test::More: '1.001014'
+  Test::Pod: '1.48'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build: '0.4211'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,14 +17,16 @@ name: Genealogy-Gedcom-Date
 provides:
   Genealogy::Gedcom::Date:
     file: lib/Genealogy/Gedcom/Date.pm
-    version: '1.08'
+    version: '1.09'
 requires:
   DateTime: '1.03'
   DateTime::Infinite: '1.03'
-  Hash::FieldHash: '0.14'
+  Moo: '2.000001'
   Try::Tiny: '0.12'
+  Type::Tiny: '1.000005'
   strict: '0'
   warnings: '0'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_2_0
-version: '1.08'
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  repository: https://github.com/ronsavage/Genealogy-Gedcom-Date
+version: '1.09'

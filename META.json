@@ -16,20 +16,22 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Test::More" : "1.001014",
+            "Test::Pod" : "1.48"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.4211"
          }
       },
       "runtime" : {
          "requires" : {
             "DateTime" : "1.03",
             "DateTime::Infinite" : "1.03",
-            "Hash::FieldHash" : "0.14",
+            "Moo" : "2.000001",
             "Try::Tiny" : "0.12",
+            "Type::Tiny" : "1.000005",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -38,14 +40,17 @@
    "provides" : {
       "Genealogy::Gedcom::Date" : {
          "file" : "lib/Genealogy/Gedcom/Date.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/ronsavage/Genealogy-Gedcom-Date"
+      }
    },
-   "version" : "1.08"
+   "version" : "1.09"
 }
