@@ -29,11 +29,12 @@ WriteMakefile
 	{
 		'DateTime' => 1.03,
 		'DateTime::Infinite' => 1.03,
-		'Hash::FieldHash' => 0.14,
+		'Moo' => 2.000001,
 		'strict' => 0,
 		'Test::More' => 1.001014,
 		'Test::Pod' => 1.48,
 		'Try::Tiny' => 0.12,
+		'Type::Tiny' => 1.000005,
 		'warnings' => 0,
 	},
 	VERSION_FROM => 'lib/Genealogy/Gedcom/Date.pm',

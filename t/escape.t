@@ -13,9 +13,9 @@ my($locale) = 'en_AU';
 DateTime -> DefaultLocale($locale);
 
 my($past)   = DateTime::Infinite::Past -> new;
-$past       = '-inf' if ( ($past eq '-1.#INF') || ($past eq '-Infinity') );
+$past       = '-Inf' if ( ($past eq '-1.#INF') || ($past eq '-Infinity') );
 my($future) = DateTime::Infinite::Future -> new;
-$future     = 'inf' if ( ($future eq '1.#INF') || ($future eq 'Infinity') );
+$future     = 'Inf' if ( ($future eq '1.#INF') || ($future eq 'Infinity') );
 my($parser) = Genealogy::Gedcom::Date -> new(debug => 0);
 
 isa_ok($parser, 'Genealogy::Gedcom::Date');
@@ -183,7 +183,7 @@ en_AU =>
 		one               => $past,
 		one_ambiguous     => 0,
 		one_bc            => 0,
-		one_date          => '-inf',
+		one_date          => '-Inf',
 		one_default_day   => 0,
 		one_default_month => 0,
 		phrase            => '',
@@ -200,7 +200,7 @@ en_AU =>
 		one               => $past,
 		one_ambiguous     => 0,
 		one_bc            => 0,
-		one_date          => '-inf',
+		one_date          => '-Inf',
 		one_default_day   => 0,
 		one_default_month => 0,
 		phrase            => '',

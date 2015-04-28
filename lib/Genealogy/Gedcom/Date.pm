@@ -6,31 +6,50 @@ use warnings;
 use DateTime;
 use DateTime::Infinite;
 
-use Hash::FieldHash ':all';
+use Moo;
 
 use Try::Tiny;
 
-fieldhash my %date         => 'date';
-fieldhash my %debug        => 'debug';
-fieldhash my %method_index => 'method_index';
-fieldhash my %style        => 'style';
+use Types::Standard qw/Bool Int Str/;
 
-our $VERSION = '1.08';
+has date =>
+(
+	default  => sub{return ''},
+	is       => 'rw',
+	isa      => Str,
+	required => 0,
+);
 
-# --------------------------------------------------
+has debug =>
+(
+	default  => sub{return 0},
+	is       => 'rw',
+	isa      => Bool,
+	required => 0,
+);
 
-sub _init
-{
-	my($self, $arg)     = @_;
-	$$arg{date}         ||= '';        # Caller can set.
-	$$arg{debug}        ||= 0;         # Caller can set.
-	$$arg{method_index} = 0;           # See parse_date_value.
-	$$arg{style}        ||= 'english'; # Caller can set.
-	$self               = from_hash($self, $arg);
+has method_index =>
+(
+	default  => sub{return 0},
+	is       => 'rw',
+	isa      => Int,
+	required => 0,
+);
 
-	return $self;
+has style =>
+(
+	default  => sub{return 'english'},
+	is       => 'rw',
+	isa      => Str,
+	required => 0,
+);
 
-} # End of _init.
+#fieldhash my %date         => 'date';
+#fieldhash my %debug        => 'debug';
+#fieldhash my %method_index => 'method_index';
+#fieldhash my %style        => 'style';
+
+our $VERSION = '1.09';
 
 # --------------------------------------------------
 
@@ -52,15 +71,15 @@ sub _init_flags
 		$flags{prefix}                 = '';
 	}
 
-	# Fix systems where DateTime::Infinite::Past is returned as '-1.#INF' etc instead of '-inf'.
-	# Likewise a fix for DateTime::Infinite::Future allegedly being '1.#INF' etc instead of 'inf'.
+	# Fix systems where DateTime::Infinite::Past is returned as '-1.#INF' etc instead of '-Inf'.
+	# Likewise a fix for DateTime::Infinite::Future allegedly being '1.#INF' etc instead of 'Inf'.
 	# This applies to OSes reported by CPAN Testers as:
 	# o Win32::GetOSName = Win7.       $date =~ /-?1\.#INF/.
 	# o Win32::GetOSName = WinXP/.Net. $date =~ /-?1\.#INF/.
 	# o osname=solaris, osvers=2.11.   $date =~ /-?Infinity/.
 
-	$flags{one} = $flags{one_date} = '-inf' if ( ($flags{one} eq '-1.#INF') || ($flags{one} eq '-Infinity') );
-	$flags{two} = $flags{two_date} = 'inf'  if ( ($flags{two} eq '1.#INF')  || ($flags{two} eq 'Infinity') );
+	$flags{one} = $flags{one_date} = '-Inf' if ( ($flags{one} eq '-1.#INF') || ($flags{one} eq '-Infinity') );
+	$flags{two} = $flags{two_date} = 'Inf'  if ( ($flags{two} eq '1.#INF')  || ($flags{two} eq 'Infinity') );
 
 	return {%flags};
 
@@ -75,18 +94,6 @@ sub month_names_in_gregorian
 	return [ [qw/january february march april may june july august september october november december/], [qw/jan feb mar apr may jun jul aug sep oct nov dec/] ];
 
 } # End of month_names_in_gregorian.
-
-# --------------------------------------------------
-
-sub new
-{
-	my($class, %arg) = @_;
-	my($self)        = bless {}, $class;
-	$self            = $self -> _init(\%arg);
-
-	return $self;
-
-}	# End of new.
 
 # --------------------------------------------------
 
@@ -1120,8 +1127,8 @@ A missing month defaults to 01. A missing day defaults to 01.
 
 Default: DateTime::Infinite::Past -> new, which stringifies to '-inf'.
 
-Note: On some systems (MS Windows), DateTime::Infinite::Past -> new stringifies to '-1.#INF', but, as of V 1.02, the code changes this to '-inf'.
-Likewise, on some systems (Solaris), DateTime::Infinite::Past -> new stringifies to '-Infinity', but, as of V 1.07, the code changes this to '-inf'.
+Note: On some systems (MS Windows), DateTime::Infinite::Past -> new stringifies to '-1.#INF', but, as of V 1.09, the code changes this to '-Inf'.
+Likewise, on some systems (Solaris), DateTime::Infinite::Past -> new stringifies to '-Infinity', but, as of V 1.09, the code changes this to '-Inf'.
 
 The default value does I<not> set the one_ambiguous and one_bc flags.
 
@@ -1163,14 +1170,14 @@ Warning: Since these objects only accept 4-digit years, any year 0 .. 999 will h
 Of course, the value for the 'one' key will I<not> have 1000 added it.
 
 This means that if the value of the 'one' key does not match the stringified value of the 'one_date' key
-(assuming the latter is not '-inf'), then the year is < 1000.
+(assuming the latter is not '-Inf'), then the year is < 1000.
 
-Alternately, if the stringified value of the 'one_date' key is '-inf', the period supplied did not have a 'From' date.
+Alternately, if the stringified value of the 'one_date' key is '-Inf', the period supplied did not have a 'From' date.
 
-Default: DateTime::Infinite::Past -> new, which stringifies to '-inf'.
+Default: DateTime::Infinite::Past -> new, which stringifies to '-Inf'.
 
-Note: On some systems (MS Windows), DateTime::Infinite::Past -> new stringifies to '-1.#INF', but, as of V 1.02, the code changes this to '-inf'.
-Likewise, on some systems (Solaris), DateTime::Infinite::Past -> new stringifies to '-Infinity', but, as of V 1.07, the code changes this to '-inf'.
+Note: On some systems (MS Windows), DateTime::Infinite::Past -> new stringifies to '-1.#INF', but, as of V 1.09, the code changes this to '-Inf'.
+Likewise, on some systems (Solaris), DateTime::Infinite::Past -> new stringifies to '-Infinity', but, as of V 1.09, the code changes this to '-Inf'.
 
 =item o one_default_day => $Boolean
 
@@ -1230,8 +1237,8 @@ A missing month defaults to 01. A missing day defaults to 01.
 
 Default: DateTime::Infinite::Future -> new, which stringifies to 'inf'.
 
-Note: On some systems (MS Windows), DateTime::Infinite::Future -> new stringifies to '1.#INF', but, as of V 1.03, the code changes this to 'inf'.
-Likewise, on some systems (Solaris), DateTime::Infinite::Future -> new stringifies to 'Infinity', but, as of V 1.07, the code changes this to 'inf'.
+Note: On some systems (MS Windows), DateTime::Infinite::Future -> new stringifies to '1.#INF', but, as of V 1.03, the code changes this to 'Inf'.
+Likewise, on some systems (Solaris), DateTime::Infinite::Future -> new stringifies to 'Infinity', but, as of V 1.07, the code changes this to 'Inf'.
 
 The default value does I<not> set the two_ambiguous and two_bc flags.
 
@@ -1273,14 +1280,14 @@ Warning: Since these objects only accept 4-digit years, any year 0 .. 999 will h
 Of course, the value for the 'two' key will I<not> have 1000 added it.
 
 This means that if the value of the 'two' key does not match the stringified value of the 'two_date' key
-(assuming the latter is not 'inf'), then the year is < 1000.
+(assuming the latter is not 'Inf'), then the year is < 1000.
 
-Alternately, if the stringified value of the 'two_date' key is 'inf', the period supplied did not have a 'To' date.
+Alternately, if the stringified value of the 'two_date' key is 'Inf', the period supplied did not have a 'To' date.
 
 Default: DateTime::Infinite::Future -> new, which stringifies to 'inf'.
 
-Note: On some systems (MS Windows), DateTime::Infinite::Future -> new stringifies to '1.#INF', but, as of V 1.03, the code changes this to 'inf'.
-Likewise, on some systems (Solaris), DateTime::Infinite::Future -> new stringifies to 'Infinity', but, as of V 1.07, the code changes this to 'inf'.
+Note: On some systems (MS Windows), DateTime::Infinite::Future -> new stringifies to '1.#INF', but, as of V 1.09, the code changes this to 'Inf'.
+Likewise, on some systems (Solaris), DateTime::Infinite::Future -> new stringifies to 'Infinity', but, as of V 1.09, the code changes this to 'Inf'.
 
 =item o two_default_day => $Boolean
 
