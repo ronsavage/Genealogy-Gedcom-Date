@@ -32,7 +32,6 @@ my(%params) =
 		'Moo' => 2.000001,
 		'strict' => 0,
 		'Test::More' => 1.001014,
-		'Test::Pod' => 1.48,
 		'Try::Tiny' => 0.12,
 		'Type::Tiny' => 1.000005,
 		'warnings' => 0,
