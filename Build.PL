@@ -49,7 +49,7 @@ $class -> new
 	requires =>
 	{
 		'Config' => 0,
-		'DateTime' => 1.03,
+		'DateTime' => 1.18,
 		'DateTime::Infinite' => 1.03,
 		'Moo' => 2.000001,
 		'strict' => 0,
