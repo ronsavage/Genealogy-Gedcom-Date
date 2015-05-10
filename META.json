@@ -28,7 +28,7 @@
       "runtime" : {
          "requires" : {
             "Config" : "0",
-            "DateTime" : "1.03",
+            "DateTime" : "1.18",
             "DateTime::Infinite" : "1.03",
             "Moo" : "2.000001",
             "Try::Tiny" : "0.12",
@@ -41,17 +41,17 @@
    "provides" : {
       "Genealogy::Gedcom::Date" : {
          "file" : "lib/Genealogy/Gedcom/Date.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://opensource.org/licenses/artistic-license-2.0.php"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
          "url" : "https://github.com/ronsavage/Genealogy-Gedcom-Date"
       }
    },
-   "version" : "1.11"
+   "version" : "1.12"
 }

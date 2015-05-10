@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4211'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,10 +17,10 @@ name: Genealogy-Gedcom-Date
 provides:
   Genealogy::Gedcom::Date:
     file: lib/Genealogy/Gedcom/Date.pm
-    version: '1.11'
+    version: '1.12'
 requires:
   Config: '0'
-  DateTime: '1.03'
+  DateTime: '1.18'
   DateTime::Infinite: '1.03'
   Moo: '2.000001'
   Try::Tiny: '0.12'
@@ -28,6 +28,6 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  license: http://opensource.org/licenses/artistic-license-2.0.php
+  license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/ronsavage/Genealogy-Gedcom-Date
-version: '1.11'
+version: '1.12'

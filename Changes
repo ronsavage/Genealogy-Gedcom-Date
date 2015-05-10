@@ -1,5 +1,10 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+1.12  Sun May 10 2015
+	- No code changes.
+	- Bump required version of DateTime from V 1.03 to V 1.18, hoping this fixes all the
+		CPAN tester fail reports. This change /really/ should have been in the last version.
+
 1.11  Tue Apr 28 17:14:00 2015
 	- Use Config.pm to tell us which version of Perl is being used, and if it's >= 5.21.11,
 		then use 'Inf' and '-Inf', otherwise use 'inf' and '-inf'.
