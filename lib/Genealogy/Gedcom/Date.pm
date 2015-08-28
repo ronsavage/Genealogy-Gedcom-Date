@@ -46,7 +46,7 @@ has style =>
 	required => 0,
 );
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 # --------------------------------------------------
 
@@ -594,15 +594,17 @@ sub _parse_1_date
 		$four_digit_year = 0;
 	}
 
-	my($candidate)           = join('-', @field);
-	$$flags{"${which}_date"} = DateTime -> new(year => $field[2], month => $field[1], day => $field[0]);
+
+	my(%params)              = (year => $field[2], month => $field[1], day => $field[0]);
+	$params{locale}          = $ENV{'LANG'} if ($ENV{'LANG'});
+	$$flags{"${which}_date"} = DateTime -> new(%params);
 	$$flags{$which}          = qq|$$flags{"${which}_date"}|;
 
 	# Phase 5: Replace leading 1 with 0 if we rigged a 4-digit year.
 
 	substr($$flags{$which}, 0, 1) = '0' if (! $four_digit_year);
 
-	# Phase 6: Check is the day is <= 12, in which case it could be a month.
+	# Phase 6: Check if the day is <= 12, in which case it could be a month.
 	# But, if the month and day are the same, the date is not ambiguous.
 
 	$$flags{"${which}_ambiguous"} = 1 if ( (substr($$flags{$which}, 8, 2) <= '12') && (substr($$flags{$which}, 5, 2) != substr($$flags{$which}, 8, 2) ) );
@@ -696,8 +698,9 @@ Genealogy::Gedcom::Date - Parse GEDCOM dates
 
 See the L</FAQ>'s first QA for the definition of $hashref.
 
-L<Genealogy::Gedcom::Date> ships with t/date.t, t/escape.t and t/value.t. You are strongly encouraged to peruse them,
-and perhaps to set the debug option in each to see extra progress reports.
+L<Genealogy::Gedcom::Date> ships with t/date.t, t/escape.t and t/value.t. You are strongly
+encouraged to peruse them, and perhaps to set the debug option in each to see extra progress
+reports.
 
 =head1 Description
 
@@ -737,7 +740,8 @@ C<new()> is called as C<< my($parser) = Genealogy::Gedcom::Date -> new(k1 => v1,
 
 It returns a new object of type C<Genealogy::Gedcom::Date>.
 
-Key-value pairs accepted in the parameter list (see corresponding methods for details [e.g. debug()]):
+Key-value pairs accepted in the parameter list (see corresponding methods for details
+[e.g. debug()]):
 
 =over 4
 
@@ -749,7 +753,8 @@ This string is always converted to lower case before being processed.
 
 Default: ''.
 
-This parameter is optional. It can be supplied to new() or to L<parse_approximate_date([%arg])>, L<parse_date_period([%arg])> or L<parse_date_range([%arg])>.
+This parameter is optional. It can be supplied to new() or to L<parse_approximate_date([%arg])>,
+L<parse_date_period([%arg])> or L<parse_date_range([%arg])>.
 
 =item o debug => $Boolean
 
@@ -771,7 +776,8 @@ Get or set the debug flag.
 
 =head2 month_names_in_gregorian()
 
-Returns an arrayref of 2 arrayrefs, the first being the month names in English and the second being the month abbreviations.
+Returns an arrayref of 2 arrayrefs, the first being the month names in English and the second being
+the month abbreviations.
 
 =head2 parse_approximate_date([%arg])
 
@@ -779,7 +785,8 @@ Here, the [] indicate an optional parameter.
 
 Parse the candidate date and return a hashref.
 
-The date is expected to be an approximate date as per p. 45 of L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
+The date is expected to be an approximate date as per p. 45 of
+L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
 
 Key => value pairs for %arg:
 
@@ -791,9 +798,11 @@ Specify the string to parse.
 
 This parameter is optional.
 
-The candidate can be passed in to new as new(date => $a_string), or into this method as parse_approximate_date(date => $a_string).
+The candidate can be passed in to new as new(date => $a_string), or into this method as
+parse_approximate_date(date => $a_string).
 
-The string in parse_approximate_date(date => $a_string) takes precedence over the one in new(date => $a_string).
+The string in parse_approximate_date(date => $a_string) takes precedence over the one in
+new(date => $a_string).
 
 This string is always converted to lower case before being processed.
 
@@ -803,7 +812,8 @@ Throw an exception if the string cannot be parsed.
 
 Specify the case-insensitive words, in your language, which indicate an approximate date.
 
-This lets you specify a candidate as 'Abt 1999', 'Cal 2000' or 'Est 1999', and have the code recognize 'Abt', 'Cal' and 'Est'.
+This lets you specify a candidate as 'Abt 1999', 'Cal 2000' or 'Est 1999', and have the code
+recognize 'Abt', 'Cal' and 'Est'.
 
 This parameter is optional. If supplied, it must be a 3-element arrayref.
 
@@ -827,7 +837,8 @@ Default: 'Est', for 'Estimated'.
 
 You must use the abbreviated forms of those words.
 
-Note: These arrayref elements are I<not> the same as used by L<parse_date_period([%arg])> nor as used by L<parse_date_range([%arg])>.
+Note: These arrayref elements are I<not> the same as used by L<parse_date_period([%arg])> nor as
+used by L<parse_date_range([%arg])>.
 
 These strings are always converted to lower case before being processed.
 
@@ -835,7 +846,8 @@ These strings are always converted to lower case before being processed.
 
 This key is explained in the L</FAQ>.
 
-The string in parse_approximate_date(style => $a_string) takes precedence over the one in new(style => $a_string).
+The string in parse_approximate_date(style => $a_string) takes precedence over the one in
+new(style => $a_string).
 
 Default: 'english'.
 
@@ -843,8 +855,9 @@ Default: 'english'.
 
 The return value is a hashref as described in the L</FAQ>'s first QA.
 
-Since a single date is provided, with 'Abt 1999', 'Cal 1999' or 'Est 2000 BC', the date is stored - in the returned hashref - under the 2 keys 'one' and 'one_date'.
-The other date in the hashref ('two', 'two_date') is an object of type L<DateTime::Infinite::Future>.
+Since a single date is provided, with 'Abt 1999', 'Cal 1999' or 'Est 2000 BC', the date is stored
+- in the returned hashref - under the 2 keys 'one' and 'one_date'. The other date in the hashref
+('two', 'two_date') is an object of type L<DateTime::Infinite::Future>.
 
 =head2 parse_date_period([%arg])
 
@@ -852,7 +865,8 @@ Here, the [] indicate an optional parameter.
 
 Parse the candidate period and return a hashref.
 
-The date is expected to be a date period as per p. 46 of L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
+The date is expected to be a date period as per p. 46 of
+L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
 
 Key => value pairs for %arg:
 
@@ -864,9 +878,11 @@ Specify the string to parse.
 
 This parameter is optional.
 
-The candidate period can be passed in to new as new(date => $a_string), or into this method as parse_date_period(date => $a_string).
+The candidate period can be passed in to new as new(date => $a_string), or into this method as
+parse_date_period(date => $a_string).
 
-The string in parse_date_period(date => $a_string) takes precedence over the one in new(date => $a_string).
+The string in parse_date_period(date => $a_string) takes precedence over the one in
+new(date => $a_string).
 
 This string is always converted to lower case before being processed.
 
@@ -876,11 +892,13 @@ Throw an exception if the string cannot be parsed.
 
 Specify the case-insensitive words, in your language, which indicate a date period.
 
-This lets you specify a period as 'From 1999', 'To 2000' or 'From 1999 to 2000', and have the code recognize 'From' and 'To'.
+This lets you specify a period as 'From 1999', 'To 2000' or 'From 1999 to 2000', and have the code
+recognize 'From' and 'To'.
 
 This parameter is optional. If supplied, it must be a 2-element arrayref.
 
-The 'From' and 'To' strings can be passed in to new as new(from_to => $arrayref), or into this method as parse_date_period(from_to => $arrayref).
+The 'From' and 'To' strings can be passed in to new as new(from_to => $arrayref), or into this
+method as parse_date_period(from_to => $arrayref).
 
 The elements of this arrayref are:
 
@@ -896,7 +914,8 @@ Default: 'To'.
 
 =back
 
-Note: These arrayref elements are I<not> the same as used by L<parse_approximate_date([%arg])> nor as used by L<parse_date_range([%arg])>.
+Note: These arrayref elements are I<not> the same as used by L<parse_approximate_date([%arg])> nor
+as used by L<parse_date_range([%arg])>.
 
 These strings are always converted to lower case before being processed.
 
@@ -904,7 +923,8 @@ These strings are always converted to lower case before being processed.
 
 This key is explained in the L</FAQ>.
 
-The string in parse_date_period(style => $a_string) takes precedence over the one in new(style => $a_string).
+The string in parse_date_period(style => $a_string) takes precedence over the one in
+new(style => $a_string).
 
 Default: 'english'.
 
@@ -918,7 +938,8 @@ Here, the [] indicate an optional parameter.
 
 Parse the candidate range and return a hashref.
 
-The date is expected to be a date range as per p. 47 of L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
+The date is expected to be a date range as per p. 47 of
+L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
 
 Key => value pairs for %arg:
 
@@ -930,9 +951,11 @@ Specify the string to parse.
 
 This parameter is optional.
 
-The candidate range can be passed in to new as new(date => $a_string), or into this method as parse_date_range(date => $a_string).
+The candidate range can be passed in to new as new(date => $a_string), or into this method as
+parse_date_range(date => $a_string).
 
-The string in parse_date_range(date => $a_string) takes precedence over the one in new(date => $a_string).
+The string in parse_date_range(date => $a_string) takes precedence over the one in
+new(date => $a_string).
 
 This string is always converted to lower case before being processed.
 
@@ -942,7 +965,8 @@ Throw an exception if the string cannot be parsed.
 
 Specify the case-insensitive words, in your language, which indicate a date range.
 
-This lets you specify a range as 'Bef 1999', 'Aft 2000' or 'Bet 1999 and 2000', and have the code recognize 'Bef', 'Aft', 'Bet' and 'And'.
+This lets you specify a range as 'Bef 1999', 'Aft 2000' or 'Bet 1999 and 2000', and have the code
+recognize 'Bef', 'Aft', 'Bet' and 'And'.
 
 This parameter is optional. If supplied, it must be a 2-element arrayref.
 
@@ -962,7 +986,8 @@ Default: 'And'.
 
 =back
 
-Note: These arrayref elements are I<not> the same as used by L<parse_approximate_date([%arg])> nor as used by L<parse_date_period([%arg])>.
+Note: These arrayref elements are I<not> the same as used by L<parse_approximate_date([%arg])> nor
+as used by L<parse_date_period([%arg])>.
 
 These strings are always converted to lower case before being processed.
 
@@ -970,7 +995,8 @@ These strings are always converted to lower case before being processed.
 
 This key is explained in the L</FAQ>.
 
-The string in parse_date_range(style => $a_string) takes precedence over the one in new(style => $a_string).
+The string in parse_date_range(style => $a_string) takes precedence over the one in
+new(style => $a_string).
 
 Default: 'english'.
 
@@ -978,14 +1004,16 @@ Default: 'english'.
 
 The return value is a hashref as described in the L</FAQ>'s first Q and A.
 
-When a single date is provided, with 'Aft 1999' or 'Bef 2000 BC', the date is stored - in the returned hashref - under the 2 keys 'one' and 'one_date'.
-The other date in the hashref ('two', 'two_date') is an object of type L<DateTime::Infinite::Future>.
+When a single date is provided, with 'Aft 1999' or 'Bef 2000 BC', the date is stored - in the
+returned hashref - under the 2 keys 'one' and 'one_date'. The other date in the hashref ('two',
+'two_date') is an object of type L<DateTime::Infinite::Future>.
 
 =head2 parse_date_value(%arg)
 
 Parse the candidate date using a series of methods, until one succeeds or we run out of methods.
 
-See the definition of date_value on p. 47 of L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
+See the definition of date_value on p. 47 of
+L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
 
 The methods are, in this order:
 
@@ -1001,8 +1029,9 @@ The methods are, in this order:
 
 =back
 
-In the hash %arg, only the 'date' key is passed to the named method. In each case, the algorithm I<must> use the default for the other key,
-since the name and format of that other key depends on the method.
+In the hash %arg, only the 'date' key is passed to the named method. In each case, the algorithm
+I<must> use the default for the other key, since the name and format of that other key depends on
+the method.
 
 See t/value.t for details.
 
@@ -1012,19 +1041,23 @@ Throw an exception if the date cannot be parsed.
 
 Parse the string and return a hashref as described in the L</FAQ>'s first Q and A.
 
-The candidate can be passed in to new as new(date => $a_string), or into this method as parse_datetime($a_string) or parse_datetime(date => $a_string).
+The candidate can be passed in to new as new(date => $a_string), or into this method as
+parse_datetime($a_string) or parse_datetime(date => $a_string).
 
 The string in parse_datetime($a_string) takes precedence over the one in new(date => $a_string).
 
-The date is expected to be an exact date as per p. 45 of L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
+The date is expected to be an exact date as per p. 45 of
+L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
 
 The date string is mandatory.
 
 Throw an exception if the date string cannot be parsed.
 
-Further, the 'style' key can be passed in as parse_datetime(date => $a_string, style => 'standard').
+Further, the 'style' key can be passed in as
+parse_datetime(date => $a_string, style => 'standard').
 
-The string in parse_datetime(style => $a_string) takes precedence over the one in new(style => $a_string).
+The string in parse_datetime(style => $a_string) takes precedence over the one in
+new(style => $a_string).
 
 Default: 'english'.
 
@@ -1034,7 +1067,8 @@ Here, the [] indicate an optional parameter.
 
 Parse the candidate date and return a hashref.
 
-The date is expected to be an interpreted date as per the definition of date_value on p. 47 of L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
+The date is expected to be an interpreted date as per the definition of date_value on p. 47 of
+L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
 
 Key => value pairs for %arg:
 
@@ -1046,9 +1080,11 @@ Specify the string to parse.
 
 This parameter is optional.
 
-The candidate can be passed in to new as new(date => $a_string), or into this method as parse_interpreted_date(date => $a_string).
+The candidate can be passed in to new as new(date => $a_string), or into this method as
+parse_interpreted_date(date => $a_string).
 
-The string in parse_interpreted_date(date => $a_string) takes precedence over the one in new(date => $a_string).
+The string in parse_interpreted_date(date => $a_string) takes precedence over the one in
+new(date => $a_string).
 
 This string is always converted to lower case before being processed.
 
@@ -1058,7 +1094,8 @@ Throw an exception if the string cannot be parsed.
 
 Specify a case-insensitive word, in your language, which indicates an interpreted date.
 
-This lets you specify a candidate as 'Int 1999', 'Int 2000 (more or less)' or '(Date not known)', and have the code recognize 'Int'.
+This lets you specify a candidate as 'Int 1999', 'Int 2000 (more or less)' or '(Date not known)',
+and have the code recognize 'Int'.
 
 This parameter is optional. If supplied, it must be a string meaning 'Int'.
 
@@ -1070,7 +1107,8 @@ Default: 'Int'.
 
 This key is explained in the L</FAQ>.
 
-The string in parse_interpreted_date(style => $a_string) takes precedence over the one in new(style => $a_string).
+The string in parse_interpreted_date(style => $a_string) takes precedence over the one in
+new(style => $a_string).
 
 Default: 'english'.
 
@@ -1078,16 +1116,19 @@ Default: 'english'.
 
 The return value is a hashref as described in the L</FAQ>'s first Q and A.
 
-Since a single date is provided, with 'Int 1999' or 'Int 1999 (more or less)', the date is stored - in the returned hashref - under the 2 keys 'one' and 'one_date'.
+Since a single date is provided, with 'Int 1999' or 'Int 1999 (more or less)', the date is stored -
+in the returned hashref - under the 2 keys 'one' and 'one_date'.
 The other date in the hashref ('two', 'two_date') is an object of type L<DateTime::Infinite::Future>.
 
-Also in the returned hashref, the key 'phrase' will have the value of the text between '(' and ')', if any.
+Also in the returned hashref, the key 'phrase' will have the value of the text between '(' and ')',
+if any.
 
 =head2 process_date_escape(@field)
 
 Parse the fields of the date, already split on ' ', '-' and '/', and return the fields as an array.
 
-In the process, convert month full names and abbreviations to Gregorian abbreviations, to make parsing easier.
+In the process, convert month full names and abbreviations to Gregorian abbreviations, to make
+parsing easier.
 
 Supported calendars:
 
@@ -1109,6 +1150,11 @@ Notes:
 
 =head1 FAQ
 
+=head2 Does this module respect the ENV{LANG} variable?
+
+Yes. When DateTime objects are created, the C<locale> parameter is set to $ENV{LANG} if the latter
+is set.
+
 =head2 What is the format of the hashref returned by parse_*()?
 
 It has these key => value pairs:
@@ -1119,7 +1165,8 @@ It has these key => value pairs:
 
 Returns the first (or only) date as a string, after 'Abt', 'Bef', 'From' or whatever.
 
-This is for cases like '1999' in 'abt 1999', '1999' in 'bef 1999, '1999' in 'from 1999', and for '1999' in 'from 1999 to 2000'.
+This is for cases like '1999' in 'abt 1999', '1999' in 'bef 1999, '1999' in 'from 1999', and for
+'1999' in 'from 1999 to 2000'.
 
 A missing month defaults to 01. A missing day defaults to 01.
 
@@ -1127,8 +1174,10 @@ A missing month defaults to 01. A missing day defaults to 01.
 
 Default: DateTime::Infinite::Past -> new, which stringifies to '-inf'.
 
-Note: On some systems (MS Windows), DateTime::Infinite::Past -> new stringifies to '-1.#INF', but, as of V 1.09, the code changes this to '-Inf'.
-Likewise, on some systems (Solaris), DateTime::Infinite::Past -> new stringifies to '-Infinity', but, as of V 1.09, the code changes this to '-Inf'.
+Note: On some systems (MS Windows), DateTime::Infinite::Past -> new stringifies to '-1.#INF', but,
+as of V 1.09, the code changes this to '-Inf'.
+Likewise, on some systems (Solaris), DateTime::Infinite::Past -> new stringifies to '-Infinity',
+but, as of V 1.09, the code changes this to '-Inf'.
 
 The default value does I<not> set the one_ambiguous and one_bc flags.
 
@@ -1144,21 +1193,24 @@ Returns 1 if the first (or only) date is ambiguous. Possibilities:
 
 =item o The day and month are reversible
 
-This is checked for by testing whether or not the day is <= 12, since in that case it could be a month.
+This is checked for by testing whether or not the day is <= 12, since in that case it could be a
+month.
 
 =back
 
-Obviously, the 'one_ambiguous' flag can be set for a date specified in a non-ambiguous way, e.g. 'From 1 Jan 2000',
+Obviously, the 'one_ambiguous' flag can be set for a date specified in a non-ambiguous way, e.g.
+'From 1 Jan 2000',
 since the numeric value of the month is 1 and the day is also 1.
 
 Default: 0.
 
 =item o one_bc => $Boolean
 
-Returns 1 if the first date is followed by one of (case-insensitive): 'B.C.', 'BC.' or 'BC'. 'BC' may be written as 'BCE',
-with or without full-stops.
+Returns 1 if the first date is followed by one of (case-insensitive): 'B.C.', 'BC.' or 'BC'. 'BC'
+may be written as 'BCE', with or without full-stops.
 
-In the input, this suffix can be separated from the year by spaces, so both '500BC' and '500 B.C.' are accepted.
+In the input, this suffix can be separated from the year by spaces, so both '500BC' and '500 B.C.'
+are accepted.
 
 Default: 0.
 
@@ -1166,28 +1218,34 @@ Default: 0.
 
 This object is of type L<DateTime>.
 
-Warning: Since these objects only accept 4-digit years, any year 0 .. 999 will have 1000 added to it.
+Warning: Since these objects only accept 4-digit years, any year 0 .. 999 will have 1000 added to
+it.
 Of course, the value for the 'one' key will I<not> have 1000 added it.
 
-This means that if the value of the 'one' key does not match the stringified value of the 'one_date' key
-(assuming the latter is not '-Inf'), then the year is < 1000.
+This means that if the value of the 'one' key does not match the stringified value of the 'one_date'
+key (assuming the latter is not '-Inf'), then the year is < 1000.
 
-Alternately, if the stringified value of the 'one_date' key is '-Inf', the period supplied did not have a 'From' date.
+Alternately, if the stringified value of the 'one_date' key is '-Inf', the period supplied did not
+have a 'From' date.
 
 Default: DateTime::Infinite::Past -> new, which stringifies to '-Inf'.
 
-Note: On some systems (MS Windows), DateTime::Infinite::Past -> new stringifies to '-1.#INF', but, as of V 1.09, the code changes this to '-Inf'.
-Likewise, on some systems (Solaris), DateTime::Infinite::Past -> new stringifies to '-Infinity', but, as of V 1.09, the code changes this to '-Inf'.
+Note: On some systems (MS Windows), DateTime::Infinite::Past -> new stringifies to '-1.#INF', but,
+as of V 1.09, the code changes this to '-Inf'. Likewise, on some systems (Solaris),
+DateTime::Infinite::Past -> new stringifies to '-Infinity', but, as of V 1.09, the code changes
+this to '-Inf'.
 
 =item o one_default_day => $Boolean
 
-Returns 1 if the input date had no value for the first date's day. The code sets the default day to 1.
+Returns 1 if the input date had no value for the first date's day. The code sets the default day to
+1.
 
 Default: 0.
 
 =item o one_default_month => $Boolean
 
-Returns 1 if the input date had no value for the first date's month. The code sets the default month to 1.
+Returns 1 if the input date had no value for the first date's month. The code sets the default month
+to 1.
 
 Default: 0.
 
@@ -1229,7 +1287,8 @@ Default: ''.
 
 =item o two => $second_date_in_range
 
-Returns the second (or only) date as a string, after 'and' in 'bet 1999 and 2000', or 'to' in 'from 1999 to 2000', or '2000' in 'to 2000'.
+Returns the second (or only) date as a string, after 'and' in 'bet 1999 and 2000', or 'to' in 'from
+1999 to 2000', or '2000' in 'to 2000'.
 
 A missing month defaults to 01. A missing day defaults to 01.
 
@@ -1237,8 +1296,10 @@ A missing month defaults to 01. A missing day defaults to 01.
 
 Default: DateTime::Infinite::Future -> new, which stringifies to 'inf'.
 
-Note: On some systems (MS Windows), DateTime::Infinite::Future -> new stringifies to '1.#INF', but, as of V 1.03, the code changes this to 'Inf'.
-Likewise, on some systems (Solaris), DateTime::Infinite::Future -> new stringifies to 'Infinity', but, as of V 1.07, the code changes this to 'Inf'.
+Note: On some systems (MS Windows), DateTime::Infinite::Future -> new stringifies to '1.#INF', but,
+as of V 1.03, the code changes this to 'Inf'. Likewise, on some systems (Solaris),
+DateTime::Infinite::Future -> new stringifies to 'Infinity', but, as of V 1.07, the code changes
+this to 'Inf'.
 
 The default value does I<not> set the two_ambiguous and two_bc flags.
 
@@ -1254,21 +1315,23 @@ Returns 1 if the second (or only) date is ambiguous. Possibilities:
 
 =item o The day and month are reversible
 
-This is checked for by testing whether or not the day is <= 12, since in that case it could be a month.
+This is checked for by testing whether or not the day is <= 12, since in that case it could be a
+month.
 
 =back
 
-Obviously, the 'two_ambiguous' flag can be set for a date specified in a non-ambiguous way, e.g. 'To 1 Jan 2000',
-since the numeric value of the month is 1 and the day is also 1.
+Obviously, the 'two_ambiguous' flag can be set for a date specified in a non-ambiguous way, e.g.
+'To 1 Jan 2000', since the numeric value of the month is 1 and the day is also 1.
 
 Default: 0.
 
 =item o two_bc => $Boolean
 
-Returns 1 if the second date is followed by one of (case-insensitive): 'B.C.', 'BC.' or 'BC'. 'BC' may be written as 'BCE',
-with or without full-stops.
+Returns 1 if the second date is followed by one of (case-insensitive): 'B.C.', 'BC.' or 'BC'. 'BC'
+may be written as 'BCE', with or without full-stops.
 
-In the input, this suffix can be separated from the year by spaces, so both '500BC' and '500 B.C.' are accepted.
+In the input, this suffix can be separated from the year by spaces, so both '500BC' and '500 B.C.'
+are accepted.
 
 Default: 0.
 
@@ -1276,28 +1339,32 @@ Default: 0.
 
 This object is of type L<DateTime>.
 
-Warning: Since these objects only accept 4-digit years, any year 0 .. 999 will have 1000 added to it.
-Of course, the value for the 'two' key will I<not> have 1000 added it.
+Warning: Since these objects only accept 4-digit years, any year 0 .. 999 will have 1000 added to
+it. Of course, the value for the 'two' key will I<not> have 1000 added it.
 
-This means that if the value of the 'two' key does not match the stringified value of the 'two_date' key
-(assuming the latter is not 'Inf'), then the year is < 1000.
+This means that if the value of the 'two' key does not match the stringified value of the
+'two_date' key (assuming the latter is not 'Inf'), then the year is < 1000.
 
-Alternately, if the stringified value of the 'two_date' key is 'Inf', the period supplied did not have a 'To' date.
+Alternately, if the stringified value of the 'two_date' key is 'Inf', the period supplied did not
+have a 'To' date.
 
 Default: DateTime::Infinite::Future -> new, which stringifies to 'inf'.
 
-Note: On some systems (MS Windows), DateTime::Infinite::Future -> new stringifies to '1.#INF', but, as of V 1.09, the code changes this to 'Inf'.
-Likewise, on some systems (Solaris), DateTime::Infinite::Future -> new stringifies to 'Infinity', but, as of V 1.09, the code changes this to 'Inf'.
+Note: On some systems (MS Windows), DateTime::Infinite::Future -> new stringifies to '1.#INF', but,
+as of V 1.09, the code changes this to 'Inf'. Likewise, on some systems (Solaris),
+DateTime::Infinite::Future -> new stringifies to 'Infinity', but, as of V 1.09, the code changes this to 'Inf'.
 
 =item o two_default_day => $Boolean
 
-Returns 1 if the input date had no value for the second date's day. The code sets the default day to 1.
+Returns 1 if the input date had no value for the second date's day. The code sets the default day
+to 1.
 
 Default: 0.
 
 =item o two_default_month => $Boolean
 
-Returns 1 if the input date had no value for the second date's month. The code sets the default month to 1.
+Returns 1 if the input date had no value for the second date's month. The code sets the default
+month to 1.
 
 Default: 0.
 
@@ -1365,17 +1432,19 @@ Firstly, all commas are deleted from incoming dates.
 
 Then, dates are split on ' ', '-' and '/', and the resultant fields are analyzed one at a time.
 
-The 'style' key can be used to force the code to assume a certain type of date format. This option is explained above, in this FAQ.
+The 'style' key can be used to force the code to assume a certain type of date format. This option
+is explained above, in this FAQ.
 
 =head2 How are incomplete dates handled?
 
 A missing month is set to 1 and a missing day is set to 1.
 
-Further, in the hashref returned by the parse_*() methods, the flags one_default_month, one_default_day,
-two_default_month and two_default_day are set to 1, as appropriate, so you can tell that the code supplied
-the value.
+Further, in the hashref returned by the parse_*() methods, the flags one_default_month,
+one_default_day, two_default_month and two_default_day are set to 1, as appropriate, so you can
+tell that the code supplied the value.
 
-Note: These flags take a Boolean value; it is only by coincidence that they can take the value of the default month or day.
+Note: These flags take a Boolean value; it is only by coincidence that they can take the value of
+the default month or day.
 
 =head2 Why are dates returned as objects of type L<DateTime>?
 
@@ -1399,13 +1468,16 @@ Clearly then, the code I<does not> reorder the dates.
 
 =head2 Why was this module renamed from DateTime::Format::Gedcom?
 
-The L<DateTime> suite of modules aren't designed, IMHO, for GEDCOM-like applications. It was a mistake to use that name in the first place.
+The L<DateTime> suite of modules aren't designed, IMHO, for GEDCOM-like applications. It was a
+mistake to use that name in the first place.
 
-By releasing under the Genealogy::Gedcom::* namespace, I can be much more targeted in the data types I choose as method return values.
+By releasing under the Genealogy::Gedcom::* namespace, I can be much more targeted in the data
+types I choose as method return values.
 
 =head2 Why did you choose Hash::FieldHash over Moose?
 
-My policy is to use the lightweight L<Hash::FieldHash> for stand-alone modules and L<Moose> for applications.
+My policy is to use the lightweight L<Hash::FieldHash> for stand-alone modules and L<Moose> for
+applications.
 
 =head1 TODO
 
@@ -1439,6 +1511,10 @@ The file Changes was converted into Changelog.ini by L<Module::Metadata::Changes
 
 Version numbers < 1.00 represent development versions. From 1.00 up, they are production versions.
 
+=head1 Repository
+
+L<https://github.com/ronsavage/Genealogy-Gedcom-Date>.
+
 =head1 Support
 
 Email the author, or log a bug on RT:
@@ -1449,13 +1525,14 @@ L<https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy::Gedcom::Date>.
 
 Thanx to Eugene van der Pijll, the author of the Gedcom::Date::* modules.
 
-Thanx also to the authors of the DateTime::* family of modules. See L<http://datetime.perl.org/wiki/datetime/dashboard> for details.
+Thanx also to the authors of the DateTime::* family of modules. See
+L<http://datetime.perl.org/wiki/datetime/dashboard> for details.
 
 =head1 Author
 
 L<Genealogy::Gedcom::Date> was written by Ron Savage I<E<lt>ron@savage.net.auE<gt>> in 2011.
 
-Home page: L<http://savage.net.au/index.html>.
+Homepage: L<http://savage.net.au/index.html>.
 
 =head1 Copyright
 
