@@ -46,7 +46,7 @@ has style =>
 	required => 0,
 );
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 # --------------------------------------------------
 
@@ -257,7 +257,14 @@ sub parse_date_value
 
 		$self -> method_index($index + 1);
 
-		die "Unable to parse date '$arg{date}'\n" if ($self -> method_index > $#method_name);
+		if ($self -> method_index > $#method_name)
+		{
+			# Having failed, ensure next parse starts from scratch.
+
+			$self -> method_index(0);
+
+			die "Unable to parse date '$arg{date}'\n";
+		}
 
 		$result = $self -> parse_date_value(date => $arg{date});
 	};
