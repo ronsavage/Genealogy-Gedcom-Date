@@ -3,12 +3,12 @@ Revision history for Perl extension Genealogy::Gedcom::Date.
 1.14  Fri Aug 28 11:34:00 2015
 	- Change logic of how we proceed after all parse methods have died, so that our own object
 		can still be used.
-		Thanx to Nigel Horne for reporing this. See RT#106705.
-	- Add thanx to Nigel in changes for V 1.13.
+		Thanx to Nigel Horne for reporting this. See RT#106705.
+	- Add below thanx to Nigel for reporting the locale issue (see V 1.13), and the code fix.
 
 1.13  Fri Aug 28 10:08:00 2015
 	- Honour the $ENV{LANG} value, if set, when creating DateTime objects.
-		Thanx to Nigel Horne for reporing this. See RT#106703.
+		Thanx to Nigel Horne for reporting this. See RT#106703.
 	- Add a note about $ENV{LANG} at the start of the FAQ.
 	- Reformat the POD, so lines are at most 100 chars wide.
 	- Clean up Makefile.PL so it references the github repo.
