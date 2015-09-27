@@ -46,7 +46,7 @@ has style =>
 	required => 0,
 );
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 # --------------------------------------------------
 
@@ -109,8 +109,8 @@ sub parse_approximate_date
 
 	# Phase 1: Validate parameters.
 
-	die "No value for the 'date' key\n"                                      if (length($date) == 0);
-	die "The value for the 'prefix' key must be an arrayref of 3 elements\n" if ( (! ref $prefix) || (ref $prefix ne 'ARRAY') || ($#$prefix != 2) );
+	die "No value for the 'date' key"                                      if (length($date) == 0);
+	die "The value for the 'prefix' key must be an arrayref of 3 elements" if ( (! ref $prefix) || (ref $prefix ne 'ARRAY') || ($#$prefix != 2) );
 
 	$prefix = [map{lc} @$prefix];
 
@@ -125,7 +125,7 @@ sub parse_approximate_date
 	}
 	else
 	{
-		die "The value of the 'date' key - '$date' - must start with one of " . join(', ', @$prefix) . "\n";
+		die "The value of the 'date' key - '$date' - must start with one of " . join(', ', @$prefix);
 	}
 
 	# Phase 3: Handle the date escape.
@@ -152,8 +152,8 @@ sub parse_date_period
 
 	# Phase 1: Validate parameters.
 
-	die "No value for the 'date' key\n"                                       if (length($date) == 0);
-	die "The value for the 'from_to' key must be an arrayref of 2 elements\n" if ( (! ref $from_to) || (ref $from_to ne 'ARRAY') || ($#$from_to != 1) );
+	die "No value for the 'date' key"                                       if (length($date) == 0);
+	die "The value for the 'from_to' key must be an arrayref of 2 elements" if ( (! ref $from_to) || (ref $from_to ne 'ARRAY') || ($#$from_to != 1) );
 
 	$from_to = [map{lc} @$from_to];
 
@@ -174,7 +174,7 @@ sub parse_date_period
 
 	if (! $prefix)
 	{
-		die "The value of the 'date' key - '$date' - must start with '$$from_to[0]' or '$$from_to[1]'\n";
+		die "The value of the 'date' key - '$date' - must start with '$$from_to[0]' or '$$from_to[1]'";
 	}
 
 	# Phase 3: Handle the date escape.
@@ -201,8 +201,8 @@ sub parse_date_range
 
 	# Phase 1: Validate parameters.
 
-	die "No value for the 'date' key\n"                                       if (length($date) == 0);
-	die "The value for the 'from_to' key must be an arrayref of 2 elements\n" if ( (! ref $from_to) || (ref $from_to ne 'ARRAY') || ($#$from_to != 1) );
+	die "No value for the 'date' key"                                       if (length($date) == 0);
+	die "The value for the 'from_to' key must be an arrayref of 2 elements" if ( (! ref $from_to) || (ref $from_to ne 'ARRAY') || ($#$from_to != 1) );
 
 	$$from_to[0] = [map{lc} @{$$from_to[0]}];
 	$$from_to[1] = lc $$from_to[1];
@@ -224,7 +224,7 @@ sub parse_date_range
 	}
 	else
 	{
-		die "The value of the 'date' key - '$date' - must start with one of " . join(', ', @{$$from_to[0][0]}) . "\n";
+		die "The value of the 'date' key - '$date' - must start with one of " . join(', ', @{$$from_to[0][0]});
 	}
 
 	# Phase 3: Handle the date escape.
@@ -263,7 +263,7 @@ sub parse_date_value
 
 			$self -> method_index(0);
 
-			die "Unable to parse date '$arg{date}'\n";
+			die "Unable to parse date '$arg{date}'";
 		}
 
 		$result = $self -> parse_date_value(date => $arg{date});
@@ -299,7 +299,7 @@ sub parse_datetime
 	$date  =~ tr/,//d;
 	$style = lc $style;
 
-	die "No date provided\n" if (length($date) == 0);
+	die 'No date provided' if (length($date) == 0);
 
 	# Phase 2: Handle the date escape, which is not expected.
 	# Really, just convert month names to numbers.
@@ -326,8 +326,8 @@ sub parse_interpreted_date
 
 	# Phase 1: Validate parameters.
 
-	die "No value for the 'date' key\n"   if (length($date) == 0);
-	die "No value for the 'prefix' key\n" if (length($prefix) == 0);
+	die "No value for the 'date' key"   if (length($date) == 0);
+	die "No value for the 'prefix' key" if (length($prefix) == 0);
 
 	# Phase 2: Split the date so we can check for prefixes.
 	# Expected format is something like 'int 21 jun 1950 (more or less)'.
@@ -340,7 +340,7 @@ sub parse_interpreted_date
 	}
 	else
 	{
-		die "The value of the 'date' key - '$date' - must start with '$prefix'\n";
+		die "The value of the 'date' key - '$date' - must start with '$prefix'";
 	}
 
 	# Phase 3: Handle the date phrase.
@@ -358,11 +358,11 @@ sub parse_interpreted_date
 	}
 	elsif ( ($open_paren < 0) && ($close_paren >= 0) )
 	{
-		die "Date - '$date' - missing the '(' before the ')'\n";
+		die "Date - '$date' - missing the '(' before the ')'";
 	}
 	elsif ( ($open_paren < 0) && ($close_paren >= 0) )
 	{
-		die "Date - '$date' - missing the ')' after the '('\n";
+		die "Date - '$date' - missing the ')' after the '('";
 	}
 	else
 	{
@@ -528,7 +528,7 @@ sub _parse_1_date
 
 	my(%valid_style) = (american => 1, english => 1, standard => 1);
 
-	die "Style '$style' must be one of ", join(', ', sort keys %valid_style), ". \n" if (! $valid_style{$style});
+	die "Style '$style' must be one of ", join(', ', sort keys %valid_style) if (! $valid_style{$style});
 
 	# Phase 2: Handle missing data or oddly-formatted (not d-m-y :-) data.
 	# Generate a date of the form (d, m, y).
@@ -587,7 +587,7 @@ sub _parse_1_date
 	# Phase 3: Check that the day and year are numeric.
 	# Brute force calls via parse_datetime() will fail this test.
 
-	die "Day ($field[0]), month ($field[1]) and year ($field[2]) must be numeric\n" if ( ($field[0] !~ /^\d+$/) || ($field[1] !~ /^\d+$/) || ($field[2] !~ /^\d+$/) );
+	die "Day ($field[0]), month ($field[1]) and year ($field[2]) must be numeric" if ( ($field[0] !~ /^\d+$/) || ($field[1] !~ /^\d+$/) || ($field[2] !~ /^\d+$/) );
 
 	# Phase 4: Hand over analysis to our slave.
 

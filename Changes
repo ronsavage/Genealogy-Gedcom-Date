@@ -1,5 +1,10 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+1.15  Mon Sep 28 08:58:00 2015
+	- Remove \n from all die messages, as suggested by Nigel Horne. See discussion in #RT107354.
+		I'm doing this assuming well-written code will capture all the dies, so the issue of
+		leaking information to users of CGI scripts does not arise.
+
 1.14  Fri Aug 28 11:34:00 2015
 	- Change logic of how we proceed after all parse methods have died, so that our own object
 		can still be used.
