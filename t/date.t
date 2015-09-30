@@ -586,7 +586,7 @@ for my $candidate (sort keys %{$range{$locale} })
 		ok($in_string eq $out_string, "Testing: $candidate");
 }
 
-diag 'Start testing parse_datetime(...)';
+diag "Start testing parse_datetime(...) with style 'english'";
 
 my(%datetime) =
 (
@@ -624,6 +624,50 @@ for my $candidate (sort keys %{$datetime{$locale} })
 				for my $key (sort keys %$date)
 				{
 						diag "$key: In: $datetime{$locale}{$candidate}{$key}. Out: $$date{$key}." if ($datetime{$locale}{$candidate}{$key} ne $$date{$key});
+				}
+		}
+
+		ok($in_string eq $out_string, "Testing: $candidate");
+}
+
+diag "Start testing parse_datetime(...) with style 'american'";
+
+my(%datetime_american) =
+(
+en_AU =>
+{
+		'December 13,1668' =>
+		{
+		one           => DateTime -> new(year => 1668, month => 12, day => 13),
+		one_ambiguous => 0,
+		one_bc        => 0,
+		one_date      => DateTime -> new(year => 1668, month => 12, day => 13),
+		one_default_day   => 0,
+		one_default_month => 0,
+		phrase        => '',
+		prefix        => '',
+		two           => $future,
+		two_ambiguous => 0,
+		two_bc        => 0,
+		two_date      => $future,
+		two_default_day   => 0,
+		two_default_month => 0,
+		},
+}
+);
+
+for my $candidate (sort keys %{$datetime_american{$locale} })
+{
+		$date = $parser -> parse_datetime(date => $candidate, style => 'american');
+
+		$in_string  = join(', ', map{"$_ => '$datetime_american{$locale}{$candidate}{$_}'"} sort keys %{$datetime_american{$locale}{$candidate} });
+		$out_string = join(', ', map{"$_ => '$$date{$_}'"} sort keys %$date);
+
+		if ($parser -> debug)
+		{
+				for my $key (sort keys %$date)
+				{
+						diag "$key: In: $datetime_american{$locale}{$candidate}{$key}. Out: $$date{$key}." if ($datetime_american{$locale}{$candidate}{$key} ne $$date{$key});
 				}
 		}
 

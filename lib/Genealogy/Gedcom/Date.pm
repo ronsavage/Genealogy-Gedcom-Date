@@ -46,7 +46,7 @@ has style =>
 	required => 0,
 );
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 # --------------------------------------------------
 
@@ -103,7 +103,7 @@ sub parse_approximate_date
 	my($date)       = lc ($arg{date} || $self -> date);
 	$date           =~ s/^\s+//;
 	$date           =~ s/\s+$//;
-	$date           =~ tr/,//d;
+	$date           =~ tr/,/ /;
 	my($prefix)     = $arg{prefix} || ['abt', 'cal', 'est'];
 	my($style)      = lc ($arg{style} || $self -> style);
 
@@ -146,7 +146,7 @@ sub parse_date_period
 	my($date)       = lc ($arg{date} || $self -> date);
 	$date           =~ s/^\s+//;
 	$date           =~ s/\s+$//;
-	$date           =~ tr/,//d;
+	$date           =~ tr/,/ /;
 	my($from_to)    = $arg{from_to} || ['from', 'to'];
 	my($style)      = lc ($arg{style} || $self -> style);
 
@@ -195,7 +195,7 @@ sub parse_date_range
 	my($date)       = lc ($arg{date} || $self -> date);
 	$date           =~ s/^\s+//;
 	$date           =~ s/\s+$//;
-	$date           =~ tr/,//d;
+	$date           =~ tr/,/ /;
 	my($from_to)    = $arg{from_to} || [ ['Aft', 'Bef', 'Bet'], 'And'];
 	my($style)      = lc ($arg{style} || $self -> style);
 
@@ -281,22 +281,37 @@ sub parse_date_value
 
 sub parse_datetime
 {
-	my($self, $date) = @_;
+	my($self, @date) = @_;
 
 	# Phase 1: Allow the caller to use $parser -> parse_datetime(date => $date, style => $style).
 
-	my($style) = $self -> style;
+	my($date);
+	my($style);
 
-	if (defined $date && ref $date && (ref $date eq 'HASH') )
+	if ($#date == 0)
 	{
-		$style = $$date{style} if (defined $$date{style});
-		$date  = $$date{date}  if (defined $$date{date});
+		# Called as parse_datetime($date).
+
+		$date  = $date[0];
+		$style = $self -> style;
+	}
+	elsif ($#date == 3)
+	{
+		# Called as parse_datetime(date => $date, style => $style).
+
+		my(%date) = @date;
+		$date     = defined $date{date}  ? $date{date}  : $self -> date;
+		$style    = defined $date{style} ? $date{style} : $self -> style;
+	}
+	else
+	{
+		die 'Unable to parse parameters in call to parse_datetime()';
 	}
 
 	$date  = lc ($date || $self -> date);
 	$date  =~ s/^\s+//;
 	$date  =~ s/\s+$//;
-	$date  =~ tr/,//d;
+	$date  =~ tr/,/ /;
 	$style = lc $style;
 
 	die 'No date provided' if (length($date) == 0);
@@ -320,7 +335,7 @@ sub parse_interpreted_date
 	my($date)       = lc ($arg{date} || $self -> date);
 	$date           =~ s/^\s+//;
 	$date           =~ s/\s+$//;
-	$date           =~ tr/,//d;
+	$date           =~ tr/,/ /;
 	my($prefix)     = lc ($arg{prefix} || 'int');
 	my($style)      = lc ($arg{style} || $self -> style);
 
@@ -600,7 +615,6 @@ sub _parse_1_date
 		$field[2]        += 1000;
 		$four_digit_year = 0;
 	}
-
 
 	my(%params)              = (year => $field[2], month => $field[1], day => $field[0]);
 	$params{locale}          = $ENV{'LANG'} if ($ENV{'LANG'});
@@ -1044,7 +1058,7 @@ See t/value.t for details.
 
 Throw an exception if the date cannot be parsed.
 
-=head2 parse_datetime($a_string)
+=head2 parse_datetime($a_string or a $hash)
 
 Parse the string and return a hashref as described in the L</FAQ>'s first Q and A.
 
@@ -1052,6 +1066,20 @@ The candidate can be passed in to new as new(date => $a_string), or into this me
 parse_datetime($a_string) or parse_datetime(date => $a_string).
 
 The string in parse_datetime($a_string) takes precedence over the one in new(date => $a_string).
+
+If a $hash is used as a parameter, the optional keys are:
+
+=over 4
+
+=item o date => $date
+
+=item o style => $style
+
+=back
+
+See t/date.t for an example.
+
+Missing keys use defaults, as expected.
 
 The date is expected to be an exact date as per p. 45 of
 L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
@@ -1481,10 +1509,9 @@ mistake to use that name in the first place.
 By releasing under the Genealogy::Gedcom::* namespace, I can be much more targeted in the data
 types I choose as method return values.
 
-=head2 Why did you choose Hash::FieldHash over Moose?
+=head2 Why did you choose Moo over Moose?
 
-My policy is to use the lightweight L<Hash::FieldHash> for stand-alone modules and L<Moose> for
-applications.
+My policy is to use the lightweight L<Moo> for all modules and applications.
 
 =head1 TODO
 
