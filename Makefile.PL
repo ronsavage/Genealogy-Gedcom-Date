@@ -28,12 +28,12 @@ my(%params) =
 	PREREQ_PM =>
 	{
 		'Config' => 0,
-		'DateTime' => 1.18,
-		'DateTime::Infinite' => 1.03,
-		'Moo' => 2.000001,
+		'DateTime' => 1.21,
+		'Marpa::R2' => 3.000000,
+		'Moo' => 2.000002,
 		'strict' => 0,
 		'Test::More' => 1.001014,
-		'Try::Tiny' => 0.12,
+		'Try::Tiny' => 0.22,
 		'Type::Tiny' => 1.000005,
 		'warnings' => 0,
 	},
