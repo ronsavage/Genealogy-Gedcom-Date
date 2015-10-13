@@ -8,11 +8,23 @@ use Config;
 use DateTime;
 use DateTime::Infinite;
 
+use Log::Handler;
+
+use Marpa::R2;
+
 use Moo;
 
 use Try::Tiny;
 
-use Types::Standard qw/Bool Int Str/;
+use Types::Standard qw/Any Bool Int Str/;
+
+has bnf =>
+(
+	default  => sub{return ''},
+	is       => 'rw',
+	isa      => Any,
+	required => 0,
+);
 
 has date =>
 (
@@ -30,11 +42,35 @@ has debug =>
 	required => 0,
 );
 
+has logger =>
+(
+	default  => sub{return undef},
+	is       => 'rw',
+	isa      => Any,
+	required => 0,
+);
+
+has maxlevel =>
+(
+	default  => sub{return 'notice'},
+	is       => 'rw',
+	isa      => Str,
+	required => 0,
+);
+
 has method_index =>
 (
 	default  => sub{return 0},
 	is       => 'rw',
 	isa      => Int,
+	required => 0,
+);
+
+has minlevel =>
+(
+	default  => sub{return 'error'},
+	is       => 'rw',
+	isa      => Str,
 	required => 0,
 );
 
@@ -47,6 +83,113 @@ has style =>
 );
 
 our $VERSION = '1.16';
+
+# ------------------------------------------------
+
+sub BUILD
+{
+	my($self) = @_;
+
+	if (! defined $self -> logger)
+	{
+		$self -> logger(Log::Handler -> new);
+		$self -> logger -> add
+		(
+			screen =>
+			{
+				maxlevel       => $self -> maxlevel,
+				message_layout => '%m',
+				minlevel       => $self -> minlevel,
+			}
+		);
+	}
+
+	# Policy: Event names are always the same as the name of the corresponding lexeme.
+
+	$self -> bnf
+	(
+<<'END_OF_GRAMMAR'
+
+:default				::= action => [values]
+
+lexeme default			=  latm => 1		# Longest Acceptable Token Match.
+
+# Rules, in top-down order.
+
+:start					::= gedcom_date
+
+gedcom_date				::= date_calendar
+							| date_calendar_escape
+
+date_calendar			::= date_calendar_name
+							| date_future
+
+date_calendar_name		::= date_french
+							| date_gregorian
+							| date_hebrew
+							| date_julian
+
+date_french				::= 'TBA'
+
+date_gregorian			::= year_gregorian_bc
+							| year_gregorian
+							| month year_gregorian
+							| day month year_gregorian
+
+date_hebrew				::= 'TBA'
+
+date_julian				::= 'TBA'
+
+date_future             ::= 'TBA'
+
+date_calendar_escape	::=
+date_calendar_escape	::= ('@#') date_calendar_name ('@')
+
+year_gregorian_bc		::= year_gregorian bc
+
+year_gregorian			::= number
+							| number ('/') digit digit
+
+# Lexemes, in alphabetical order.
+
+bc						~ 'BC'
+							| 'B.C.'
+
+day						~ digit
+							| digit digit
+
+digit					~ [0-9]
+
+month					~ 'JAN' | 'FEB' | 'MAR' | 'APR' | 'MAY' | 'JUN'
+							| 'JUL' | 'AUG' | 'SEP' | 'OCT' | 'NOV' | 'DEC'
+
+number					~ digit+
+
+# Boilerplate.
+
+:discard				~ whitespace
+whitespace				~ [\s]+
+
+END_OF_GRAMMAR
+	);
+
+	$self -> grammar
+	(
+		Marpa::R2::Scanless::G -> new
+		({
+			source => \$self -> bnf
+		})
+	);
+
+	$self -> recce
+	(
+		Marpa::R2::Scanless::R -> new
+		({
+			grammar => $self -> grammar,
+		})
+	);
+
+} # End of BUILD.
 
 # --------------------------------------------------
 
@@ -686,6 +829,52 @@ sub process_date_escape
 	return @field;
 
 } # End of process_date_escape.
+
+# --------------------------------------------------
+
+sub run
+{
+	my($self, $candidate) = @_;
+	my($length_input)     = length($candidate);
+
+	# Return 0 for success and 1 for failure.
+
+	my($result) = 0;
+
+	my($length_read);
+	my($value);
+
+	try
+	{
+		$length_read = $self -> recce -> read(\$candidate);
+
+		if ($length_read == $length_input)
+		{
+			$value = $self -> recce -> value;
+
+			$self -> log(info => 'Parsed: ' . $$value);
+		}
+		else
+		{
+			$result = 1;
+
+			$self -> log(error => 'Parse failed');
+		}
+	}
+	catch
+	{
+		$result = 1;
+
+		$self -> log(error => "Parse failed. Error: $_");
+	};
+
+	$self -> log(info => "Parse result:  $result (0 is success)");
+
+	# Return 0 for success and 1 for failure.
+
+	return $result;
+
+} # End of run.
 
 # --------------------------------------------------
 
@@ -1519,7 +1708,7 @@ My policy is to use the lightweight L<Moo> for all modules and applications.
 
 =item o Comparisons between dates
 
-Sample code to overload '<' and '>' is in L<Gedcom::Date>.
+Sample code to overload '<' and '>' as in L<Gedcom::Date>.
 
 =item o Handle Gregorian years of the form 1699/00
 
@@ -1532,10 +1721,6 @@ See p. 65 of L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/Fi
 L<Genealogy::Gedcom>.
 
 L<Gedcom::Date>.
-
-=head1 References
-
-See L<Genealogy::Gedcom::Reader::Lexer/References>.
 
 =head1 Machine-Readable Change Log
 
