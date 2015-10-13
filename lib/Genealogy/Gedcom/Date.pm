@@ -82,6 +82,14 @@ has style =>
 	required => 0,
 );
 
+has trace_terminals =>
+(
+	default  => sub{return 0},
+	is       => 'rw',
+	isa      => Int,
+	required => 0,
+);
+
 our $VERSION = '1.16';
 
 # ------------------------------------------------
@@ -185,7 +193,8 @@ END_OF_GRAMMAR
 	(
 		Marpa::R2::Scanless::R -> new
 		({
-			grammar => $self -> grammar,
+			grammar         => $self -> grammar,
+			trace_terminals => $self -> trace_terminals,
 		})
 	);
 
