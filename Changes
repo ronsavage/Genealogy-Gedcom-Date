@@ -1,5 +1,13 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+2.00  Tue Oct 13 20:43:00 2015
+	- Re-write using Marpa.
+	- Add methods: parse(), calendar(), error().
+	- Remove methods: parse_approximate_date(), parse_date_escape(), parse_datetime(),
+		parse_date_period(), parse_date_range(), parse_date_value(), parse_interpreted_date(),
+		debug(), method_index(), months_in_gregorian() and style().
+	- Reduce the max line length of this file, and of the docs, to (an arbitrary) 100 chars.
+
 1.16  Wed Sep 30 10:14:00 2015
 	- Expand parse_datetime() so it accepts either a string or a hash.
 	- Expand docs to match.
@@ -51,21 +59,23 @@ Revision history for Perl extension Genealogy::Gedcom::Date.
 
 1.08  Wed Jun 26 11:00:00 2013
 	- Rename CHANGES to Changes as per CPAN::Changes::SPEC.
-	- Update pre-preqs' version #s, especially for DateTime and DateTime::Infinite, to see if that fixes
-		mysterious CPAN Tester failures with t/date.t's use of '15 Jul 1954'.
+	- Update pre-preqs' version #s, especially for DateTime and DateTime::Infinite, to see if that
+		fixes mysterious CPAN Tester failures with t/date.t's use of '15 Jul 1954'.
 
 1.07  Fri Mar 23 16:51:00 2012
-	- Patch code and tests for Solaris, where Data::Infinite::(Past, Future) return '-Infinity' and 'Infinity'.
+	- Patch code and tests for Solaris, where Data::Infinite::(Past, Future) return '-Infinity' and
+		'Infinity'.
 	- Turn off debug in tests.
 
 1.06  Thu Mar 22 09:18:00 2012
 	- No code changes. No need to upgrade.
-	- The only patch is that debug is enabled in all test scripts. The point is to report as much information
-		as possible when CPAN Testers using Solaris run tests. Unfortunately, no CPAN Tester in this situation
-		has responded to my direct emails, so I'm using this mechanism to get the info I need. This is all part
-		of the mess MS Windows and Solaris make when failing to handle Data::Infinite::(Past, Future).
-		The next version will of course just have debug turned off again, along with a Solaris fix.
-		After that, I never want to hear about this problem again.
+	- The only patch is that debug is enabled in all test scripts. The point is to report as much
+		information as possible when CPAN Testers using Solaris run tests. Unfortunately, no CPAN
+		Tester in this situation has responded to my direct emails, so I'm using this mechanism to
+		get the info I need. This is all part of the mess MS Windows and Solaris make when failing
+		to handle Data::Infinite::(Past, Future). The next version will of course just have debug
+		turned off again, along with a Solaris fix. After that, I never want to hear about this
+		problem again.
 
 1.05  Sat Mar 17 17:29:00 2012
 	- CPAN testing showed more cases where the patches in V 1.02 had to be applied.
@@ -79,16 +89,20 @@ Revision history for Perl extension Genealogy::Gedcom::Date.
 		o Win32::GetOSName = WinXP/.Net
 
 1.02  Tue Mar 13 08:57:00 2012
-	- Bump pre-reqs for DateTime and DateTime::Inifinite from V 0.70 to V 0.72, since these are the latest (today).
-	- Fix sub _init_flags() for systems where DateTime::Infinite::Past is returned as '-1.#INF' instead of '-inf'.
-		For testing, this only affects the 2 tests in t/escape.t where we expect '-inf' as the output for one_date.
+	- Bump pre-reqs for DateTime and DateTime::Inifinite from V 0.70 to V 0.72, since these are the
+		latest (today).
+	- Fix sub _init_flags() for systems where DateTime::Infinite::Past is returned as '-1.#INF'
+		instead of '-inf'. For testing, this only affects the 2 tests in t/escape.t where we expect
+		'-inf' as the output for one_date.
 		For end users of course, the change in sub _init_flags() is what matters.
 	- Update the docs to explain that '-inf' is returned even when the system returns '-1.#INF'.
 
 1.01  Wed Feb 29 09:35:00 2012
 	  - No code changes.
-	  - Update pre-req Hash::FieldHash from V 0.10 to V 0.12, in presumably hopeless attempt to rectify a CPAN Tester report about failure under MS Windows.
-	  	See: http://www.cpantesters.org/cpan/report/9c177958-6ca0-1014-a634-88fc0063837e. The code tests perfectly on my Debian stable system.
+	  - Update pre-req Hash::FieldHash from V 0.10 to V 0.12, in presumably hopeless attempt to
+		rectify a CPAN Tester report about failure under MS Windows.
+	  	See: http://www.cpantesters.org/cpan/report/9c177958-6ca0-1014-a634-88fc0063837e. The code
+		tests perfectly on my Debian stable system.
 
 1.00  Thu Sep 20 13:47:00 2011
 	  - Initial release. This is an updated version of DateTime::Format::Gedcom V 1.00.
