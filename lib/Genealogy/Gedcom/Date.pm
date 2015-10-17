@@ -64,6 +64,14 @@ has recce =>
 	required => 0,
 );
 
+has trace_terminals =>
+(
+	default  => sub{return 0},
+	is       => 'rw',
+	isa      => Int,
+	required => 0,
+);
+
 our $VERSION = '2.00';
 
 # ------------------------------------------------
@@ -87,54 +95,64 @@ lexeme default				=  latm => 1		# Longest Acceptable Token Match.
 :start						::= gedcom_date
 
 gedcom_date					::= date
-								| date_lds_ord
+								| lds_ord_date
 
-date						::= date_calendar_name
-								| date_calendar_escape
+date						::= calendar_name
+								| calendar_escape
 
-date_calendar_name			::= date_french
-								| date_gregorian
-								| date_hebrew
-								| date_julian
+calendar_name				::= french_date
+								| german_date
+								| gregorian_date
+								| hebrew_date
+								| julian_date
 
-date_french					::= year_bc
+german_date					::= german_year
+								| german_r_month dot german_year
+								| day dot german_r_month dot german_year
+								| german_r_month german_year
+
+german_year					::= year
+								| year german_bc
+
+french_date					::= year_bc
 								| year
-								| french_month year
-								| day french_month year
+								| french_r_month year
+								| day french_r_month year
 
 year_bc						::= year bc
 
 year						::= number
 
-date_gregorian				::= year_gregorian_bc
-								| year_gregorian
-								| gregorian_month year_gregorian
-								| day gregorian_month year_gregorian
+gregorian_date				::= gregorian_year_bc
+								| gregorian_year
+								| gregorian_month gregorian_year
+								| day gregorian_month gregorian_year
 
-date_calendar_escape		::=
-date_calendar_escape		::= ('@#') date_calendar_name ('@')
+calendar_escape				::= ('@#') calendar_name ('@')
 
-year_gregorian_bc			::= year_gregorian bc
+gregorian_year_bc			::= gregorian_year bc
 
-year_gregorian				::= number
+gregorian_year				::= number
 								| number ('/') pair_of_digits
 
-date_hebrew					::= year_bc
+hebrew_date					::= year_bc
 								| year
 								| hebrew_month year
 								| day hebrew_month year
 
-date_julian					::= year_bc
+julian_date					::= year_bc
 								| year
 								| gregorian_month year
 								| day gregorian_month year
 
-date_lds_ord				::= date_value
+lds_ord_date				::= date_value
 
 date_value					::= date
 								| date_period
 								| date_range
-								| date_approximated
+								| approximated_date
+								| interpreted date '(' date_phrase ')'
+								| '(' date_phrase ')'
 
 date_period					::= from date
 								| to date
@@ -144,44 +162,72 @@ date_range					::= before date
 								| after date
 								| between date and date
 
-date_approximated			::= about date
+approximated_date			::= about date
 								| calculated date
 								| estimated date
+
+date_phrase					::= date_text
 
 # Lexemes, in alphabetical order.
 
 about						~ 'abt'
+								| 'about'
+								| 'circa'
 
 after						~ 'aft'
+								| 'after'
 
 and							~ 'and'
 
 bc							~ 'bc'
-								| 'b.c.'
+								| 'b c'
+								| 'bce'
 
 before						~ 'bef'
+								| 'before'
 
 between						~ 'bet'
+								| 'between'
 
 calculated					~ 'cal'
+								| 'calculated'
+
+date_text					~ [\w ]+
 
 day							~ digit
 								| digit digit
 
 digit						~ [0-9]
 
-estimated					~ 'est'
+dot							~ '.'
 
-french_month				~ 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent'
+estimated					~ 'est'
+								| 'estimated'
+
+french_r_month				~ 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent'
 								| 'germ' | 'flor' | 'prai' | 'mess' | 'ther' | 'fruc' | 'comp'
+
+from						~ 'from'
+
+german_bc					~ 'vc'
+								| 'v c'
+								| 'vchr'
+								| 'v chr'
+								| 'vuz'
+								| 'v u z'
+
+german_r_month				~ 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr'
+								| 'mai' | 'jun' | 'jul' | 'aug' | 'sep'
+								| 'sept' | 'okt' | 'nov' | 'dez'
+
+gregorian_month				~ 'jan' | 'feb' | 'mar' | 'apr' | 'may' | 'jun'
+								| 'jul' | 'aug' | 'sep' | 'oct' | 'nov' | 'dec'
 
 hebrew_month				~ 'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr'
 								| 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' | 'aav' | 'ell'
 
-from						~ 'from'
-
-gregorian_month				~ 'jan' | 'feb' | 'mar' | 'apr' | 'may' | 'jun'
-								| 'jul' | 'aug' | 'sep' | 'oct' | 'nov' | 'dec'
+interpreted					~ 'int'
+								| 'interpreted'
 
 number						~ digit+
 
@@ -290,14 +336,17 @@ sub parse
 	my($self, %args)  = @_;
 	my($date)         = $self -> date;
 	$date             = lc(defined($args{date}) ? $args{date} : $date);
+	$date             =~ tr/.,/ /s;
 	my($length_input) = length($date);
 
+	$self -> date($date);
 	$self -> error('');
 	$self -> recce
 	(
 		Marpa::R2::Scanless::R -> new
 		({
-			grammar => $self -> grammar,
+			grammar         => $self -> grammar,
+			trace_terminals => $self -> trace_terminals,
 		})
 	);
 
@@ -332,35 +381,53 @@ sub parse
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
 Genealogy::Gedcom::Date - Parse GEDCOM dates
 
 =head1 Synopsis
 
+	#!/usr/bin/env perl
+
+	use strict;
+	use warnings;
+	use Genealogy::Gedcom::Date;
+
 	my($parser) = Genealogy::Gedcom::Date -> new;
 
-	# These samples are from t/value.t.
-
-	for my $candidate (
-	'Abt 1 Jan 2001', # use parse_approximate_date().
-	'Aft 1 Jan 2001', # Use parse_date_range().
-	'From 0'          # Use parse_date_period().
+	for my $candidate
+	(
+		'ABT 10 JUL 2003',
+		'CAL 10 JUL 2003',
+		'EST 1700',
+		'FROM 1522 TO 1534',
 	)
 	{
-		my($hashref) = $parser -> parse(date => $candidate);
+		print "Date: $date. ";
+
+		$result = $parser -> parse(date => $date);
+
+		if ($result)
+		{
+			print "Result: $result. \n";
+		}
+		else
+		{
+			print $parser -> error();
+		}
 	}
 
 See the L</FAQ>'s first QA for the definition of $hashref.
 
-L<Genealogy::Gedcom::Date> ships with t/date.t, t/escape.t and t/value.t. You are strongly
-encouraged to peruse them.
+This code is a fragment of scripts/synopsis.pl.
 
 =head1 Description
 
 L<Genealogy::Gedcom::Date> provides a parser for GEDCOM dates.
 
-See L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
+See L<the GEDCOM Specification|http://wiki.webtrees.net/en/Main_Page>.
 
 =head1 Installation
 
@@ -399,33 +466,92 @@ Key-value pairs accepted in the parameter list (see corresponding methods for de
 
 =over 4
 
-=item o date => $a_string
+=item o calendar => $name
+
+The name of the calendar to use as the default.
+
+See L</calendar([$name])> for details.
+
+Default: 'Gregorian'.
+
+=item o date => $date
 
 The string to be parsed.
 
-This string is always converted to lower case before being processed.
+This string is always converted to lower case before being processed. Further, ',' and '.' are
+replaced by spaces. See the L</FAQ> for details.
+
+See L</date([$date])> for details.
 
 Default: ''.
 
-This parameter is optional. It can be supplied to new() or to L<parse_approximate_date([%arg])>,
-L<parse_date_period([%arg])> or L<parse_date_range([%arg])>.
-
 =back
+
+Note: These parameters can also be provided in the call to L</parse([%args])>.
 
 =head1 Methods
 
-=head2 date([$string])
+=head2 calendar([$name])
+
+Here, [ and ] indicate an optional parameter.
+
+Gets or sets the name of the default calendar.
+
+The name in C<< parse(calendar => $name) >> takes precedence over C<< new(calendar => $name) >>
+and C<calendar($name)>.
+
+This means if you call C<parse()> as C<< parse(calendar => $name) >>, then the value C<$name> is
+stored so that if you subsequently call C<calendar()>, that value is returned.
+
+$name (case-insensitive) must be one of:
+
+=over 4
+
+=item o French
+
+=item o German
+
+=item o Gregorian
+
+This is the default.
+
+=item o Hebrew
+
+=item o Julian
+
+=back
+
+Note: C<calendar> is a parameter to new().
+
+=head2 date([$date])
+
+Here, [ and ] indicate an optional parameter.
+
+Gets or sets the date to be parsed, or the date which was just parsed.
+
+The date in C<< parse(date => $date) >> takes precedence over C<< new(date => $date) >>
+and C<date($date)>.
+
+This means if you call C<parse()> as C<< parse(date => $date) >>, then the value C<$date> is stored
+so that if you subsequently call C<date()>, that value is returned.
+
+Note: C<date> is a parameter to new().
+
+=head2 new([%args])
+
+The constructor. See L</Constructor and Initialization>.
 
 =head2 parse([%args])
 
+Here, [ and ] indicate an optional parameter.
+
+C<parse()> is often the only method you'll need to call, after calling C<new()>.
+
+C<parse()> takes the same parameters as C<new()>.
+
 =head1 FAQ
 
-=head2 Does this module respect the ENV{LANG} variable?
-
-Yes. When DateTime objects are created, the C<locale> parameter is set to $ENV{LANG} if the latter
-is set.
-
-=head2 What is the format of the hashref returned by parse_*()?
+=head2 What is the format of the hashref returned by parse()?
 
 It has these key => value pairs:
 
@@ -641,6 +767,113 @@ Default: 0.
 
 =back
 
+=head2 What is the meaning of the 'calendar' key in calls to the new() and parse() methods?
+
+Possible values (case-insensitive):
+
+=over 4
+
+=item o calendar => 'French'
+
+Expect dates in 'month day year' format, as in From Jan 2 2011 BC to Mar 4 2011.
+
+=item o calendar => 'German'
+
+=item o calendar => 'Gregorian'
+
+Expect dates in 'day month year' format, as in From 1 Jan 2001 to 25 Dec 2002.
+
+This is the default.
+
+=item o calendar => 'Hebrew'
+
+Expect dates in 'year month day' format, as in 2011-01-02 to 2011-03-04.
+
+=item o calendar => 'Julian'
+
+Expect dates in 'year month day' format, as in 2011-01-02 to 2011-03-04.
+
+=back
+
+=head2 Are dates massaged before being processed?
+
+Yes. They are lower-cased, and both commas and full-stops are replaced with spaces. So that's how
+they are returned if you call L</date($date)> to retrieve the date actually processed.
+
+=head2 What extensions to the Gedcom grammar are supported?
+
+Note: Please read the preceeding QA first!
+
+Date types:
+
+=over 4
+
+=item o 'about' may be spelled as 'abt', 'about' or 'circa'
+
+=item o 'after' may be spelled as 'aft' or 'after'
+
+=item o 'before' may be spelled as 'bef' or 'before'
+
+=item o 'between' may be spelled as 'bet' or 'between'
+
+=item o 'calculated' may be spelled as 'cal' or 'calculated'
+
+=item o 'estimated' may be spelled as 'est' or 'estimated'
+
+=item o 'interpreted' may be spelled as 'int' or 'interpreted'
+
+=back
+
+Month names:
+
+=over 4
+
+=item o French months
+
+Use 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent' | 'germ' | 'flor' | 'prai' | 'mess' | 'ther'
+| 'fruc' | 'comp'.
+
+=item o German months
+
+Use 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun' | 'jul' | 'aug' | 'sep' | 'sept'
+| 'okt' | 'nov' | 'dez'.
+
+
+=back
+
+BC:
+
+=over 4
+
+=item o Gregorian BC may be spelled as 'bc', 'b c' or 'bce'
+
+=item o German BC may be spelled as 'vc', 'v c', 'v chr', 'vchr', 'vuz' or 'v u z'
+
+=back
+
+=head2 Are Gregorian dates of the form 1699/00 handled?
+
+Yes. Specifically, '1 Dec 1699/00' is returned as '1 dec 1699 00'.
+
+See scripts/synopsis.pl.
+
+=head2 Your module rejected my date!
+
+There are many possible reasons for this. One is:
+
+=over 4
+
+=item o The date is in American format (month before year), but the code was not warned
+
+See L</calendar([$name])> for a list of supported calendars.
+
+=back
+
+=head2 Does this module respect the ENV{LANG} variable?
+
+Yes. When DateTime objects are created, the C<locale> parameter is set to $ENV{LANG} if the latter
+is set.
+
 =head2 On what systems do DateTime::Inifinite::(Past, Future) return '-1.#INF' and '1.#INF'?
 
 So far (as reported by CPAN Testers):
@@ -663,58 +896,21 @@ So far (as reported by CPAN Testers):
 
 =back
 
-=head2 What is the meaning of the 'calendar' key in calls to the new() and parse() methods?
-
-Possible values (in any case):
-
-=over 4
-
-=item o calendar => 'french'
-
-Expect dates in 'month day year' format, as in From Jan 2 2011 BC to Mar 4 2011.
-
-=item o calendar => 'gregorian'
-
-Expect dates in 'day month year' format, as in From 1 Jan 2001 to 25 Dec 2002.
-
-This is the default.
-
-=item o calendar => 'hebrew'
-
-Expect dates in 'year month day' format, as in 2011-01-02 to 2011-03-04.
-
-=item o calendar => 'julian'
-
-Expect dates in 'year month day' format, as in 2011-01-02 to 2011-03-04.
-
-=back
-
-The string in parse(calendar => $a_string) takes precedence over new(calendar => $a_string).
-
 =head2 How do I format dates for output?
 
 Use the hashref keys 'one' and 'two', to get dates in the form 2011-06-21. Re-format as necessary.
 
-Such a hashref is returned from all parse_*() methods.
+Such a hashref is returned from the L</parse([%args])> method.
 
 =head2 Does this module handle non-Gregorian calendars?
 
-No, not yet. See L</process_date_escape(@field)> for more details.
-
-=head2 How are the various date formats handled?
-
-Firstly, all commas are deleted from incoming dates.
-
-Then, dates are split on ' ', '-' and '/', and the resultant fields are analyzed one at a time.
-
-The 'calendar' key can be used to force the code to assume a certain type of date format. This
-option is explained above, in this FAQ.
+Yes. See L</calendar([$name])> for more details.
 
 =head2 How are incomplete dates handled?
 
 A missing month is set to 1 and a missing day is set to 1.
 
-Further, in the hashref returned by the parse_*() methods, the flags one_default_month,
+Further, in the hashref returned by the L</parse([%args])>, the flags one_default_month,
 one_default_day, two_default_month and two_default_day are set to 1, as appropriate, so you can
 tell that the code supplied the value.
 
@@ -727,7 +923,7 @@ Because such objects have the sophistication required to handle such a complex t
 
 See L<DateTime> and L<http://datetime.perl.org/wiki/datetime/dashboard> for details.
 
-=head2 What happens if parse_date_period() is given a string like 'From 2000 to 1999'?
+=head2 What happens if C<parse()> is given a string like 'From 2000 to 1999'?
 
 Then the returned hashref will have:
 
@@ -761,17 +957,37 @@ My policy is to use the lightweight L<Moo> for all modules and applications.
 
 Sample code to overload '<' and '>' as in L<Gedcom::Date>.
 
-=item o Handle Gregorian years of the form 1699/00
-
-See p. 65 of L<the GEDCOM Specification Ged551-5.pdf|http://wiki.webtrees.net/File:Ged551-5.pdf>.
-
 =back
 
 =head1 See Also
 
+=head2 Modules
+
+L<DateTime>.
+
+L<DateTime::Moonpig>.
+
+L<DateTimeX::Lite>.
+
 L<Genealogy::Gedcom>.
 
-L<Gedcom::Date>.
+L<Time::Duration>, which is more sophisticated than L<Time::Elapsed>.
+
+L<Time::Moment> implements L<ISO 8601|https://en.wikipedia.org/wiki/ISO_8601>.
+
+L<Time::ParseDate>.
+
+L<Time::Piece>, which is in Perl core.
+
+=head2 Articles
+
+L<http://perltricks.com/article/59/2014/1/10/Solve-almost-any-datetime-need-with-Time-Piece>.
+
+The next two articles discuss a wide range of modules:
+
+L<http://blogs.perl.org/users/buddy_burden/2015/09/a-date-with-cpan-part-1-state-of-the-union.html>.
+
+L<http://blogs.perl.org/users/buddy_burden/2015/10/a-date-with-cpan-part-2-target-first-aim-afterwards.html>.
 
 =head1 Machine-Readable Change Log
 
