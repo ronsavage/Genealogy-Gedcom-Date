@@ -70,19 +70,22 @@ for my $date
 	'1950 BC.',
 	'1950 B.C.',
 	'1950 BCE',
+	'21.mär.1999',
 )
 {
 	print "Date: $date. ";
+
+	# Return 0 for success and 1 for failure.
 
 	$result = $parser -> parse(date => $date);
 
 	if ($result)
 	{
-		print "Result: $result. \n";
+		print $parser -> error();
 	}
 	else
 	{
-		print $parser -> error();
+		print 'Result: ', $parser -> result, ". \n";
 	}
 }
 
@@ -95,14 +98,16 @@ for my $date
 {
 	print "Date: $date. ";
 
+	# Return 0 for success and 1 for failure.
+
 	$result = $parser -> parse(date => $date);
 
 	if ($result)
 	{
-		print "Result: $result. \n";
+		print $parser -> error();
 	}
 	else
 	{
-		print $parser -> error();
+		print 'Result: ', $parser -> result, ". \n";
 	}
 }

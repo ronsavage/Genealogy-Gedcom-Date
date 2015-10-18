@@ -5,12 +5,14 @@ Revision history for Perl extension Genealogy::Gedcom::Date.
 		flexability is permitted in that German month names are accepted, and BC/BCE can contain
 		full-stops. Likewise, commas are accepted, but both ',' and '.' are discarded.
 		See the FAQ for all such extensions to the Gedcom grammar.
+	- Add scripts/synopsis.pl.
+	- Accept Unicode input. See scripts/synopsis.pl.
+	- Add support for German dates.
 	- Add methods: parse(), calendar(), error().
 	- Remove methods: parse_approximate_date(), parse_date_escape(), parse_datetime(),
 		parse_date_period(), parse_date_range(), parse_date_value(), parse_interpreted_date(),
 		debug(), method_index(), months_in_gregorian() and style().
 	- Reduce the max line length of this file, and of the docs, to (an arbitrary) 100 chars.
-	- Add scripts/synopsis.pl.
 	- Replace all tests with TODO.
 
 1.16  Wed Sep 30 10:14:00 2015

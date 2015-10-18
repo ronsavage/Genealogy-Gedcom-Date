@@ -8,13 +8,15 @@ use Config;
 use DateTime;
 use DateTime::Infinite;
 
+use Log::Handler;
+
 use Marpa::R2;
 
 use Moo;
 
 use Try::Tiny;
 
-use Types::Standard qw/Any Bool Int Str/;
+use Types::Standard qw/Any Bool Int HashRef Str/;
 
 has bnf =>
 (
@@ -56,12 +58,54 @@ has grammar =>
 	required => 0,
 );
 
+has known_events =>
+(
+	default  => sub{return {} },
+	is       => 'rw',
+	isa      => HashRef,
+	required => 0,
+);
+
+has logger =>
+(
+	default  => sub{return undef},
+	is       => 'rw',
+	isa      => Any,
+	required => 0,
+);
+
+has maxlevel =>
+(
+	default  => sub{return 'notice'},
+	is       => 'rw',
+	isa      => Str,
+	required => 0,
+);
+
+has minlevel =>
+(
+	default  => sub{return 'error'},
+	is       => 'rw',
+	isa      => Str,
+	required => 0,
+);
+
 has recce =>
 (
 	default  => sub{return ''},
 	is       => 'rw',
 	isa      => Any,
 	required => 0,
+);
+
+has result =>
+(
+#	default  => sub{return {} },
+	default  => sub{return ''},
+	is       => 'rw',
+#	isa      => HashRef,
+	isa      => Str,
+#	required => 0,
 );
 
 has trace_terminals =>
@@ -80,165 +124,211 @@ sub BUILD
 {
 	my($self) = @_;
 
+	if (! defined $self -> logger)
+	{
+		$self -> logger(Log::Handler -> new);
+		$self -> logger -> add
+		(
+			screen =>
+			{
+				maxlevel       => $self -> maxlevel,
+				message_layout => '%m',
+				minlevel       => $self -> minlevel,
+			}
+		);
+	}
+
 	# Policy: Event names are always the same as the name of the corresponding lexeme.
 
 	$self -> bnf
 	(
 <<'END_OF_GRAMMAR'
 
-:default					::= action => [values]
+:default			::= action => [values]
 
-lexeme default				=  latm => 1		# Longest Acceptable Token Match.
+lexeme default		=  latm => 1		# Longest Acceptable Token Match.
 
-# Rules, (more-or-less) in top-down order.
+# Rules, in top-down order (more-or-less).
 
-:start						::= gedcom_date
+:start				::= gedcom_date
 
-gedcom_date					::= date
-								| lds_ord_date
+gedcom_date			::= date			rank => 1
+						| lds_ord_date	rank => 2
 
-date						::= calendar_name
-								| calendar_escape
+date				::= calendar_date
+						| calendar_escape
 
-calendar_name				::= french_date
-								| german_date
-								| gregorian_date
-								| hebrew_date
-								| julian_date
+#calendar_date		::= french_date
+#						| german_date
+#						| gregorian_date
+#						| hebrew_date
+#						| julian_date
 
-german_date					::= german_year
-								| german_r_month dot german_year
-								| day dot german_r_month dot german_year
-								| german_r_month german_year
+calendar_date		::= gregorian_date
 
-german_year					::= year
-								| year german_bc
+#french_date			::= year_bc
+#						| year
+#						| french_month year
+#						| day french_month year
+#
+#german_date			::= german_year
+#						| german_month dot german_year
+#						| day dot german_month dot german_year
+#						| german_month german_year
+#
+#german_year			::= year
+#						| year german_bc
+#
+#year_bc				::= year bc
+#
+#year				::= number
 
-french_date					::= year_bc
-								| year
-								| french_r_month year
-								| day french_r_month year
+gregorian_date		::= gregorian_year_bc
+						| gregorian_year
+						| gregorian_month gregorian_year
+						| day gregorian_month gregorian_year
 
-year_bc						::= year bc
+calendar_escape		::= ('@#') calendar_name ('@')
 
-year						::= number
+gregorian_year_bc	::= gregorian_year bc
 
-gregorian_date				::= gregorian_year_bc
-								| gregorian_year
-								| gregorian_month gregorian_year
-								| day gregorian_month gregorian_year
+gregorian_year		::= number
+						| number ('/') pair_of_digits
 
-calendar_escape				::= ('@#') calendar_name ('@')
+#hebrew_date			::= year_bc
+#						| year
+#						| hebrew_month year
+#						| day hebrew_month year
 
-gregorian_year_bc			::= gregorian_year bc
+#julian_date			::= year_bc
+#						| year
+#						| gregorian_month year
+#						| day gregorian_month year
 
-gregorian_year				::= number
-								| number ('/') pair_of_digits
+lds_ord_date		::= date_value
 
-hebrew_date					::= year_bc
-								| year
-								| hebrew_month year
-								| day hebrew_month year
+date_value			::= date
+						| date_period
+						| date_range
+						| approximated_date
+						| interpreted date '(' date_phrase ')'
+						| '(' date_phrase ')'
 
-julian_date					::= year_bc
-								| year
-								| gregorian_month year
-								| day gregorian_month year
+date_period			::= from date
+						| to date
+						| from date to date
 
-lds_ord_date				::= date_value
+date_range			::= before date
+						| after date
+						| between date and date
 
-date_value					::= date
-								| date_period
-								| date_range
-								| approximated_date
-								| interpreted date '(' date_phrase ')'
-								| '(' date_phrase ')'
-
-date_period					::= from date
-								| to date
-								| from date to date
-
-date_range					::= before date
-								| after date
-								| between date and date
-
-approximated_date			::= about date
-								| calculated date
-								| estimated date
+approximated_date	::= about date
+						| calculated date
+						| estimated date
 
 date_phrase					::= date_text
 
 # Lexemes, in alphabetical order.
 
-about						~ 'abt'
-								| 'about'
-								| 'circa'
+:lexeme				~ about				pause => before		event => about
+about				~ 'abt'
+						| 'about'
+						| 'circa'
 
-after						~ 'aft'
-								| 'after'
+:lexeme				~ after				pause => before		event => after
+after				~ 'aft'
+						| 'after'
 
-and							~ 'and'
+:lexeme				~ and				pause => before		event => and
+and					~ 'and'
 
-bc							~ 'bc'
-								| 'b c'
-								| 'bce'
+:lexeme				~ bc				pause => before		event => bc
+bc					~ 'bc'
+						| 'b.c'
+						| 'b.c.'
+						| 'bc.'
+						| 'b c'
+						| 'bce'
 
-before						~ 'bef'
-								| 'before'
+:lexeme				~ before			pause => before		event => before
+before				~ 'bef'
+						| 'before'
 
-between						~ 'bet'
-								| 'between'
+:lexeme				~ between			pause => before		event => between
+between				~ 'bet'
+						| 'between'
 
-calculated					~ 'cal'
-								| 'calculated'
+:lexeme				~ calculated		pause => before		event => calculated
+calculated			~ 'cal'
+						| 'calculated'
 
-date_text					~ [\w ]+
+:lexeme				~ calendar_name		pause => before		event => calendar_name
+calendar_name		~ 'dfrench r'
+						| 'dfrenchr'
+						| 'dgerman'
+						| 'dgregorian'
+						| 'dhebrew'
+						| 'djulian'
 
-day							~ digit
-								| digit digit
+:lexeme				~ date_text			pause => before		event => date_text
+date_text			~ [\w ]+
 
-digit						~ [0-9]
+:lexeme				~ day				pause => before		event => day
+day					~ digit
+						| digit digit
 
-dot							~ '.'
+digit				~ [0-9]
 
-estimated					~ 'est'
-								| 'estimated'
+#:lexeme				~ dot				pause => before		event => dot
+#dot					~ '.'
 
-french_r_month				~ 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent'
-								| 'germ' | 'flor' | 'prai' | 'mess' | 'ther' | 'fruc' | 'comp'
+:lexeme				~ estimated			pause => before		event => estimated
+estimated			~ 'est'
+						| 'estimated'
 
-from						~ 'from'
+#:lexeme				~ french_month		pause => before		event => french_month
+#french_month		~ 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent'
+#						| 'germ' | 'flor' | 'prai' | 'mess' | 'ther' | 'fruc' | 'comp'
 
-german_bc					~ 'vc'
-								| 'v c'
-								| 'vchr'
-								| 'v chr'
-								| 'vuz'
-								| 'v u z'
+:lexeme				~ from				pause => before		event => from
+from				~ 'from'
 
-german_r_month				~ 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr'
-								| 'mai' | 'jun' | 'jul' | 'aug' | 'sep'
-								| 'sept' | 'okt' | 'nov' | 'dez'
+#:lexeme				~ german_bc			pause => before		event => german_bc
+#german_bc			~ 'vc'
+#						| 'v.c.'
+#						| 'v.chr.'
+#						| 'vchr'
+#						| 'vuz'
+#						| 'v.u.z.'
+#
+#:lexeme				~ german_month		pause => before		event => german_month
+#german_month		~ 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun'
+#						| 'jul' | 'aug' | 'sep' | 'sept' | 'okt' | 'nov' | 'dez'
 
-gregorian_month				~ 'jan' | 'feb' | 'mar' | 'apr' | 'may' | 'jun'
-								| 'jul' | 'aug' | 'sep' | 'oct' | 'nov' | 'dec'
+:lexeme				~ gregorian_month	pause => before		event => gregorian_month
+gregorian_month		~ 'jan' | 'feb' | 'mar' | 'apr' | 'may' | 'jun'
+						| 'jul' | 'aug' | 'sep' | 'oct' | 'nov' | 'dec'
 
-hebrew_month				~ 'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr'
-								| 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' | 'aav' | 'ell'
+#:lexeme				~ hebrew_month		pause => before		event => hebrew_month
+#hebrew_month		~ 'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr'
+#						| 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' | 'aav' | 'ell'
 
-interpreted					~ 'int'
-								| 'interpreted'
+:lexeme				~ interpreted		pause => before		event => interpreted
+interpreted			~ 'int'
+						| 'interpreted'
 
-number						~ digit+
+:lexeme				~ number			pause => before		event => number
+number				~ digit+
 
-pair_of_digits				~ digit digit
+pair_of_digits		~ digit digit
 
-to							~ 'to'
+:lexeme				~ to				pause => before		event => to
+to					~ 'to'
 
 # Boilerplate.
 
-:discard				~ whitespace
-whitespace				~ [\s]+
+:discard			~ whitespace
+whitespace			~ [\s]+
 
 END_OF_GRAMMAR
 	);
@@ -250,6 +340,15 @@ END_OF_GRAMMAR
 			source => \$self -> bnf
 		})
 	);
+
+	my(%event);
+
+	for my $line (split(/\n/, $self -> bnf) )
+	{
+		$event{$1} = 1 if ($line =~ /event\s+=>\s+(\w+)/);
+	}
+
+	$self -> known_events(\%event);
 
 } # End of BUILD.
 
@@ -325,19 +424,28 @@ sub _init_flags
 	$flags{one} = $flags{one_date} = $minus_infinity if ( ($flags{one} eq '-1.#INF') || ($flags{one} eq '-Infinity') );
 	$flags{two} = $flags{two_date} = $plus_infinity  if ( ($flags{two} eq '1.#INF')  || ($flags{two} eq 'Infinity') );
 
-	return {%flags};
+	$self -> result({%flags});
 
 } # End of _init_flags.
+
+# ------------------------------------------------
+
+sub log
+{
+	my($self, $level, $s) = @_;
+
+	$self -> logger -> log($level => $s) if ($self -> logger);
+
+} # End of log.
 
 # --------------------------------------------------
 
 sub parse
 {
-	my($self, %args)  = @_;
-	my($date)         = $self -> date;
-	$date             = lc(defined($args{date}) ? $args{date} : $date);
-	$date             =~ tr/.,/ /s;
-	my($length_input) = length($date);
+	my($self, %args) = @_;
+	my($date)        = $self -> date;
+	$date            = lc(defined($args{date}) ? $args{date} : $date);
+	$date            =~ tr/,/ /s;
 
 	$self -> date($date);
 	$self -> error('');
@@ -346,34 +454,151 @@ sub parse
 		Marpa::R2::Scanless::R -> new
 		({
 			grammar         => $self -> grammar,
+			ranking_method  => 'high_rule_only',
 			trace_terminals => $self -> trace_terminals,
 		})
 	);
 
-	my($length_processed);
-	my($value);
+	# Return 0 for success and 1 for failure.
+
+	my($result) = 0;
 
 	try
 	{
-		$length_processed = $self -> recce -> read(\$date);
-
-		if ($length_processed == $length_input)
+		if (defined (my $value = $self -> _process($date) ) )
 		{
-			$value = $self-> _decode_result(${$self -> recce -> value});
+			$self -> log(info => $self -> result);
 		}
 		else
 		{
-			$self -> error("Input length: $length_input. Length processed: $length_processed");
+			$result = 1;
+
+			$self -> error('Parse failed');
+
+			$self -> log(error => 'Parse failed');
 		}
 	}
 	catch
 	{
+		$result = 1;
+
 		$self -> error($_);
+
+		$self -> log(error => "Parse failed. $_");
 	};
 
-	return $value;
+	# Return 0 for success and 1 for failure.
+
+	return $result;
 
 } # End of parse.
+
+# ------------------------------------------------
+
+sub _process
+{
+	my($self)       = @_;
+	my($date)       = $self -> date;
+	my($length)     = length $date;
+	my($last_event) = '';
+	my($pos)        = 0;
+
+	my($event_name);
+	my($lexeme);
+	my($node_name);
+	my($original_lexeme);
+	my($span, $start, @stack);
+	my($temp, $type);
+
+	# We use read()/lexeme_read()/resume() because we pause at each lexeme.
+	# Also, in read(), we use $pos and $length to avoid reading Ruby Slippers tokens (if any).
+
+	for
+	(
+		$pos = $self -> recce -> read(\$date, $pos, $length);
+		$pos < $length;
+		$pos = $self -> recce -> resume($pos)
+	)
+	{
+		($start, $span)            = $self -> recce -> pause_span;
+		($event_name, $span, $pos) = $self -> _validate_event($date, $start, $span, $pos);
+		$lexeme                    = $self -> recce -> literal($start, $span);
+		$original_lexeme           = $lexeme;
+		$pos                       = $self -> recce -> lexeme_read($event_name);
+
+		die "lexeme_read($event_name) rejected lexeme |$lexeme|\n" if (! defined $pos);
+
+		push @stack, $lexeme;
+
+=pod
+
+		if ($event_name eq 'about')
+		{
+		}
+		elsif ($event_name eq 'after')
+		{
+		}
+		elsif ($event_name eq 'and')
+		{
+		}
+
+=cut
+
+		$last_event = $event_name;
+    }
+
+	if (my $ambiguous_status = $self -> recce -> ambiguous)
+	{
+		my($terminals) = $self -> recce -> terminals_expected;
+		$terminals     = ['(None)'] if ($#$terminals < 0);
+
+		$self -> log(info => 'Terminals expected: ' . join(', ', @$terminals) );
+		$self -> log(info => "Parse is ambiguous. Status: $ambiguous_status");
+	}
+
+	$self -> result('<' . join(' ', @stack) . '>');
+
+	# Return a defined value for success and undef for failure.
+
+	return 0; # TODO.
+
+	return $self -> recce -> value;
+
+} # End of _process.
+
+# ------------------------------------------------
+
+sub _validate_event
+{
+	my($self, $string, $start, $span, $pos) = @_;
+	my(@events)        = @{$self -> recce -> events};
+	my($event_count)   = scalar @events;
+	my(@event_names)   = sort map{$$_[0]} @events;
+	my($event_name)    = $event_names[0]; # Default.
+	my($lexeme)        = substr($string, $start, $span);
+	my($line, $column) = $self -> recce -> line_column($start);
+	my($message)       = "Location: ($line, $column). Lexeme: |$lexeme|. String: |$string|";
+	$message           = "$message. Events: $event_count. Names: ";
+
+	$self -> log(debug => $message . join(', ', @event_names) . '.');
+
+	my(%event_name);
+
+	@event_name{@event_names} = (1) x @event_names;
+
+	for (@event_names)
+	{
+		die "Unexpected event name '$_'" if (! ${$self -> known_events}{$_});
+	}
+
+	if ($event_count > 1)
+	{
+#TODO		die 'The code only handles 1 event at a time. Events: ' . join(', ', @event_names), ". \n";
+	}
+
+	return ($event_name, $span, $pos);
+
+} # End of _validate_event.
 
 # --------------------------------------------------
 
@@ -503,23 +728,9 @@ and C<calendar($name)>.
 This means if you call C<parse()> as C<< parse(calendar => $name) >>, then the value C<$name> is
 stored so that if you subsequently call C<calendar()>, that value is returned.
 
-$name (case-insensitive) must be one of:
+See L</What extensions to the Gedcom grammar are supported?> for details.
 
-=over 4
-
-=item o French
-
-=item o German
-
-=item o Gregorian
-
-This is the default.
-
-=item o Hebrew
-
-=item o Julian
-
-=back
+See also L</What is the meaning of the 'calendar' key in method calls?>.
 
 Note: C<calendar> is a parameter to new().
 
@@ -537,6 +748,15 @@ so that if you subsequently call C<date()>, that value is returned.
 
 Note: C<date> is a parameter to new().
 
+=head2 error()
+
+Gets the last error message.
+
+Returns '' (the empty string) if there have been no errors.
+
+If L<Marpa::R2> throws an exception, it is caught by a try/catch block, and the C<Marpa> error
+is returned by this method.
+
 =head2 new([%args])
 
 The constructor. See L</Constructor and Initialization>.
@@ -545,13 +765,19 @@ The constructor. See L</Constructor and Initialization>.
 
 Here, [ and ] indicate an optional parameter.
 
+C<parser()> returns 0 for success and 1 for failure.
+
 C<parse()> is often the only method you'll need to call, after calling C<new()>.
+
+Upon success, call L</result()> to retrieve the hashref discussed in the first FAQ.
+
+Upon failure, call L</error()> to retrieve the error message.
 
 C<parse()> takes the same parameters as C<new()>.
 
 =head1 FAQ
 
-=head2 What is the format of the hashref returned by parse()?
+=head2 What is the format of the hashref returned by result()?
 
 It has these key => value pairs:
 
@@ -767,7 +993,7 @@ Default: 0.
 
 =back
 
-=head2 What is the meaning of the 'calendar' key in calls to the new() and parse() methods?
+=head2 What is the meaning of the 'calendar' key in method calls?
 
 Possible values (case-insensitive):
 
@@ -795,14 +1021,22 @@ Expect dates in 'year month day' format, as in 2011-01-02 to 2011-03-04.
 
 =back
 
+=head2 Does this module accept Unicode characters?
+
+Yes. Seel scripts/synopsis.pl.
+
 =head2 Are dates massaged before being processed?
 
-Yes. They are lower-cased, and both commas and full-stops are replaced with spaces. So that's how
-they are returned if you call L</date($date)> to retrieve the date actually processed.
+Yes. They are lower-cased, and commas are replaced with spaces. So that's how they are returned if
+you call L</date($date)> to retrieve the date actually processed.
 
 =head2 What extensions to the Gedcom grammar are supported?
 
 Note: Please read the preceeding QA first!
+
+Calendar names:
+
+Use 'dfrench r', 'dfrenchr', 'dgerman', 'dgregorian', 'dhebrew' or 'djulian'.
 
 Date types:
 
@@ -850,6 +1084,10 @@ BC:
 =item o German BC may be spelled as 'vc', 'v c', 'v chr', 'vchr', 'vuz' or 'v u z'
 
 =back
+
+=head2 Do you accept suggestion regarding other extensions?
+
+Yes, but they must not be ambiguous.
 
 =head2 Are Gregorian dates of the form 1699/00 handled?
 
@@ -900,7 +1138,7 @@ So far (as reported by CPAN Testers):
 
 Use the hashref keys 'one' and 'two', to get dates in the form 2011-06-21. Re-format as necessary.
 
-Such a hashref is returned from the L</parse([%args])> method.
+Such a hashref is returned from the L</result()> method.
 
 =head2 Does this module handle non-Gregorian calendars?
 
@@ -910,7 +1148,7 @@ Yes. See L</calendar([$name])> for more details.
 
 A missing month is set to 1 and a missing day is set to 1.
 
-Further, in the hashref returned by the L</parse([%args])>, the flags one_default_month,
+Further, in the hashref returned by the L</result()>, the flags one_default_month,
 one_default_day, two_default_month and two_default_day are set to 1, as appropriate, so you can
 tell that the code supplied the value.
 
@@ -1007,12 +1245,18 @@ Email the author, or log a bug on RT:
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy::Gedcom::Date>.
 
-=head1 Thanx
+=head1 Credits
 
 Thanx to Eugene van der Pijll, the author of the Gedcom::Date::* modules.
 
 Thanx also to the authors of the DateTime::* family of modules. See
 L<http://datetime.perl.org/wiki/datetime/dashboard> for details.
+
+Thanx for Mike Elston on the perl-gedcom mailing list for providing French month abbreviations,
+amongst other information pertaining to the French language.
+
+Thanx to Michael Ionescu on the perl-gedcom mailing list for providing the grammar for German dates
+and German month abbreviations.
 
 =head1 Author
 
