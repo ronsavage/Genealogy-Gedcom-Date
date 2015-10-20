@@ -23,7 +23,6 @@ if ($option_parser -> getoptions
 	'help',
 	'maxlevel=s',
 	'minlevel=s',
-	'trace_terminals=i',
 ) )
 {
 	pod2usage(1) if ($option{'help'});
@@ -54,7 +53,6 @@ parse.pl [options]
 	-help
 	-maxlevel logOption1
 	-minlevel logOption2
-	-trace_terminals anInteger
 
 Exit value: 0 for success, 1 for failure. Die upon error.
 
@@ -91,14 +89,6 @@ See the Log::handler docs.
 Default: 'error'.
 
 No lower levels are used.
-
-=item o -trace_terminals anInteger
-
-See the trace level in Marpa::R2::Scanless::R.
-
-Typical values: 0, 1, 99.
-
-Default: 0 (No tracing).
 
 =back
 

@@ -58,14 +58,6 @@ has grammar =>
 	required => 0,
 );
 
-has known_events =>
-(
-	default  => sub{return {} },
-	is       => 'rw',
-	isa      => HashRef,
-	required => 0,
-);
-
 has logger =>
 (
 	default  => sub{return undef},
@@ -108,14 +100,6 @@ has result =>
 #	required => 0,
 );
 
-has trace_terminals =>
-(
-	default  => sub{return 0},
-	is       => 'rw',
-	isa      => Int,
-	required => 0,
-);
-
 our $VERSION = '2.00';
 
 # ------------------------------------------------
@@ -138,8 +122,6 @@ sub BUILD
 		);
 	}
 
-	# Policy: Event names are always the same as the name of the corresponding lexeme.
-
 	$self -> bnf
 	(
 <<'END_OF_GRAMMAR'
@@ -150,38 +132,36 @@ lexeme default		=  latm => 1		# Longest Acceptable Token Match.
 
 # Rules, in top-down order (more-or-less).
 
-:start				::= gedcom_date
+:start				::= date_string
 
-gedcom_date			::= date			rank => 1
-						| lds_ord_date	rank => 2
+date_string			::= generic_date
+						| lds_ord_date
 
-date				::= calendar_date
+generic_date		::= date_type
 						| calendar_escape
 
-#calendar_date		::= french_date
-#						| german_date
-#						| gregorian_date
-#						| hebrew_date
-#						| julian_date
+date_type			::= gregorian_date
+						| julian_date
+						| french_date
+						| german_date
+						| hebrew_date
 
-calendar_date		::= gregorian_date
+french_date			::= year_bc
+						| year
+						| french_month year
+						| day french_month year
 
-#french_date			::= year_bc
-#						| year
-#						| french_month year
-#						| day french_month year
-#
-#german_date			::= german_year
-#						| german_month dot german_year
-#						| day dot german_month dot german_year
-#						| german_month german_year
-#
-#german_year			::= year
-#						| year german_bc
-#
-#year_bc				::= year bc
-#
-#year				::= number
+german_date			::= german_year
+						| german_month dot german_year
+						| day dot german_month dot german_year
+						| german_month german_year
+
+german_year			::= year
+						| year german_bc
+
+year_bc				::= year bc
+
+year				::= number
 
 gregorian_date		::= gregorian_year_bc
 						| gregorian_year
@@ -195,54 +175,50 @@ gregorian_year_bc	::= gregorian_year bc
 gregorian_year		::= number
 						| number ('/') pair_of_digits
 
-#hebrew_date			::= year_bc
-#						| year
-#						| hebrew_month year
-#						| day hebrew_month year
+hebrew_date			::= year_bc
+						| year
+						| hebrew_month year
+						| day hebrew_month year
 
-#julian_date			::= year_bc
-#						| year
-#						| gregorian_month year
-#						| day gregorian_month year
+julian_date			::= year_bc
+						| year
+						| gregorian_month year
+						| day gregorian_month year
 
 lds_ord_date		::= date_value
 
-date_value			::= date
+date_value			::= generic_date
 						| date_period
 						| date_range
 						| approximated_date
-						| interpreted date '(' date_phrase ')'
+						| interpreted generic_date '(' date_phrase ')'
 						| '(' date_phrase ')'
 
-date_period			::= from date
-						| to date
-						| from date to date
+date_period			::= from generic_date
+						| to generic_date
+						| from generic_date to generic_date
 
-date_range			::= before date
-						| after date
-						| between date and date
+date_range			::= before generic_date
+						| after generic_date
+						| between generic_date and generic_date
 
-approximated_date	::= about date
-						| calculated date
-						| estimated date
+approximated_date	::= about generic_date
+						| calculated generic_date
+						| estimated generic_date
 
-date_phrase					::= date_text
+date_phrase				::= date_text
 
 # Lexemes, in alphabetical order.
 
-:lexeme				~ about				pause => before		event => about
 about				~ 'abt'
 						| 'about'
 						| 'circa'
 
-:lexeme				~ after				pause => before		event => after
 after				~ 'aft'
 						| 'after'
 
-:lexeme				~ and				pause => before		event => and
 and					~ 'and'
 
-:lexeme				~ bc				pause => before		event => bc
 bc					~ 'bc'
 						| 'b.c'
 						| 'b.c.'
@@ -250,19 +226,15 @@ bc					~ 'bc'
 						| 'b c'
 						| 'bce'
 
-:lexeme				~ before			pause => before		event => before
 before				~ 'bef'
 						| 'before'
 
-:lexeme				~ between			pause => before		event => between
 between				~ 'bet'
 						| 'between'
 
-:lexeme				~ calculated		pause => before		event => calculated
 calculated			~ 'cal'
 						| 'calculated'
 
-:lexeme				~ calendar_name		pause => before		event => calendar_name
 calendar_name		~ 'dfrench r'
 						| 'dfrenchr'
 						| 'dgerman'
@@ -270,59 +242,46 @@ calendar_name		~ 'dfrench r'
 						| 'dhebrew'
 						| 'djulian'
 
-:lexeme				~ date_text			pause => before		event => date_text
 date_text			~ [\w ]+
 
-:lexeme				~ day				pause => before		event => day
 day					~ digit
 						| digit digit
 
 digit				~ [0-9]
 
-#:lexeme				~ dot				pause => before		event => dot
-#dot					~ '.'
+dot					~ '.'
 
-:lexeme				~ estimated			pause => before		event => estimated
 estimated			~ 'est'
 						| 'estimated'
 
-#:lexeme				~ french_month		pause => before		event => french_month
-#french_month		~ 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent'
-#						| 'germ' | 'flor' | 'prai' | 'mess' | 'ther' | 'fruc' | 'comp'
+french_month		~ 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent'
+						| 'germ' | 'flor' | 'prai' | 'mess' | 'ther' | 'fruc' | 'comp'
 
-:lexeme				~ from				pause => before		event => from
 from				~ 'from'
 
-#:lexeme				~ german_bc			pause => before		event => german_bc
-#german_bc			~ 'vc'
-#						| 'v.c.'
-#						| 'v.chr.'
-#						| 'vchr'
-#						| 'vuz'
-#						| 'v.u.z.'
-#
-#:lexeme				~ german_month		pause => before		event => german_month
-#german_month		~ 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun'
-#						| 'jul' | 'aug' | 'sep' | 'sept' | 'okt' | 'nov' | 'dez'
+german_bc			~ 'vc'
+						| 'v.c.'
+						| 'v.chr.'
+						| 'vchr'
+						| 'vuz'
+						| 'v.u.z.'
 
-:lexeme				~ gregorian_month	pause => before		event => gregorian_month
+german_month		~ 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun'
+						| 'jul' | 'aug' | 'sep' | 'sept' | 'okt' | 'nov' | 'dez'
+
 gregorian_month		~ 'jan' | 'feb' | 'mar' | 'apr' | 'may' | 'jun'
 						| 'jul' | 'aug' | 'sep' | 'oct' | 'nov' | 'dec'
 
-#:lexeme				~ hebrew_month		pause => before		event => hebrew_month
-#hebrew_month		~ 'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr'
-#						| 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' | 'aav' | 'ell'
+hebrew_month		~ 'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr'
+						| 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' | 'aav' | 'ell'
 
-:lexeme				~ interpreted		pause => before		event => interpreted
 interpreted			~ 'int'
 						| 'interpreted'
 
-:lexeme				~ number			pause => before		event => number
 number				~ digit+
 
 pair_of_digits		~ digit digit
 
-:lexeme				~ to				pause => before		event => to
 to					~ 'to'
 
 # Boilerplate.
@@ -341,55 +300,7 @@ END_OF_GRAMMAR
 		})
 	);
 
-	my(%event);
-
-	for my $line (split(/\n/, $self -> bnf) )
-	{
-		$event{$1} = 1 if ($line =~ /event\s+=>\s+(\w+)/);
-	}
-
-	$self -> known_events(\%event);
-
 } # End of BUILD.
-
-# ------------------------------------------------
-
-sub _decode_result
-{
-	my($self, $result) = @_;
-	my(@worklist)      = $result;
-
-	my($obj);
-	my($ref_type);
-	my(@stack);
-
-	do
-	{
-		$obj      = shift @worklist;
-		$ref_type = ref $obj;
-
-		if ($ref_type eq 'ARRAY')
-		{
-			unshift @worklist, @$obj;
-		}
-		elsif ($ref_type eq 'HASH')
-		{
-			push @stack, {%$obj};
-		}
-		elsif ($ref_type)
-		{
-			die "Unsupported object type $ref_type\n";
-		}
-		else
-		{
-			push @stack, $obj;
-		}
-
-	} while (@worklist);
-
-	return join(' ', @stack);
-
-} # End of _decode_result.
 
 # --------------------------------------------------
 
@@ -453,9 +364,7 @@ sub parse
 	(
 		Marpa::R2::Scanless::R -> new
 		({
-			grammar         => $self -> grammar,
-			ranking_method  => 'high_rule_only',
-			trace_terminals => $self -> trace_terminals,
+			grammar => $self -> grammar,
 		})
 	);
 
@@ -467,7 +376,6 @@ sub parse
 	{
 		if (defined (my $value = $self -> _process($date) ) )
 		{
-			$self -> log(info => $self -> result);
 		}
 		else
 		{
@@ -497,108 +405,78 @@ sub parse
 
 sub _process
 {
-	my($self)       = @_;
-	my($date)       = $self -> date;
-	my($length)     = length $date;
-	my($last_event) = '';
-	my($pos)        = 0;
+	my($self, @args) = @_;
+	my($date) = $self -> date;
 
-	my($event_name);
-	my($lexeme);
-	my($node_name);
-	my($original_lexeme);
-	my($span, $start, @stack);
-	my($temp, $type);
+	$self -> recce -> read(\$date);
 
-	# We use read()/lexeme_read()/resume() because we pause at each lexeme.
-	# Also, in read(), we use $pos and $length to avoid reading Ruby Slippers tokens (if any).
+	my($ambiguity_metric) = $self -> recce -> ambiguity_metric;
 
-	for
-	(
-		$pos = $self -> recce -> read(\$date, $pos, $length);
-		$pos < $length;
-		$pos = $self -> recce -> resume($pos)
-	)
+	if ($ambiguity_metric <= 0)
 	{
-		($start, $span)            = $self -> recce -> pause_span;
-		($event_name, $span, $pos) = $self -> _validate_event($date, $start, $span, $pos);
-		$lexeme                    = $self -> recce -> literal($start, $span);
-		$original_lexeme           = $lexeme;
-		$pos                       = $self -> recce -> lexeme_read($event_name);
-
-		die "lexeme_read($event_name) rejected lexeme |$lexeme|\n" if (! defined $pos);
-
-		push @stack, $lexeme;
-
-=pod
-
-		if ($event_name eq 'about')
-		{
-		}
-		elsif ($event_name eq 'after')
-		{
-		}
-		elsif ($event_name eq 'and')
-		{
-		}
-
-=cut
-
-		$last_event = $event_name;
-    }
-
-	if (my $ambiguous_status = $self -> recce -> ambiguous)
+		die "Call to ambiguity_metric() returned $ambiguity_metric";
+	}
+	elsif ($ambiguity_metric == 1)
 	{
-		my($terminals) = $self -> recce -> terminals_expected;
-		$terminals     = ['(None)'] if ($#$terminals < 0);
+		# No ambiguity.
 
-		$self -> log(info => 'Terminals expected: ' . join(', ', @$terminals) );
-		$self -> log(info => "Parse is ambiguous. Status: $ambiguous_status");
+		my($value) = $self -> recce -> value;
+		$value     = (defined $value) ? $$value : '';
+
+		$self -> log(debug => "Result: $value");
+	}
+	else
+	{
+		# Ambiguity. See https://metacpan.org/pod/distribution/Marpa-R2/pod/ASF.pod.
+
+		my($asf)     = Marpa::R2::ASF -> new({slr => $self -> recce});
+		my($scratch) = {self => $self};
+		my($result)  = $asf -> traverse($scratch, \&traverser);
+
+		$self -> log(debug => "Result: $result");
 	}
 
-	$self -> result('<' . join(' ', @stack) . '>');
-
+	# TODO?
 	# Return a defined value for success and undef for failure.
 
-	return 0; # TODO.
-
-	return $self -> recce -> value;
+	return 0;
 
 } # End of _process.
 
-# ------------------------------------------------
+# --------------------------------------------------
+# Warning: This is a function, not a method.
 
-sub _validate_event
-{
-	my($self, $string, $start, $span, $pos) = @_;
-	my(@events)        = @{$self -> recce -> events};
-	my($event_count)   = scalar @events;
-	my(@event_names)   = sort map{$$_[0]} @events;
-	my($event_name)    = $event_names[0]; # Default.
-	my($lexeme)        = substr($string, $start, $span);
-	my($line, $column) = $self -> recce -> line_column($start);
-	my($message)       = "Location: ($line, $column). Lexeme: |$lexeme|. String: |$string|";
-	$message           = "$message. Events: $event_count. Names: ";
-
-	$self -> log(debug => $message . join(', ', @event_names) . '.');
-
-	my(%event_name);
-
-	@event_name{@event_names} = (1) x @event_names;
-
-	for (@event_names)
+	sub traverser
 	{
-		die "Unexpected event name '$_'" if (! ${$self -> known_events}{$_});
-	}
+		my($glade, $scratch) = @_;
+		my($rule_id)         = $glade -> rule_id;
+		my($symbol_id)       = $glade -> symbol_id;
+		my($symbol_name)     = $$scratch{self} -> grammar -> symbol_name($symbol_id);
 
-	if ($event_count > 1)
-	{
-#TODO		die 'The code only handles 1 event at a time. Events: ' . join(', ', @event_names), ". \n";
-	}
+		if (! defined $rule_id)
+		{
+			return $glade -> literal;
+		}
 
-	return ($event_name, $span, $pos);
+		my($length) = $glade -> rh_length;
+		my(@value)  = map{$glade -> rh_value($_)} 0 .. $length - 1;
 
-} # End of _validate_event.
+		my($result);
+
+		if ($symbol_name eq '[:start:]')
+		{
+			$result = '[:start:] => ' . join(' ', @value);
+		}
+		else
+		{
+			$result = join(' ', @value);
+		}
+
+		$$scratch{self} -> log(debug => "Symbol name: $symbol_name. Result: $result");
+
+		return $result;
+
+	} # End of traverser.
 
 # --------------------------------------------------
 
