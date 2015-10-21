@@ -5,6 +5,8 @@ use warnings;
 
 use Config;
 
+use Data::Dumper::Concise; # For Dumper.
+
 use DateTime;
 use DateTime::Infinite;
 
@@ -302,6 +304,43 @@ END_OF_GRAMMAR
 
 } # End of BUILD.
 
+# ------------------------------------------------
+
+sub decode_result
+{
+	my($self, $result) = @_;
+	my(@worklist) = $result;
+
+	my($obj);
+	my($ref_type);
+	my(@stack);
+
+	do
+	{
+		$obj      = shift @worklist;
+		$ref_type = ref $obj;
+
+		if ($ref_type eq 'ARRAY')
+		{
+			unshift @worklist, @$obj;
+		}
+		elsif ($ref_type)
+		{
+			die "Unsupported object type $ref_type\n";
+		}
+		else
+		{
+			push @stack, $obj;
+		}
+
+	} while (@worklist);
+
+	return join(' ', @stack);
+
+#	return [@stack];
+
+} # End of decode_result.
+
 # --------------------------------------------------
 
 sub _init_flags
@@ -432,8 +471,20 @@ sub _process
 		my($asf)     = Marpa::R2::ASF -> new({slr => $self -> recce});
 		my($scratch) = {self => $self};
 		my($result)  = $asf -> traverse($scratch, \&traverser);
+		$result      = $self -> decode_result($result);
+		my($token)   = [qw/about after and before between calculated estimated from interpreted to/];
+		my($target)  = join('|', @$token);
 
-		$self -> log(debug => "Result: $result");
+		if ($result =~ /(?:$target)/)
+		{
+			$result = $self -> _process_complex_date($target, $result);
+		}
+		else
+		{
+			$result = $self -> _process_simple_date($result);
+		}
+
+		$self -> log(debug => $result);
 	}
 
 	# TODO?
@@ -444,39 +495,95 @@ sub _process
 } # End of _process.
 
 # --------------------------------------------------
+
+sub _process_complex_date
+{
+	my($self, $target, $result) = @_;
+	my(@part) = split(/$target/, $result);
+
+	shift @part;
+
+	@part = map{$self -> _process_simple_date($_)} @part;
+
+	return join(' ', @part);
+
+} # End of _process_complex_date.
+
+# --------------------------------------------------
+
+sub _process_simple_date
+{
+	my($self, $result)                   = @_;
+	my($target)                          = 'date_string lds_ord_date';
+	my($index)                           = index($result, $target);
+	substr($result, $index)              = '' if ($index >= 0);
+	$target                              = 'date_string';
+	$index                               = index($result, $target);
+	substr($result, 0, length($target) ) = '' if ($index >= 0);
+	$target                              = 'generic_date';
+	$index                               = index($result, $target);
+	substr($result, 0, length($target) ) = '' if ($index >= 0);
+	$result                              =~ s/^\s+//;
+	$result                              =~ s/\s+$//;
+	my(@part)                            = split(/\s*date_type\s*/, $result);
+	@part                                = map{s/(?:gregorian_year|year)//g; tr/ //s; $_} @part;
+
+	return "<$part[1]> <$part[2]>";
+
+} # End of _process_simple_date.
+
+# --------------------------------------------------
 # Warning: This is a function, not a method.
 
-	sub traverser
+sub traverser
+{
+	my($glade, $scratch) = @_;
+	my($rule_id)         = $glade -> rule_id;
+	my($symbol_id)       = $glade -> symbol_id;
+	my($symbol_name)     = $$scratch{self} -> grammar -> symbol_name($symbol_id);
+
+	if (! defined $rule_id)
 	{
-		my($glade, $scratch) = @_;
-		my($rule_id)         = $glade -> rule_id;
-		my($symbol_id)       = $glade -> symbol_id;
-		my($symbol_name)     = $$scratch{self} -> grammar -> symbol_name($symbol_id);
+		return [$glade -> literal];
+	}
 
-		if (! defined $rule_id)
-		{
-			return $glade -> literal;
-		}
+	my(@return_value);
+	my($temp);
 
+	do
+	{
 		my($length) = $glade -> rh_length;
-		my(@value)  = map{$glade -> rh_value($_)} 0 .. $length - 1;
+		my(@result) = ([]);
 
-		my($result);
-
-		if ($symbol_name eq '[:start:]')
+		for my $i (0 .. $length - 1)
 		{
-			$result = '[:start:] => ' . join(' ', @value);
+			my(@new_result);
+
+			for my $old_result (@result)
+			{
+				my($child_value) = $glade -> rh_value($i);
+
+				for my $new_value (@$child_value)
+				{
+					$new_value =~ s|\n||g;
+
+					push @new_result, [@$old_result, $new_value];
+				}
+			}
+
+			@result = @new_result;
 		}
-		else
-		{
-			$result = join(' ', @value);
-		}
 
-		$$scratch{self} -> log(debug => "Symbol name: $symbol_name. Result: $result");
+		$temp = join(' ', map{@$_} @result);
+		$temp = "$symbol_name $temp" if ($symbol_name ne '[:start]');
 
-		return $result;
+		push @return_value, $temp;
 
-	} # End of traverser.
+	} until ! defined $glade -> next;
+
+	return \@return_value;
+
+} # End of traverser.
 
 # --------------------------------------------------
 
