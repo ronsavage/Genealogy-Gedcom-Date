@@ -5,8 +5,6 @@ use warnings;
 
 use Config;
 
-use Data::Dumper::Concise; # For Dumper.
-
 use DateTime;
 use DateTime::Infinite;
 
@@ -468,12 +466,12 @@ sub _process
 	{
 		# Ambiguity. See https://metacpan.org/pod/distribution/Marpa-R2/pod/ASF.pod.
 
-		my($asf)     = Marpa::R2::ASF -> new({slr => $self -> recce});
-		my($scratch) = {self => $self};
-		my($result)  = $asf -> traverse($scratch, \&traverser);
-		$result      = $self -> decode_result($result);
-		my($token)   = [qw/about after and before between calculated estimated from interpreted to/];
-		my($target)  = join('|', @$token);
+		my($asf)    = Marpa::R2::ASF -> new({slr => $self -> recce});
+		my($cache)  = {self => $self};
+		my($result) = $asf -> traverse($cache, \&traverser);
+		$result     = $self -> decode_result($result);
+		my($token)  = [qw/about after and before between calculated estimated from interpreted to/];
+		my($target) = join('|', @$token);
 
 		if ($result =~ /(?:$target)/)
 		{
@@ -537,10 +535,10 @@ sub _process_simple_date
 
 sub traverser
 {
-	my($glade, $scratch) = @_;
-	my($rule_id)         = $glade -> rule_id;
-	my($symbol_id)       = $glade -> symbol_id;
-	my($symbol_name)     = $$scratch{self} -> grammar -> symbol_name($symbol_id);
+	my($glade, $cache) = @_;
+	my($rule_id)       = $glade -> rule_id;
+	my($symbol_id)     = $glade -> symbol_id;
+	my($symbol_name)   = $$cache{self} -> grammar -> symbol_name($symbol_id);
 
 	if (! defined $rule_id)
 	{
