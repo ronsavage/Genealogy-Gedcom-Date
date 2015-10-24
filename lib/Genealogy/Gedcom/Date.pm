@@ -5,6 +5,8 @@ use warnings;
 
 use Config;
 
+use Data::Dumper::Concise; # For Dumper().
+
 use DateTime;
 use DateTime::Infinite;
 
@@ -464,25 +466,10 @@ sub _process
 	}
 	else
 	{
-		# Ambiguity. See https://metacpan.org/pod/distribution/Marpa-R2/pod/ASF.pod.
-
-		my($asf)    = Marpa::R2::ASF -> new({slr => $self -> recce});
-		my($cache)  = {self => $self};
-		my($result) = $asf -> traverse($cache, \&traverser);
-		$result     = $self -> decode_result($result);
-		my($token)  = [qw/about after and before between calculated estimated from interpreted to/];
-		my($target) = join('|', @$token);
-
-		if ($result =~ /(?:$target)/)
+		while (my $value = $self -> recce -> value)
 		{
-			$result = $self -> _process_complex_date($target, $result);
+			$self -> log(debug => 'Solution: ' . $self -> decode_result($$value) );
 		}
-		else
-		{
-			$result = $self -> _process_simple_date($result);
-		}
-
-		$self -> log(debug => $result);
 	}
 
 	# TODO?
@@ -529,59 +516,6 @@ sub _process_simple_date
 	return "<$part[1]> <$part[2]>";
 
 } # End of _process_simple_date.
-
-# --------------------------------------------------
-# Warning: This is a function, not a method.
-
-sub traverser
-{
-	my($glade, $cache) = @_;
-	my($rule_id)       = $glade -> rule_id;
-	my($symbol_id)     = $glade -> symbol_id;
-	my($symbol_name)   = $$cache{self} -> grammar -> symbol_name($symbol_id);
-
-	if (! defined $rule_id)
-	{
-		return [$glade -> literal];
-	}
-
-	my(@return_value);
-	my($temp);
-
-	do
-	{
-		my($length) = $glade -> rh_length;
-		my(@result) = ([]);
-
-		for my $i (0 .. $length - 1)
-		{
-			my(@new_result);
-
-			for my $old_result (@result)
-			{
-				my($child_value) = $glade -> rh_value($i);
-
-				for my $new_value (@$child_value)
-				{
-					$new_value =~ s|\n||g;
-
-					push @new_result, [@$old_result, $new_value];
-				}
-			}
-
-			@result = @new_result;
-		}
-
-		$temp = join(' ', map{@$_} @result);
-		$temp = "$symbol_name $temp" if ($symbol_name ne '[:start]');
-
-		push @return_value, $temp;
-
-	} until ! defined $glade -> next;
-
-	return \@return_value;
-
-} # End of traverser.
 
 # --------------------------------------------------
 
