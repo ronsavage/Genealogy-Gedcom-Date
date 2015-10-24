@@ -10,6 +10,8 @@ use Data::Dumper::Concise; # For Dumper().
 use DateTime;
 use DateTime::Infinite;
 
+use Genealogy::Gedcom::Date::Actions;
+
 use Log::Handler;
 
 use Marpa::R2;
@@ -94,12 +96,10 @@ has recce =>
 
 has result =>
 (
-#	default  => sub{return {} },
 	default  => sub{return ''},
 	is       => 'rw',
-#	isa      => HashRef,
 	isa      => Str,
-#	required => 0,
+	required => 0,
 );
 
 our $VERSION = '2.00';
@@ -109,6 +109,12 @@ our $VERSION = '2.00';
 sub BUILD
 {
 	my($self) = @_;
+
+	# 1 of 2: Initialize the action class via global variables - Yuk!
+	# The point is that we don't create an action instance.
+	# Marpa creates one but we can't get our hands on it.
+
+	$MarpaX::Languages::SVG::Parser::Actions::logger = $self -> logger;
 
 	if (! defined $self -> logger)
 	{
@@ -134,62 +140,62 @@ lexeme default		=  latm => 1		# Longest Acceptable Token Match.
 
 # Rules, in top-down order (more-or-less).
 
-:start				::= date_string
+:start				::= gedcom_date
 
-date_string			::= generic_date
-						| lds_ord_date
+gedcom_date			::= date				action => date
+						| lds_ord_date		action => lds_ord_date
 
-generic_date		::= date_type
+date				::= calendar_date		action => calendar_date
 						| calendar_escape
 
-date_type			::= gregorian_date
-						| julian_date
-						| french_date
-						| german_date
-						| hebrew_date
-
-french_date			::= year_bc
-						| year
-						| french_month year
-						| day french_month year
-
-german_date			::= german_year
-						| german_month dot german_year
-						| day dot german_month dot german_year
-						| german_month german_year
-
-german_year			::= year
-						| year german_bc
-
-year_bc				::= year bc
-
-year				::= number
+calendar_date		::= gregorian_date		action => gregorian_date
+						| julian_date		action => julian_date
+#						| french_date
+#						| german_date
+#						| hebrew_date
 
 gregorian_date		::= gregorian_year_bc
 						| gregorian_year
 						| gregorian_month gregorian_year
 						| day gregorian_month gregorian_year
 
-calendar_escape		::= ('@#') calendar_name ('@')
-
 gregorian_year_bc	::= gregorian_year bc
 
 gregorian_year		::= number
 						| number ('/') pair_of_digits
-
-hebrew_date			::= year_bc
-						| year
-						| hebrew_month year
-						| day hebrew_month year
 
 julian_date			::= year_bc
 						| year
 						| gregorian_month year
 						| day gregorian_month year
 
+year_bc				::= year bc
+
+year				::= number
+
+#french_date			::= year_bc
+#						| year
+#						| french_month year
+#						| day french_month year
+#
+#german_date			::= german_year
+#						| german_month dot german_year
+#						| day dot german_month dot german_year
+#						| german_month german_year
+#
+#german_year			::= year
+#						| year german_bc
+
+calendar_escape		::= ('@#') calendar_name ('@')
+
+#hebrew_date			::= year_bc
+#						| year
+#						| hebrew_month year
+#						| day hebrew_month year
+
 lds_ord_date		::= date_value
 
-date_value			::= generic_date
+date_value			::= date
 						| date_period
 						| date_range
 						| approximated_date
@@ -208,7 +214,7 @@ approximated_date	::= about generic_date
 						| calculated generic_date
 						| estimated generic_date
 
-date_phrase				::= date_text
+date_phrase			::= date_text
 
 # Lexemes, in alphabetical order.
 
@@ -251,31 +257,31 @@ day					~ digit
 
 digit				~ [0-9]
 
-dot					~ '.'
+#dot					~ '.'
 
 estimated			~ 'est'
 						| 'estimated'
 
-french_month		~ 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent'
-						| 'germ' | 'flor' | 'prai' | 'mess' | 'ther' | 'fruc' | 'comp'
+#french_month		~ 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent'
+#						| 'germ' | 'flor' | 'prai' | 'mess' | 'ther' | 'fruc' | 'comp'
 
 from				~ 'from'
 
-german_bc			~ 'vc'
-						| 'v.c.'
-						| 'v.chr.'
-						| 'vchr'
-						| 'vuz'
-						| 'v.u.z.'
-
-german_month		~ 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun'
-						| 'jul' | 'aug' | 'sep' | 'sept' | 'okt' | 'nov' | 'dez'
+#german_bc			~ 'vc'
+#						| 'v.c.'
+#						| 'v.chr.'
+#						| 'vchr'
+#						| 'vuz'
+#						| 'v.u.z.'
+#
+#german_month		~ 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun'
+#						| 'jul' | 'aug' | 'sep' | 'sept' | 'okt' | 'nov' | 'dez'
 
 gregorian_month		~ 'jan' | 'feb' | 'mar' | 'apr' | 'may' | 'jun'
 						| 'jul' | 'aug' | 'sep' | 'oct' | 'nov' | 'dec'
 
-hebrew_month		~ 'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr'
-						| 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' | 'aav' | 'ell'
+#hebrew_month		~ 'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr'
+#						| 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' | 'aav' | 'ell'
 
 interpreted			~ 'int'
 						| 'interpreted'
@@ -303,43 +309,6 @@ END_OF_GRAMMAR
 	);
 
 } # End of BUILD.
-
-# ------------------------------------------------
-
-sub decode_result
-{
-	my($self, $result) = @_;
-	my(@worklist) = $result;
-
-	my($obj);
-	my($ref_type);
-	my(@stack);
-
-	do
-	{
-		$obj      = shift @worklist;
-		$ref_type = ref $obj;
-
-		if ($ref_type eq 'ARRAY')
-		{
-			unshift @worklist, @$obj;
-		}
-		elsif ($ref_type)
-		{
-			die "Unsupported object type $ref_type\n";
-		}
-		else
-		{
-			push @stack, $obj;
-		}
-
-	} while (@worklist);
-
-	return join(' ', @stack);
-
-#	return [@stack];
-
-} # End of decode_result.
 
 # --------------------------------------------------
 
@@ -403,7 +372,8 @@ sub parse
 	(
 		Marpa::R2::Scanless::R -> new
 		({
-			grammar => $self -> grammar,
+			grammar           => $self -> grammar,
+			semantics_package => 'Genealogy::Gedcom::Date::Actions',
 		})
 	);
 
@@ -413,7 +383,37 @@ sub parse
 
 	try
 	{
-		if (defined (my $value = $self -> _process($date) ) )
+		$self -> log(debug => 'Calling read()');
+		$self -> recce -> read(\$date);
+
+		my($ambiguity_metric) = $self -> recce -> ambiguity_metric;
+
+		$self -> log(debug => "Ambiguity metric: $ambiguity_metric");
+
+		if ($ambiguity_metric <= 0)
+		{
+			die "Call to ambiguity_metric() returned $ambiguity_metric";
+		}
+		elsif ($ambiguity_metric == 1)
+		{
+			# No ambiguity.
+
+			my($value) = $self -> recce -> value;
+			$value     = (defined $value) ? $$value : '';
+
+			$self -> log(debug => "Result: $value");
+		}
+		else
+		{
+			while (my $value = $self -> recce -> value)
+			{
+				$self -> log(debug => 'Solution: ' . $self -> decode_result($$value) );
+			}
+		}
+
+=pod
+
+		if ()
 		{
 		}
 		else
@@ -424,6 +424,9 @@ sub parse
 
 			$self -> log(error => 'Parse failed');
 		}
+
+=cut
+
 	}
 	catch
 	{
@@ -439,45 +442,6 @@ sub parse
 	return $result;
 
 } # End of parse.
-
-# ------------------------------------------------
-
-sub _process
-{
-	my($self, @args) = @_;
-	my($date) = $self -> date;
-
-	$self -> recce -> read(\$date);
-
-	my($ambiguity_metric) = $self -> recce -> ambiguity_metric;
-
-	if ($ambiguity_metric <= 0)
-	{
-		die "Call to ambiguity_metric() returned $ambiguity_metric";
-	}
-	elsif ($ambiguity_metric == 1)
-	{
-		# No ambiguity.
-
-		my($value) = $self -> recce -> value;
-		$value     = (defined $value) ? $$value : '';
-
-		$self -> log(debug => "Result: $value");
-	}
-	else
-	{
-		while (my $value = $self -> recce -> value)
-		{
-			$self -> log(debug => 'Solution: ' . $self -> decode_result($$value) );
-		}
-	}
-
-	# TODO?
-	# Return a defined value for success and undef for failure.
-
-	return 0;
-
-} # End of _process.
 
 # --------------------------------------------------
 
