@@ -5,8 +5,12 @@ use warnings;
 
 use Config;
 
+use Data::Dumper::Concise; # For Dumper().
+
 use DateTime;
 use DateTime::Infinite;
+
+use Genealogy::Gedcom::Date::Actions;
 
 use Log::Handler;
 
@@ -58,14 +62,6 @@ has grammar =>
 	required => 0,
 );
 
-has known_events =>
-(
-	default  => sub{return {} },
-	is       => 'rw',
-	isa      => HashRef,
-	required => 0,
-);
-
 has logger =>
 (
 	default  => sub{return undef},
@@ -100,19 +96,9 @@ has recce =>
 
 has result =>
 (
-#	default  => sub{return {} },
 	default  => sub{return ''},
 	is       => 'rw',
-#	isa      => HashRef,
 	isa      => Str,
-#	required => 0,
-);
-
-has trace_terminals =>
-(
-	default  => sub{return 0},
-	is       => 'rw',
-	isa      => Int,
 	required => 0,
 );
 
@@ -123,6 +109,12 @@ our $VERSION = '2.00';
 sub BUILD
 {
 	my($self) = @_;
+
+	# 1 of 2: Initialize the action class via global variables - Yuk!
+	# The point is that we don't create an action instance.
+	# Marpa creates one but we can't get our hands on it.
+
+	$MarpaX::Languages::SVG::Parser::Actions::logger = $self -> logger;
 
 	if (! defined $self -> logger)
 	{
@@ -152,19 +144,36 @@ lexeme default		=  latm => 1		# Longest Acceptable Token Match.
 
 :start				::= gedcom_date
 
-gedcom_date			::= date			rank => 1
-						| lds_ord_date	rank => 2
+gedcom_date			::= date				action => date
+						| lds_ord_date		action => lds_ord_date
 
-date				::= calendar_date
+date				::= calendar_date		action => calendar_date
 						| calendar_escape
 
-#calendar_date		::= french_date
+calendar_date		::= gregorian_date		action => gregorian_date
+						| julian_date		action => julian_date
+#						| french_date
 #						| german_date
-#						| gregorian_date
 #						| hebrew_date
-#						| julian_date
 
-calendar_date		::= gregorian_date
+gregorian_date		::= gregorian_year_bc
+						| gregorian_year
+						| gregorian_month gregorian_year
+						| day gregorian_month gregorian_year
+
+gregorian_year_bc	::= gregorian_year bc
+
+gregorian_year		::= number
+						| number ('/') pair_of_digits
+
+julian_date			::= year_bc
+						| year
+						| gregorian_month year
+						| day gregorian_month year
+
+year_bc				::= year bc
+
+year				::= number
 
 #french_date			::= year_bc
 #						| year
@@ -178,32 +187,13 @@ calendar_date		::= gregorian_date
 #
 #german_year			::= year
 #						| year german_bc
-#
-#year_bc				::= year bc
-#
-#year				::= number
-
-gregorian_date		::= gregorian_year_bc
-						| gregorian_year
-						| gregorian_month gregorian_year
-						| day gregorian_month gregorian_year
 
 calendar_escape		::= ('@#') calendar_name ('@')
-
-gregorian_year_bc	::= gregorian_year bc
-
-gregorian_year		::= number
-						| number ('/') pair_of_digits
 
 #hebrew_date			::= year_bc
 #						| year
 #						| hebrew_month year
 #						| day hebrew_month year
-
-#julian_date			::= year_bc
-#						| year
-#						| gregorian_month year
-#						| day gregorian_month year
 
 lds_ord_date		::= date_value
 
@@ -226,23 +216,19 @@ approximated_date	::= about date
 						| calculated date
 						| estimated date
 
-date_phrase					::= date_text
+date_phrase			::= date_text
 
 # Lexemes, in alphabetical order.
 
-:lexeme				~ about				pause => before		event => about
 about				~ 'abt'
 						| 'about'
 						| 'circa'
 
-:lexeme				~ after				pause => before		event => after
 after				~ 'aft'
 						| 'after'
 
-:lexeme				~ and				pause => before		event => and
 and					~ 'and'
 
-:lexeme				~ bc				pause => before		event => bc
 bc					~ 'bc'
 						| 'b.c'
 						| 'b.c.'
@@ -250,19 +236,15 @@ bc					~ 'bc'
 						| 'b c'
 						| 'bce'
 
-:lexeme				~ before			pause => before		event => before
 before				~ 'bef'
 						| 'before'
 
-:lexeme				~ between			pause => before		event => between
 between				~ 'bet'
 						| 'between'
 
-:lexeme				~ calculated		pause => before		event => calculated
 calculated			~ 'cal'
 						| 'calculated'
 
-:lexeme				~ calendar_name		pause => before		event => calendar_name
 calendar_name		~ 'dfrench r'
 						| 'dfrenchr'
 						| 'dgerman'
@@ -270,30 +252,23 @@ calendar_name		~ 'dfrench r'
 						| 'dhebrew'
 						| 'djulian'
 
-:lexeme				~ date_text			pause => before		event => date_text
 date_text			~ [\w ]+
 
-:lexeme				~ day				pause => before		event => day
 day					~ digit
 						| digit digit
 
 digit				~ [0-9]
 
-#:lexeme				~ dot				pause => before		event => dot
 #dot					~ '.'
 
-:lexeme				~ estimated			pause => before		event => estimated
 estimated			~ 'est'
 						| 'estimated'
 
-#:lexeme				~ french_month		pause => before		event => french_month
 #french_month		~ 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent'
 #						| 'germ' | 'flor' | 'prai' | 'mess' | 'ther' | 'fruc' | 'comp'
 
-:lexeme				~ from				pause => before		event => from
 from				~ 'from'
 
-#:lexeme				~ german_bc			pause => before		event => german_bc
 #german_bc			~ 'vc'
 #						| 'v.c.'
 #						| 'v.chr.'
@@ -301,28 +276,22 @@ from				~ 'from'
 #						| 'vuz'
 #						| 'v.u.z.'
 #
-#:lexeme				~ german_month		pause => before		event => german_month
 #german_month		~ 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun'
 #						| 'jul' | 'aug' | 'sep' | 'sept' | 'okt' | 'nov' | 'dez'
 
-:lexeme				~ gregorian_month	pause => before		event => gregorian_month
 gregorian_month		~ 'jan' | 'feb' | 'mar' | 'apr' | 'may' | 'jun'
 						| 'jul' | 'aug' | 'sep' | 'oct' | 'nov' | 'dec'
 
-#:lexeme				~ hebrew_month		pause => before		event => hebrew_month
 #hebrew_month		~ 'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr'
 #						| 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' | 'aav' | 'ell'
 
-:lexeme				~ interpreted		pause => before		event => interpreted
 interpreted			~ 'int'
 						| 'interpreted'
 
-:lexeme				~ number			pause => before		event => number
 number				~ digit+
 
 pair_of_digits		~ digit digit
 
-:lexeme				~ to				pause => before		event => to
 to					~ 'to'
 
 # Boilerplate.
@@ -341,55 +310,27 @@ END_OF_GRAMMAR
 		})
 	);
 
-	my(%event);
-
-	for my $line (split(/\n/, $self -> bnf) )
-	{
-		$event{$1} = 1 if ($line =~ /event\s+=>\s+(\w+)/);
-	}
-
-	$self -> known_events(\%event);
-
 } # End of BUILD.
 
-# ------------------------------------------------
+# --------------------------------------------------
 
-sub _decode_result
+sub gregorian_date
 {
-	my($self, $result) = @_;
-	my(@worklist)      = $result;
+	my($cache, @params) = @_;
 
-	my($obj);
-	my($ref_type);
-	my(@stack);
+	return $params[0];
 
-	do
-	{
-		$obj      = shift @worklist;
-		$ref_type = ref $obj;
+} # End of gregorian_date.
 
-		if ($ref_type eq 'ARRAY')
-		{
-			unshift @worklist, @$obj;
-		}
-		elsif ($ref_type eq 'HASH')
-		{
-			push @stack, {%$obj};
-		}
-		elsif ($ref_type)
-		{
-			die "Unsupported object type $ref_type\n";
-		}
-		else
-		{
-			push @stack, $obj;
-		}
+# --------------------------------------------------
 
-	} while (@worklist);
+sub julian_date
+{
+	my($cache, @params) = @_;
 
-	return join(' ', @stack);
+	return $params[0];
 
-} # End of _decode_result.
+} # End of julian_date.
 
 # --------------------------------------------------
 
@@ -453,9 +394,8 @@ sub parse
 	(
 		Marpa::R2::Scanless::R -> new
 		({
-			grammar         => $self -> grammar,
-			ranking_method  => 'high_rule_only',
-			trace_terminals => $self -> trace_terminals,
+			grammar           => $self -> grammar,
+			semantics_package => 'Genealogy::Gedcom::Date::Actions',
 		})
 	);
 
@@ -465,9 +405,17 @@ sub parse
 
 	try
 	{
-		if (defined (my $value = $self -> _process($date) ) )
+		$self -> log(debug => 'Calling read()');
+		$self -> recce -> read(\$date);
+
+		my($metric) = $self -> recce -> ambiguity_metric;
+
+		$self -> log(debug => "Ambiguity metric: $metric");
+
+=pod
+
 		{
-			$self -> log(info => $self -> result);
+			#$self -> log(info => $self -> result);
 		}
 		else
 		{
@@ -477,6 +425,9 @@ sub parse
 
 			$self -> log(error => 'Parse failed');
 		}
+
+=cut
+
 	}
 	catch
 	{
@@ -492,113 +443,6 @@ sub parse
 	return $result;
 
 } # End of parse.
-
-# ------------------------------------------------
-
-sub _process
-{
-	my($self)       = @_;
-	my($date)       = $self -> date;
-	my($length)     = length $date;
-	my($last_event) = '';
-	my($pos)        = 0;
-
-	my($event_name);
-	my($lexeme);
-	my($node_name);
-	my($original_lexeme);
-	my($span, $start, @stack);
-	my($temp, $type);
-
-	# We use read()/lexeme_read()/resume() because we pause at each lexeme.
-	# Also, in read(), we use $pos and $length to avoid reading Ruby Slippers tokens (if any).
-
-	for
-	(
-		$pos = $self -> recce -> read(\$date, $pos, $length);
-		$pos < $length;
-		$pos = $self -> recce -> resume($pos)
-	)
-	{
-		($start, $span)            = $self -> recce -> pause_span;
-		($event_name, $span, $pos) = $self -> _validate_event($date, $start, $span, $pos);
-		$lexeme                    = $self -> recce -> literal($start, $span);
-		$original_lexeme           = $lexeme;
-		$pos                       = $self -> recce -> lexeme_read($event_name);
-
-		die "lexeme_read($event_name) rejected lexeme |$lexeme|\n" if (! defined $pos);
-
-		push @stack, $lexeme;
-
-=pod
-
-		if ($event_name eq 'about')
-		{
-		}
-		elsif ($event_name eq 'after')
-		{
-		}
-		elsif ($event_name eq 'and')
-		{
-		}
-
-=cut
-
-		$last_event = $event_name;
-    }
-
-	if (my $ambiguous_status = $self -> recce -> ambiguous)
-	{
-		my($terminals) = $self -> recce -> terminals_expected;
-		$terminals     = ['(None)'] if ($#$terminals < 0);
-
-		$self -> log(info => 'Terminals expected: ' . join(', ', @$terminals) );
-		$self -> log(info => "Parse is ambiguous. Status: $ambiguous_status");
-	}
-
-	$self -> result('<' . join(' ', @stack) . '>');
-
-	# Return a defined value for success and undef for failure.
-
-	return 0; # TODO.
-
-	return $self -> recce -> value;
-
-} # End of _process.
-
-# ------------------------------------------------
-
-sub _validate_event
-{
-	my($self, $string, $start, $span, $pos) = @_;
-	my(@events)        = @{$self -> recce -> events};
-	my($event_count)   = scalar @events;
-	my(@event_names)   = sort map{$$_[0]} @events;
-	my($event_name)    = $event_names[0]; # Default.
-	my($lexeme)        = substr($string, $start, $span);
-	my($line, $column) = $self -> recce -> line_column($start);
-	my($message)       = "Location: ($line, $column). Lexeme: |$lexeme|. String: |$string|";
-	$message           = "$message. Events: $event_count. Names: ";
-
-	$self -> log(debug => $message . join(', ', @event_names) . '.');
-
-	my(%event_name);
-
-	@event_name{@event_names} = (1) x @event_names;
-
-	for (@event_names)
-	{
-		die "Unexpected event name '$_'" if (! ${$self -> known_events}{$_});
-	}
-
-	if ($event_count > 1)
-	{
-#TODO		die 'The code only handles 1 event at a time. Events: ' . join(', ', @event_names), ". \n";
-	}
-
-	return ($event_name, $span, $pos);
-
-} # End of _validate_event.
 
 # --------------------------------------------------
 
