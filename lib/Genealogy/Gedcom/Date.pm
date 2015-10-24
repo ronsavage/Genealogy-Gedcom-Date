@@ -199,20 +199,20 @@ date_value			::= date
 						| date_period
 						| date_range
 						| approximated_date
-						| interpreted generic_date '(' date_phrase ')'
+						| interpreted date '(' date_phrase ')'
 						| '(' date_phrase ')'
 
-date_period			::= from generic_date
-						| to generic_date
-						| from generic_date to generic_date
+date_period			::= from date
+						| to date
+						| from date to date
 
-date_range			::= before generic_date
-						| after generic_date
-						| between generic_date and generic_date
+date_range			::= before date
+						| after date
+						| between date and date
 
-approximated_date	::= about generic_date
-						| calculated generic_date
-						| estimated generic_date
+approximated_date	::= about date
+						| calculated date
+						| estimated date
 
 date_phrase			::= date_text
 
