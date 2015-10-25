@@ -7,9 +7,6 @@ use Config;
 
 use Data::Dumper::Concise; # For Dumper().
 
-use DateTime;
-use DateTime::Infinite;
-
 use Genealogy::Gedcom::Date::Actions;
 
 use Log::Handler;
@@ -156,28 +153,28 @@ calendar_date		::= gregorian_date			action => gregorian_date
 
 gregorian_date		::= day gregorian_month gregorian_year
 						| gregorian_month gregorian_year
-						| gregorian_year_bc
+						| gregorian_year_bce
 						| gregorian_year
 
 day					::= one_or_two_digits		action => day
 
-gregorian_year_bc	::= gregorian_year bc		action => gregorian_year_bc
+gregorian_year_bce	::= gregorian_year bce		action => gregorian_year_bce
 
 gregorian_year		::= number
 						| number ('/') two_digits
 
 julian_date			::= day gregorian_month year
 						| gregorian_month year
-						| julian_year_bc
+						| julian_year_bce
 						| year
 
-julian_year_bc		::= number bc				action => julian_year_bc
+julian_year_bce		::= number bce				action => julian_year_bce
 
-year_bc				::= year bc
+#year_bce			::= year bce
 
 year				::= number
 
-#french_date			::= year_bc
+#french_date			::= year_bce
 #						| year
 #						| french_month year
 #						| day french_month year
@@ -188,11 +185,11 @@ year				::= number
 #						| german_month german_year
 #
 #german_year			::= year
-#						| year german_bc
+#						| year german_bce
 
 calendar_escape		::= ('@#') calendar_name ('@')
 
-#hebrew_date			::= year_bc
+#hebrew_date			::= year_bce
 #						| year
 #						| hebrew_month year
 #						| day hebrew_month year
@@ -236,7 +233,7 @@ after				~ 'aft':i
 
 and					~ 'and':i
 
-bc					~ 'bc'
+bce					~ 'bc'
 						| 'b.c'
 						| 'b.c.'
 						| 'bc.'
@@ -273,7 +270,7 @@ estimated			~ 'est':i
 
 from				~ 'from':i
 
-#german_bc			~ 'vc'
+#german_bce			~ 'vc'
 #						| 'v.c.'
 #						| 'v.chr.'
 #						| 'vchr'
@@ -357,43 +354,6 @@ sub decode_result
 	return [@stack];
 
 } # End of decode_result.
-
-# --------------------------------------------------
-
-sub _init_flags
-{
-	my($self) = @_;
-
-	my(%flags);
-
-	for my $key (qw/one two/)
-	{
-		$flags{$key}                   = $key eq 'one' ? DateTime::Infinite::Past -> new : DateTime::Infinite::Future -> new;
-		$flags{"${key}_ambiguous"}     = 0;
-		$flags{"${key}_bc"}            = 0;
-		$flags{"${key}_date"}          = $flags{$key};
-		$flags{"${key}_default_day"}   = 0;
-		$flags{"${key}_default_month"} = 0;
-		$flags{phrase}                 = '';
-		$flags{prefix}                 = '';
-	}
-
-	# Fix systems where DateTime::Infinite::Past is returned as '-1.#INF' etc instead of '-Inf'.
-	# Likewise a fix for DateTime::Infinite::Future allegedly being '1.#INF' etc instead of 'Inf'.
-	# This applies to OSes reported by CPAN Testers as:
-	# o Win32::GetOSName = Win7.       $date =~ /-?1\.#INF/.
-	# o Win32::GetOSName = WinXP/.Net. $date =~ /-?1\.#INF/.
-	# o osname=solaris, osvers=2.11.   $date =~ /-?Infinity/.
-
-	my($minus_infinity) = $Config{version} ge '5.21.11' ? '-Inf' : '-inf';
-	my($plus_infinity)  = $Config{version} ge '5.21.11' ? 'Inf'  : 'inf';
-
-	$flags{one} = $flags{one_date} = $minus_infinity if ( ($flags{one} eq '-1.#INF') || ($flags{one} eq '-Infinity') );
-	$flags{two} = $flags{two_date} = $plus_infinity  if ( ($flags{two} eq '1.#INF')  || ($flags{two} eq 'Infinity') );
-
-	$self -> result({%flags});
-
-} # End of _init_flags.
 
 # ------------------------------------------------
 

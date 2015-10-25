@@ -180,21 +180,21 @@ sub gregorian_date
 
 # ------------------------------------------------
 
-sub gregorian_year_bc
+sub gregorian_year_bce
 {
 	my($cache, $t1, $t2) = @_;
 
-	print 'gregorian_year_bc 1 => ' . Dumper($t1) if ($DEBUG);
-	print 'gregorian_year_bc 2 => ' . Dumper($t2) if ($DEBUG);
+	print 'gregorian_year_bce 1 => ' . Dumper($t1) if ($DEBUG);
+	print 'gregorian_year_bce 2 => ' . Dumper($t2) if ($DEBUG);
 
 	return
 	{
-		bc   => $t2,
+		bce  => $t2,
 		type => 'gregorian_year',
 		year => $$t1[0],
 	};
 
-} # End of gregorian_year_bc.
+} # End of gregorian_year_bce.
 
 # ------------------------------------------------
 
@@ -241,21 +241,21 @@ sub julian_date
 
 # ------------------------------------------------
 
-sub julian_year_bc
+sub julian_year_bce
 {
 	my($cache, $t1, $t2) = @_;
 
-	print 'julian_year_bc 1 => ' . Dumper($t1) if ($DEBUG);
-	print 'julian_year_bc 2 => ' . Dumper($t2) if ($DEBUG);
+	print 'julian_year_bce 1 => ' . Dumper($t1) if ($DEBUG);
+	print 'julian_year_bce 2 => ' . Dumper($t2) if ($DEBUG);
 
 	return
 	{
-		bc   => $t2,
+		bce  => $t2,
 		type => 'julian_year',
 		year => $t1,
 	};
 
-} # End of julian_year_bc.
+} # End of julian_year_bce.
 
 # ------------------------------------------------
 
