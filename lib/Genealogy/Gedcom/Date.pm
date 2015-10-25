@@ -142,14 +142,14 @@ lexeme default		=  latm => 1		# Longest Acceptable Token Match.
 
 :start				::= gedcom_date
 
-gedcom_date			::= date				action => date
-						| lds_ord_date		action => lds_ord_date
+gedcom_date			::= date
+						| lds_ord_date
 
-date				::= calendar_date		action => calendar_date
+date				::= calendar_date			action => date
 						| calendar_escape
 
-calendar_date		::= gregorian_date		action => gregorian_date
-						| julian_date		action => julian_date
+calendar_date		::= gregorian_date			action => gregorian_date
+						| julian_date			action => julian_date
 #						| french_date
 #						| german_date
 #						| hebrew_date
@@ -195,26 +195,31 @@ calendar_escape		::= ('@#') calendar_name ('@')
 
 lds_ord_date		::= date_value
 
-date_value			::= date
-						| date_period
+date_value			::= date_period
 						| date_range
 						| approximated_date
-						| interpreted date '(' date_phrase ')'
-						| '(' date_phrase ')'
+						| interpreted_date
+						| '(' date_text ')'
 
-date_period			::= from date
-						| to date
-						| from date to date
+date_period			::= from_date
+						| to_date
+						| from_date to_date
 
-date_range			::= before date
-						| after date
-						| between date and date
+from_date			::= from date				action => from_date
 
-approximated_date	::= about date
-						| calculated date
-						| estimated date
+to_date				::= to date			 		action => to_date
 
-date_phrase			::= date_text
+date_range			::= before date				action => before_date
+						| after date			action => after_date
+						| between date and date	action => between_date
+
+approximated_date	::= about date				action => about_date
+						| calculated date		action => calculated_date
+						| estimated date		action => estimated_date
+
+interpreted_date	::= interpreted date '(' date_text ')'	action => interpreted_date
+
+date_text			::= date_phrase				action => date_phrase
 
 # Lexemes, in alphabetical order.
 
@@ -250,7 +255,7 @@ calendar_name		~ 'dfrench r'
 						| 'dhebrew'
 						| 'djulian'
 
-date_text			~ [\w ]+
+date_phrase			~ [\w ]+
 
 day					~ digit
 						| digit digit
@@ -309,6 +314,45 @@ END_OF_GRAMMAR
 	);
 
 } # End of BUILD.
+
+# ------------------------------------------------
+
+sub decode_result
+{
+	my($self, $result) = @_;
+	my(@worklist) = $result;
+
+	my($obj);
+	my($ref_type);
+	my(@stack);
+
+	do
+	{
+		$obj      = shift @worklist;
+		$ref_type = ref $obj;
+
+		if ($ref_type eq 'ARRAY')
+		{
+			unshift @worklist, @$obj;
+		}
+		elsif ($ref_type eq 'HASH')
+		{
+			push @stack, {%$obj};
+		}
+		elsif ($ref_type)
+		{
+			die "Unsupported object type $ref_type\n";
+		}
+		else
+		{
+			push @stack, $obj;
+		}
+
+	} while (@worklist);
+
+	return [@stack];
+
+} # End of decode_result.
 
 # --------------------------------------------------
 
@@ -383,12 +427,9 @@ sub parse
 
 	try
 	{
-		$self -> log(debug => 'Calling read()');
 		$self -> recce -> read(\$date);
 
 		my($ambiguity_metric) = $self -> recce -> ambiguity_metric;
-
-		$self -> log(debug => "Ambiguity metric: $ambiguity_metric");
 
 		if ($ambiguity_metric <= 0)
 		{
@@ -399,15 +440,17 @@ sub parse
 			# No ambiguity.
 
 			my($value) = $self -> recce -> value;
-			$value     = (defined $value) ? $$value : '';
+			$value     = $self -> decode_result($$value);
 
-			$self -> log(debug => "Result: $value");
+			$self -> log(debug => "Only solution: \n" . Dumper($value) );
 		}
 		else
 		{
 			while (my $value = $self -> recce -> value)
 			{
-				$self -> log(debug => 'Solution: ' . $self -> decode_result($$value) );
+				$value = $self -> decode_result($$value);
+
+				$self -> log(debug => "Nth solution: \n" . Dumper($_) ) for @$value;
 			}
 		}
 

@@ -9,15 +9,63 @@ our $VERSION = '1.08';
 
 # ------------------------------------------------
 
-sub calendar_date
+sub about_date
 {
 	my($cache, $t1) = @_;
 
-	print 'calendar_date: ' . Dumper($t1);
+	print 'about_date => ', Dumper($t1), "\n";
 
 	return $t1;
 
-} # End of calendar_date.
+} # End of about_date.
+
+# ------------------------------------------------
+
+sub after_date
+{
+	my($cache, $t1) = @_;
+
+	print 'after_date => ', Dumper($t1), "\n";
+
+	return $t1;
+
+} # End of after_date.
+
+# ------------------------------------------------
+
+sub before_date
+{
+	my($cache, $t1) = @_;
+
+	print 'before_date => ', Dumper($t1), "\n";
+
+	return $t1;
+
+} # End of before_date.
+
+# ------------------------------------------------
+
+sub between_date
+{
+	my($cache, $t1) = @_;
+
+	print 'between_date => ', Dumper($t1), "\n";
+
+	return $t1;
+
+} # End of between_date.
+
+# ------------------------------------------------
+
+sub calculated_date
+{
+	my($cache, $t1) = @_;
+
+	print 'calculated_date => ', Dumper($t1), "\n";
+
+	return $t1;
+
+} # End of calculated_date.
 
 # ------------------------------------------------
 
@@ -25,7 +73,7 @@ sub date
 {
 	my($cache, $t1) = @_;
 
-	print 'date: ' . Dumper($t1);
+	#print 'date => ', Dumper($t1), "\n";
 
 	return $t1;
 
@@ -33,39 +81,124 @@ sub date
 
 # ------------------------------------------------
 
-sub gregorian_date
+sub date_phrase
 {
 	my($cache, $t1) = @_;
 
-	print 'gregorian_date: ' . Dumper($t1);
+	print 'date_phrase => ', Dumper($t1), "\n";
 
 	return $t1;
 
+} # End of date_phrase.
+
+# ------------------------------------------------
+
+sub estimated_date
+{
+	my($cache, $t1) = @_;
+
+	print 'estimated_date => ', Dumper($t1), "\n";
+
+	return $t1;
+
+} # End of estimated_date.
+
+# ------------------------------------------------
+
+sub from_date
+{
+	my($cache, $t1, $t2) = @_;
+	$$t2{from} = 'from';
+
+	#print 'from_date => ', Dumper($t2), "\n";
+
+	return $t2;
+
+} # End of from_date.
+
+# ------------------------------------------------
+
+sub from_to_date
+{
+	my($cache, $t1, $t2) = @_;
+
+	print 'from_to_date => ', Dumper($t1), "\n";
+
+	return [$t1, $t2];
+
+} # End of from_to_date.
+
+# ------------------------------------------------
+
+sub gregorian_date
+{
+	my($cache, $t1) = @_;
+	my($year)       = $$t1[2];
+
+	if ($#$year > 0)
+	{
+		$year = "$$year[0]/$$year[1]";
+	}
+	else
+	{
+		$year = $$year[0];
+	}
+
+	#print 'gregorian_date => ' . Dumper($t1);
+
+	return
+	{
+		day   => $$t1[0],
+		month => $$t1[1],
+		type  => 'gregorian_date',
+		year  => $year,
+	};
+
 } # End of gregorian_date.
+
+# ------------------------------------------------
+
+sub interpreted_date
+{
+	my($cache, $t1) = @_;
+
+	print 'interpreted_date => ', Dumper($t1), "\n";
+
+	return $t1;
+
+} # End of interpreted_date.
 
 # ------------------------------------------------
 
 sub julian_date
 {
 	my($cache, $t1) = @_;
+	my($year)       = $$t1[2][0];
 
-	print 'julian_date: ' . Dumper($t1);
+	#print 'julian_date => ' . Dumper($t1);
 
-	return $t1;
+	return
+	{
+		day   => $$t1[0],
+		month => $$t1[1],
+		type  => 'julian_date',
+		year  => $year,
+	};
 
 } # End of julian_date.
 
 # ------------------------------------------------
 
-sub lds_ord_date
+sub to_date
 {
-	my($cache, $t1) = @_;
+	my($cache, $t1, $t2) = @_;
+	$$t2{to} = 'to';
 
-	print 'lds_ord_date: ' . Dumper($t1);
+	#print 'to_date => ', Dumper($t2), "\n";
 
-	return $t1;
+	return $t2;
 
-} # End of lds_ord_date.
+} # End of to_date.
 
 # ------------------------------------------------
 
