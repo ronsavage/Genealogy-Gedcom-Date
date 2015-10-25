@@ -159,15 +159,19 @@ gregorian_date		::= day gregorian_month gregorian_year
 						| gregorian_year_bc
 						| gregorian_year
 
+day					::= one_or_two_digits		action => day
+
 gregorian_year_bc	::= gregorian_year bc		action => gregorian_year_bc
 
 gregorian_year		::= number
-						| number ('/') pair_of_digits
+						| number ('/') two_digits
 
 julian_date			::= day gregorian_month year
 						| gregorian_month year
-						| year_bc
+						| julian_year_bc
 						| year
+
+julian_year_bc		::= number bc				action => julian_year_bc
 
 year_bc				::= year bc
 
@@ -257,9 +261,6 @@ calendar_name		~ 'dfrench r'
 
 date_text			~ [\w ]+
 
-day					~ digit
-						| digit digit
-
 digit				~ [0-9]
 
 #dot					~ '.'
@@ -293,9 +294,12 @@ interpreted			~ 'int':i
 
 number				~ digit+
 
-pair_of_digits		~ digit digit
+one_or_two_digits	~ digit
+						| digit digit
 
 to					~ 'to':i
+
+two_digits			~ digit digit
 
 # Boilerplate.
 

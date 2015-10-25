@@ -5,7 +5,7 @@ use warnings;
 
 use Data::Dumper::Concise; # For Dumper().
 
-our $DEBUG   = 1;
+our $DEBUG   = 0;
 our $VERSION = '1.08';
 
 # ------------------------------------------------
@@ -101,6 +101,18 @@ sub date_phrase
 
 # ------------------------------------------------
 
+sub day
+{
+	my($cache, $t1) = @_;
+
+	print 'day 1 => ', Dumper($t1) if ($DEBUG);
+
+	return $t1;
+
+} # End of day.
+
+# ------------------------------------------------
+
 sub estimated_date
 {
 	my($cache, $t1, $t2) = @_;
@@ -138,6 +150,13 @@ sub gregorian_date
 
 	print 'gregorian_date 1 => ' . Dumper($t1) if ($DEBUG);
 
+	# Is it a BCE date? If so, it's already a hashref.
+
+	if (ref($$t1[0]) eq 'HASH')
+	{
+		return $$t1[0];
+	}
+
 	my($year) = $$t1[2];
 
 	if ($#$year > 0)
@@ -151,10 +170,10 @@ sub gregorian_date
 
 	return
 	{
-		date_type  => 'gregorian',
-		day        => $$t1[0],
-		month      => $$t1[1],
-		year       => $year,
+		day   => $$t1[0],
+		month => $$t1[1],
+		type  => 'gregorian',
+		year  => $year,
 	};
 
 } # End of gregorian_date.
@@ -170,9 +189,9 @@ sub gregorian_year_bc
 
 	return
 	{
-		bc        => $t2,
-		date_type => 'gregorian_year_bc',
-		year      => $$t1[0],
+		bc   => $t2,
+		type => 'gregorian_year',
+		year => $$t1[0],
 	};
 
 } # End of gregorian_year_bc.
@@ -199,19 +218,44 @@ sub julian_date
 {
 	my($cache, $t1) = @_;
 
+	# Is it a BCE date? If so, it's already a hashref.
+
+	if (ref($$t1[0]) eq 'HASH')
+	{
+		return $$t1[0];
+	}
+
 	print 'julian_date 1 => ' . Dumper($t1) if ($DEBUG);
 
 	my($year) = $$t1[2][0];
 
 	return
 	{
-		date_type  => 'julian',
-		day        => $$t1[0],
-		month      => $$t1[1],
-		year       => $year,
+		day   => $$t1[0],
+		month => $$t1[1],
+		type  => 'julian',
+		year  => $year,
 	};
 
 } # End of julian_date.
+
+# ------------------------------------------------
+
+sub julian_year_bc
+{
+	my($cache, $t1, $t2) = @_;
+
+	print 'julian_year_bc 1 => ' . Dumper($t1) if ($DEBUG);
+	print 'julian_year_bc 2 => ' . Dumper($t2) if ($DEBUG);
+
+	return
+	{
+		bc   => $t2,
+		type => 'julian_year',
+		year => $t1,
+	};
+
+} # End of julian_year_bc.
 
 # ------------------------------------------------
 
