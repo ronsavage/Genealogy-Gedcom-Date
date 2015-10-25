@@ -145,7 +145,7 @@ lexeme default		=  latm => 1		# Longest Acceptable Token Match.
 gedcom_date			::= date
 						| lds_ord_date
 
-date				::= calendar_date			action => date
+date				::= calendar_date
 						| calendar_escape
 
 calendar_date		::= gregorian_date			action => gregorian_date
@@ -154,20 +154,20 @@ calendar_date		::= gregorian_date			action => gregorian_date
 #						| german_date
 #						| hebrew_date
 
-gregorian_date		::= gregorian_year_bc
-						| gregorian_year
+gregorian_date		::= day gregorian_month gregorian_year
 						| gregorian_month gregorian_year
-						| day gregorian_month gregorian_year
+						| gregorian_year_bc
+						| gregorian_year
 
 gregorian_year_bc	::= gregorian_year bc
 
 gregorian_year		::= number
 						| number ('/') pair_of_digits
 
-julian_date			::= year_bc
-						| year
+julian_date			::= day gregorian_month year
 						| gregorian_month year
-						| day gregorian_month year
+						| year_bc
+						| year
 
 year_bc				::= year bc
 
@@ -199,7 +199,7 @@ date_value			::= date_period
 						| date_range
 						| approximated_date
 						| interpreted_date
-						| '(' date_text ')'
+						| '(' date_phrase ')'
 
 date_period			::= from_date
 						| to_date
@@ -217,9 +217,9 @@ approximated_date	::= about date				action => about_date
 						| calculated date		action => calculated_date
 						| estimated date		action => estimated_date
 
-interpreted_date	::= interpreted date '(' date_text ')'	action => interpreted_date
+interpreted_date	::= interpreted date '(' date_phrase ')'	action => interpreted_date
 
-date_text			::= date_phrase				action => date_phrase
+date_phrase			::= date_text				action => date_phrase
 
 # Lexemes, in alphabetical order.
 
@@ -255,7 +255,7 @@ calendar_name		~ 'dfrench r'
 						| 'dhebrew'
 						| 'djulian'
 
-date_phrase			~ [\w ]+
+date_text			~ [\w ]+
 
 day					~ digit
 						| digit digit
@@ -407,7 +407,7 @@ sub parse
 {
 	my($self, %args) = @_;
 	my($date)        = $self -> date;
-	$date            = lc(defined($args{date}) ? $args{date} : $date);
+	$date            = defined($args{date} ? $args{date} : $date);
 	$date            =~ tr/,/ /s;
 
 	$self -> date($date);
@@ -446,11 +446,13 @@ sub parse
 		}
 		else
 		{
+			my($count) = 0;
+
 			while (my $value = $self -> recce -> value)
 			{
 				$value = $self -> decode_result($$value);
 
-				$self -> log(debug => "Nth solution: \n" . Dumper($_) ) for @$value;
+				$self -> log(debug => "Solution @{[++$count]}: \n" . Dumper($_) ) for @$value;
 			}
 		}
 
@@ -485,44 +487,6 @@ sub parse
 	return $result;
 
 } # End of parse.
-
-# --------------------------------------------------
-
-sub _process_complex_date
-{
-	my($self, $target, $result) = @_;
-	my(@part) = split(/$target/, $result);
-
-	shift @part;
-
-	@part = map{$self -> _process_simple_date($_)} @part;
-
-	return join(' ', @part);
-
-} # End of _process_complex_date.
-
-# --------------------------------------------------
-
-sub _process_simple_date
-{
-	my($self, $result)                   = @_;
-	my($target)                          = 'date_string lds_ord_date';
-	my($index)                           = index($result, $target);
-	substr($result, $index)              = '' if ($index >= 0);
-	$target                              = 'date_string';
-	$index                               = index($result, $target);
-	substr($result, 0, length($target) ) = '' if ($index >= 0);
-	$target                              = 'generic_date';
-	$index                               = index($result, $target);
-	substr($result, 0, length($target) ) = '' if ($index >= 0);
-	$result                              =~ s/^\s+//;
-	$result                              =~ s/\s+$//;
-	my(@part)                            = split(/\s*date_type\s*/, $result);
-	@part                                = map{s/(?:gregorian_year|year)//g; tr/ //s; $_} @part;
-
-	return "<$part[1]> <$part[2]>";
-
-} # End of _process_simple_date.
 
 # --------------------------------------------------
 
