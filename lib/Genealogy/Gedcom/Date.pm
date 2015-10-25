@@ -223,14 +223,14 @@ date_phrase			::= date_text				action => date_phrase
 
 # Lexemes, in alphabetical order.
 
-about				~ 'abt'
-						| 'about'
-						| 'circa'
+about				~ 'abt':i
+						| 'about':i
+						| 'circa':i
 
-after				~ 'aft'
-						| 'after'
+after				~ 'aft':i
+						| 'after':i
 
-and					~ 'and'
+and					~ 'and':i
 
 bc					~ 'bc'
 						| 'b.c'
@@ -239,14 +239,14 @@ bc					~ 'bc'
 						| 'b c'
 						| 'bce'
 
-before				~ 'bef'
-						| 'before'
+before				~ 'bef':i
+						| 'before':i
 
-between				~ 'bet'
-						| 'between'
+between				~ 'bet':i
+						| 'between':i
 
-calculated			~ 'cal'
-						| 'calculated'
+calculated			~ 'cal':i
+						| 'calculated':i
 
 calendar_name		~ 'dfrench r'
 						| 'dfrenchr'
@@ -264,13 +264,13 @@ digit				~ [0-9]
 
 #dot					~ '.'
 
-estimated			~ 'est'
-						| 'estimated'
+estimated			~ 'est':i
+						| 'estimated':i
 
 #french_month		~ 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent'
 #						| 'germ' | 'flor' | 'prai' | 'mess' | 'ther' | 'fruc' | 'comp'
 
-from				~ 'from'
+from				~ 'from':i
 
 #german_bc			~ 'vc'
 #						| 'v.c.'
@@ -288,14 +288,14 @@ gregorian_month		~ 'jan' | 'feb' | 'mar' | 'apr' | 'may' | 'jun'
 #hebrew_month		~ 'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr'
 #						| 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' | 'aav' | 'ell'
 
-interpreted			~ 'int'
-						| 'interpreted'
+interpreted			~ 'int':i
+						| 'interpreted':i
 
 number				~ digit+
 
 pair_of_digits		~ digit digit
 
-to					~ 'to'
+to					~ 'to':i
 
 # Boilerplate.
 
@@ -407,7 +407,7 @@ sub parse
 {
 	my($self, %args) = @_;
 	my($date)        = $self -> date;
-	$date            = defined($args{date} ? $args{date} : $date);
+	$date            = defined($args{date}) ? $args{date} : $date;
 	$date            =~ tr/,/ /s;
 
 	$self -> date($date);
