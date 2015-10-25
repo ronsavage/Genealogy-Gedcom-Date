@@ -5,7 +5,7 @@ use warnings;
 
 use Data::Dumper::Concise; # For Dumper().
 
-our $DEBUG   = 0;
+our $DEBUG   = 1;
 our $VERSION = '1.08';
 
 # ------------------------------------------------
@@ -16,8 +16,8 @@ sub about_date
 
 	print 'about_date 2 => ', Dumper($t2) if ($DEBUG);
 
-	$t2         = $$t2[0];
-	$$t2{about} = 'about';
+	$t2        = $$t2[0];
+	$$t2{flag} = 'about';
 
 	return $t2;
 
@@ -31,8 +31,8 @@ sub after_date
 
 	print 'after_date 2 => ', Dumper($t2) if ($DEBUG);
 
-	$t2         = $$t2[0];
-	$$t2{after} = 'after';
+	$t2        = $$t2[0];
+	$$t2{flag} = 'after';
 
 	return $t2;
 
@@ -46,8 +46,8 @@ sub before_date
 
 	print 'before_date 2 => ', Dumper($t2) if ($DEBUG);
 
-	$t2          = $$t2[0];
-	$$t2{before} = 'before';
+	$t2        = $$t2[0];
+	$$t2{flag} = 'before';
 
 	return $t2;
 
@@ -62,10 +62,10 @@ sub between_date
 	print 'between_date 2 => ', Dumper($t2) if ($DEBUG);
 	print 'between_date 4 => ', Dumper($t4) if ($DEBUG);
 
-	$t2           = $$t2[0];
-	$$t2{between} = 'between';
-	$t4           = $$t4[0];
-	$$t4{and}     = 'and';
+	$t2        = $$t2[0];
+	$$t2{flag} = 'between';
+	$t4        = $$t4[0];
+	$$t4{and}  = 'and';
 
 	return [$t2, $t4];
 
@@ -80,8 +80,8 @@ sub calculated_date
 	print 'calculated_date 1 => ', Dumper($t1) if ($DEBUG);
 	print 'calculated_date 2 => ', Dumper($t2) if ($DEBUG);
 
-	$t2              = $$t2[0];
-	$$t2{calculated} = 'calculated';
+	$t2        = $$t2[0];
+	$$t2{flag} = 'calculated';
 
 	return $t2;
 
@@ -91,11 +91,16 @@ sub calculated_date
 
 sub date_phrase
 {
-	my($cache, $t1) = @_;
+	my($cache, $t1, $t2, $t3) = @_;
 
 	print 'date_phrase 1 => ', Dumper($t1) if ($DEBUG);
+	print 'date_phrase 2 => ', Dumper($t2) if ($DEBUG);
+	print 'date_phrase 3 => ', Dumper($t3) if ($DEBUG);
 
-	return $t1;
+	return
+	{
+		phrase => "$t1$$t2[0]$t3"
+	};
 
 } # End of date_phrase.
 
@@ -119,8 +124,8 @@ sub estimated_date
 
 	print 'estimated_date 2 => ', Dumper($t2) if ($DEBUG);
 
-	$t2             = $$t2[0];
-	$$t2{estimated} = 'estimated';
+	$t2        = $$t2[0];
+	$$t2{flag} = 'estimated';
 
 	return $t2;
 
@@ -136,7 +141,7 @@ sub from_date
 	print 'from_date 2 => ', Dumper($t2) if ($DEBUG);
 
 	$t2        = $$t2[0];
-	$$t2{from} = 'from';
+	$$t2{flag} = 'from';
 
 	return $t2;
 
@@ -200,13 +205,13 @@ sub gregorian_year_bce
 
 sub interpreted_date
 {
-	my($cache, $t1, $t2) = @_;
+	my($cache, $t1) = @_;
 
 	print 'interpreted_date 1 => ', Dumper($t1) if ($DEBUG);
-	print 'interpreted_date 2 => ', Dumper($t2) if ($DEBUG);
 
-	$t2               = $$t2[0];
-	$$t2{interpreted} = 'interpreted';
+	my($t2)      = $$t1[1][0];
+	$$t2{flag}   = 'interpreted';
+	$$t2{phrase} = "$$t1[2]$$t1[3][0]$$t1[4]";
 
 	return $t2;
 
@@ -266,8 +271,8 @@ sub to_date
 	print 'to_date 1 => ', Dumper($t1) if ($DEBUG);
 	print 'to_date 2 => ', Dumper($t2) if ($DEBUG);
 
-	$t2      = $$t2[0];
-	$$t2{to} = 'to';
+	$t2        = $$t2[0];
+	$$t2{flag} = 'to';
 
 	return $t2;
 

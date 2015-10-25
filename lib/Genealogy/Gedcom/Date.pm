@@ -158,17 +158,17 @@ gregorian_date		::= day gregorian_month gregorian_year
 
 day					::= one_or_two_digits		action => day
 
-gregorian_year_bce	::= gregorian_year bce		action => gregorian_year_bce
-
 gregorian_year		::= number
 						| number ('/') two_digits
+
+gregorian_year_bce	::= gregorian_year bce		action => gregorian_year_bce
 
 julian_date			::= day gregorian_month year
 						| gregorian_month year
 						| julian_year_bce
 						| year
 
-julian_year_bce		::= number bce				action => julian_year_bce
+julian_year_bce		::= year bce				action => julian_year_bce
 
 #year_bce			::= year bce
 
@@ -199,8 +199,8 @@ lds_ord_date		::= date_value
 date_value			::= date_period
 						| date_range
 						| approximated_date
-						| interpreted_date
-						| '(' date_phrase ')'
+						| interpreted_date		action => interpreted_date
+						| '(' date_phrase ')'	action => date_phrase
 
 date_period			::= from_date
 						| to_date
@@ -218,9 +218,9 @@ approximated_date	::= about date				action => about_date
 						| calculated date		action => calculated_date
 						| estimated date		action => estimated_date
 
-interpreted_date	::= interpreted date '(' date_phrase ')'	action => interpreted_date
+interpreted_date	::= interpreted date '(' date_phrase ')'
 
-date_phrase			::= date_text				action => date_phrase
+date_phrase			::= date_text
 
 # Lexemes, in alphabetical order.
 
