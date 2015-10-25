@@ -13,10 +13,11 @@ our $VERSION = '1.08';
 sub about_date
 {
 	my($cache, $t1, $t2) = @_;
-	$t2         = $$t2[0];
-	$$t2{about} = 'about';
 
 	print 'about_date 2 => ', Dumper($t2) if ($DEBUG);
+
+	$t2         = $$t2[0];
+	$$t2{about} = 'about';
 
 	return $t2;
 
@@ -27,10 +28,11 @@ sub about_date
 sub after_date
 {
 	my($cache, $t1, $t2) = @_;
-	$t2         = $$t2[0];
-	$$t2{after} = 'after';
 
 	print 'after_date 2 => ', Dumper($t2) if ($DEBUG);
+
+	$t2         = $$t2[0];
+	$$t2{after} = 'after';
 
 	return $t2;
 
@@ -41,10 +43,11 @@ sub after_date
 sub before_date
 {
 	my($cache, $t1, $t2) = @_;
-	$t2          = $$t2[0];
-	$$t2{before} = 'before';
 
 	print 'before_date 2 => ', Dumper($t2) if ($DEBUG);
+
+	$t2          = $$t2[0];
+	$$t2{before} = 'before';
 
 	return $t2;
 
@@ -55,13 +58,14 @@ sub before_date
 sub between_date
 {
 	my($cache, $t1, $t2, $t3, $t4) = @_;
+
+	print 'between_date 2 => ', Dumper($t2) if ($DEBUG);
+	print 'between_date 4 => ', Dumper($t4) if ($DEBUG);
+
 	$t2           = $$t2[0];
 	$$t2{between} = 'between';
 	$t4           = $$t4[0];
 	$$t4{and}     = 'and';
-
-	print 'between_date 2 => ', Dumper($t2) if ($DEBUG);
-	print 'between_date 4 => ', Dumper($t4) if ($DEBUG);
 
 	return [$t2, $t4];
 
@@ -72,10 +76,12 @@ sub between_date
 sub calculated_date
 {
 	my($cache, $t1, $t2) = @_;
+
+	print 'calculated_date 1 => ', Dumper($t1) if ($DEBUG);
+	print 'calculated_date 2 => ', Dumper($t2) if ($DEBUG);
+
 	$t2              = $$t2[0];
 	$$t2{calculated} = 'calculated';
-
-	print 'calculated_date 2 => ', Dumper($t2) if ($DEBUG);
 
 	return $t2;
 
@@ -98,10 +104,11 @@ sub date_phrase
 sub estimated_date
 {
 	my($cache, $t1, $t2) = @_;
-	$t2             = $$t2[0];
-	$$t2{estimated} = 'estimated';
 
 	print 'estimated_date 2 => ', Dumper($t2) if ($DEBUG);
+
+	$t2             = $$t2[0];
+	$$t2{estimated} = 'estimated';
 
 	return $t2;
 
@@ -112,10 +119,12 @@ sub estimated_date
 sub from_date
 {
 	my($cache, $t1, $t2) = @_;
+
+	print 'from_date 1 => ', Dumper($t1) if ($DEBUG);
+	print 'from_date 2 => ', Dumper($t2) if ($DEBUG);
+
 	$t2        = $$t2[0];
 	$$t2{from} = 'from';
-
-	print 'from_date 2 => ', Dumper($t2) if ($DEBUG);
 
 	return $t2;
 
@@ -126,6 +135,9 @@ sub from_date
 sub gregorian_date
 {
 	my($cache, $t1) = @_;
+
+	print 'gregorian_date 1 => ' . Dumper($t1) if ($DEBUG);
+
 	my($year) = $$t1[2];
 
 	if ($#$year > 0)
@@ -137,28 +149,45 @@ sub gregorian_date
 		$year = $$year[0];
 	}
 
-	print 'gregorian_date 1 => ' . Dumper($t1) if ($DEBUG);
-
 	return
 	{
-		day   => $$t1[0],
-		month => $$t1[1],
-		type  => 'gregorian_date',
-		year  => $year,
+		date_type  => 'gregorian',
+		day        => $$t1[0],
+		month      => $$t1[1],
+		year       => $year,
 	};
 
 } # End of gregorian_date.
 
 # ------------------------------------------------
 
+sub gregorian_year_bc
+{
+	my($cache, $t1, $t2) = @_;
+
+	print 'gregorian_year_bc 1 => ' . Dumper($t1) if ($DEBUG);
+	print 'gregorian_year_bc 2 => ' . Dumper($t2) if ($DEBUG);
+
+	return
+	{
+		bc        => $t2,
+		date_type => 'gregorian_year_bc',
+		year      => $$t1[0],
+	};
+
+} # End of gregorian_year_bc.
+
+# ------------------------------------------------
+
 sub interpreted_date
 {
 	my($cache, $t1, $t2) = @_;
-	$t2               = $$t2[0];
-	$$t2{interpreted} = 'interpreted';
 
 	print 'interpreted_date 1 => ', Dumper($t1) if ($DEBUG);
 	print 'interpreted_date 2 => ', Dumper($t2) if ($DEBUG);
+
+	$t2               = $$t2[0];
+	$$t2{interpreted} = 'interpreted';
 
 	return $t2;
 
@@ -169,16 +198,17 @@ sub interpreted_date
 sub julian_date
 {
 	my($cache, $t1) = @_;
-	my($year)       = $$t1[2][0];
 
 	print 'julian_date 1 => ' . Dumper($t1) if ($DEBUG);
 
+	my($year) = $$t1[2][0];
+
 	return
 	{
-		day   => $$t1[0],
-		month => $$t1[1],
-		type  => 'julian_date',
-		year  => $year,
+		date_type  => 'julian',
+		day        => $$t1[0],
+		month      => $$t1[1],
+		year       => $year,
 	};
 
 } # End of julian_date.
@@ -188,10 +218,12 @@ sub julian_date
 sub to_date
 {
 	my($cache, $t1, $t2) = @_;
+
+	print 'to_date 1 => ', Dumper($t1) if ($DEBUG);
+	print 'to_date 2 => ', Dumper($t2) if ($DEBUG);
+
 	$t2      = $$t2[0];
 	$$t2{to} = 'to';
-
-	print 'to_date 2 => ', Dumper($t2) if ($DEBUG);
 
 	return $t2;
 

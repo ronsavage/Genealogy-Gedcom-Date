@@ -159,7 +159,7 @@ gregorian_date		::= day gregorian_month gregorian_year
 						| gregorian_year_bc
 						| gregorian_year
 
-gregorian_year_bc	::= gregorian_year bc
+gregorian_year_bc	::= gregorian_year bc		action => gregorian_year_bc
 
 gregorian_year		::= number
 						| number ('/') pair_of_digits
@@ -282,8 +282,8 @@ from				~ 'from':i
 #german_month		~ 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun'
 #						| 'jul' | 'aug' | 'sep' | 'sept' | 'okt' | 'nov' | 'dez'
 
-gregorian_month		~ 'jan' | 'feb' | 'mar' | 'apr' | 'may' | 'jun'
-						| 'jul' | 'aug' | 'sep' | 'oct' | 'nov' | 'dec'
+gregorian_month		~ 'jan':i | 'feb':i | 'mar':i | 'apr':i | 'may':i | 'jun':i
+						| 'jul':i | 'aug':i | 'sep':i | 'oct':i | 'nov':i | 'dec':i
 
 #hebrew_month		~ 'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr'
 #						| 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' | 'aav' | 'ell'
