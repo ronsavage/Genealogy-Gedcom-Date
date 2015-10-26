@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use DateTime::Infinite;
+use Data::Dumper::Concise; # For Dumper().
 
 use Genealogy::Gedcom::Date;
 
@@ -75,17 +75,15 @@ for my $date
 {
 	print "Date: $date. ";
 
-	# Return 0 for success and 1 for failure.
-
 	$result = $parser -> parse(date => $date);
 
-	if ($result)
+	if ($#$result < 0)
 	{
 		print $parser -> error();
 	}
 	else
 	{
-		print 'Result: ', $parser -> result, ". \n";
+		print Dumper($_) for @$result;
 	}
 }
 
@@ -102,12 +100,12 @@ for my $date
 
 	$result = $parser -> parse(date => $date);
 
-	if ($result)
+	if ($#$result < 0)
 	{
 		print $parser -> error();
 	}
 	else
 	{
-		print 'Result: ', $parser -> result, ". \n";
+		print Dumper($_) for @$result;
 	}
 }

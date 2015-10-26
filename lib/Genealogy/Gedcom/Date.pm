@@ -131,177 +131,179 @@ sub BUILD
 	(
 <<'END_OF_GRAMMAR'
 
-:default			::= action => [values]
+:default				::= action => [values]
 
-lexeme default		=  latm => 1		# Longest Acceptable Token Match.
+lexeme default			=  latm => 1		# Longest Acceptable Token Match.
 
 # Rules, in top-down order (more-or-less).
 
-:start				::= gedcom_date
+:start					::= gedcom_date
 
-gedcom_date			::= date
-						| lds_ord_date
+gedcom_date				::= date
+							| lds_ord_date
 
-date				::= calendar_date
-						| calendar_escape
+date					::= calendar_date
+							| calendar_escape
 
-calendar_date		::= gregorian_date			action => gregorian_date
-						| julian_date			action => julian_date
-#						| french_date
-#						| german_date
-#						| hebrew_date
+calendar_date			::= gregorian_date			action => gregorian_date
+							| julian_date			action => julian_date
+#							| french_date
+#							| german_date
+#							| hebrew_date
 
-gregorian_date		::= day gregorian_month gregorian_year
-						| gregorian_month gregorian_year
-						| gregorian_year_bce
-						| gregorian_year
+gregorian_date			::= day gregorian_month gregorian_year
+							| gregorian_month gregorian_year
+							| gregorian_year_bce
+							| gregorian_year
 
-day					::= one_or_two_digits		action => day
+day						::= one_or_two_digits		action => day
 
-gregorian_year		::= number
-						| number ('/') two_digits
+gregorian_month			::= gregorian_month_name	action => gregorian_month
 
-gregorian_year_bce	::= gregorian_year bce		action => gregorian_year_bce
+gregorian_year			::= number
+							| number ('/') two_digits
 
-julian_date			::= day gregorian_month year
-						| gregorian_month year
-						| julian_year_bce
-						| year
+gregorian_year_bce		::= gregorian_year bce		action => gregorian_year_bce
 
-julian_year_bce		::= year bce				action => julian_year_bce
+julian_date				::= day gregorian_month_name year
+							| gregorian_month_name year
+							| julian_year_bce
+							| year
 
-#year_bce			::= year bce
+julian_year_bce			::= year bce				action => julian_year_bce
 
-year				::= number
+#year_bce				::= year bce
 
-#french_date			::= year_bce
-#						| year
-#						| french_month year
-#						| day french_month year
+year					::= number
+
+#french_date				::= year_bce
+#							| year
+#							| french_month_name year
+#							| day french_month_name year
 #
-#german_date			::= german_year
-#						| german_month dot german_year
-#						| day dot german_month dot german_year
-#						| german_month german_year
+#german_date				::= german_year
+#							| german_month_name dot german_year
+#							| day dot german_month_name dot german_year
+#							| german_month_name german_year
 #
-#german_year			::= year
-#						| year german_bce
+#german_year				::= year
+#							| year german_bce
 
-calendar_escape		::= ('@#') calendar_name ('@')
+calendar_escape			::= ('@#') calendar_name ('@')
 
 #hebrew_date			::= year_bce
-#						| year
-#						| hebrew_month year
-#						| day hebrew_month year
+#							| year
+#							| hebrew_month year
+#							| day hebrew_month year
 
-lds_ord_date		::= date_value
+lds_ord_date			::= date_value
 
-date_value			::= date_period
-						| date_range
-						| approximated_date
-						| interpreted_date		action => interpreted_date
-						| '(' date_phrase ')'	action => date_phrase
+date_value				::= date_period
+							| date_range
+							| approximated_date
+							| interpreted_date		action => interpreted_date
+							| '(' date_phrase ')'	action => date_phrase
 
-date_period			::= from_date
-						| to_date
-						| from_date to_date
+date_period				::= from_date
+							| to_date
+							| from_date to_date
 
-from_date			::= from date				action => from_date
+from_date				::= from date				action => from_date
 
-to_date				::= to date			 		action => to_date
+to_date					::= to date			 		action => to_date
 
-date_range			::= before date				action => before_date
-						| after date			action => after_date
-						| between date and date	action => between_date
+date_range				::= before date				action => before_date
+							| after date			action => after_date
+							| between date and date	action => between_date
 
-approximated_date	::= about date				action => about_date
-						| calculated date		action => calculated_date
-						| estimated date		action => estimated_date
+approximated_date		::= about date				action => about_date
+							| calculated date		action => calculated_date
+							| estimated date		action => estimated_date
 
-interpreted_date	::= interpreted date '(' date_phrase ')'
+interpreted_date		::= interpreted date '(' date_phrase ')'
 
-date_phrase			::= date_text
+date_phrase				::= date_text
 
 # Lexemes, in alphabetical order.
 
-about				~ 'abt':i
-						| 'about':i
-						| 'circa':i
+about					~ 'abt':i
+							| 'about':i
+							| 'circa':i
 
-after				~ 'aft':i
-						| 'after':i
+after					~ 'aft':i
+							| 'after':i
 
-and					~ 'and':i
+and						~ 'and':i
 
-bce					~ 'bc'
-						| 'b.c'
-						| 'b.c.'
-						| 'bc.'
-						| 'b c'
-						| 'bce'
+bce						~ 'bc'
+							| 'b.c'
+							| 'b.c.'
+							| 'bc.'
+							| 'b c'
+							| 'bce'
 
-before				~ 'bef':i
-						| 'before':i
+before					~ 'bef':i
+							| 'before':i
 
-between				~ 'bet':i
-						| 'between':i
+between					~ 'bet':i
+							| 'between':i
 
-calculated			~ 'cal':i
-						| 'calculated':i
+calculated				~ 'cal':i
+							| 'calculated':i
 
-calendar_name		~ 'dfrench r'
-						| 'dfrenchr'
-						| 'dgerman'
-						| 'dgregorian'
-						| 'dhebrew'
-						| 'djulian'
+calendar_name			~ 'dfrench r'
+							| 'dfrenchr'
+							| 'dgerman'
+							| 'dgregorian'
+							| 'dhebrew'
+							| 'djulian'
 
-date_text			~ [\w ]+
+date_text				~ [\w ]+
 
-digit				~ [0-9]
+digit					~ [0-9]
 
 #dot					~ '.'
 
-estimated			~ 'est':i
-						| 'estimated':i
+estimated				~ 'est':i
+							| 'estimated':i
 
-#french_month		~ 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent'
-#						| 'germ' | 'flor' | 'prai' | 'mess' | 'ther' | 'fruc' | 'comp'
+#french_month_name		~ 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent'
+#							| 'germ' | 'flor' | 'prai' | 'mess' | 'ther' | 'fruc' | 'comp'
 
-from				~ 'from':i
+from					~ 'from':i
 
-#german_bce			~ 'vc'
-#						| 'v.c.'
-#						| 'v.chr.'
-#						| 'vchr'
-#						| 'vuz'
-#						| 'v.u.z.'
+#german_bce				~ 'vc'
+#							| 'v.c.'
+#							| 'v.chr.'
+#							| 'vchr'
+#							| 'vuz'
+#							| 'v.u.z.'
 #
-#german_month		~ 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun'
-#						| 'jul' | 'aug' | 'sep' | 'sept' | 'okt' | 'nov' | 'dez'
+#german_month_name		~ 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun'
+#							| 'jul' | 'aug' | 'sep' | 'sept' | 'okt' | 'nov' | 'dez'
 
-gregorian_month		~ 'jan':i | 'feb':i | 'mar':i | 'apr':i | 'may':i | 'jun':i
-						| 'jul':i | 'aug':i | 'sep':i | 'oct':i | 'nov':i | 'dec':i
+gregorian_month_name		~ 'jan':i | 'feb':i | 'mar':i | 'apr':i | 'may':i | 'jun':i
+							| 'jul':i | 'aug':i | 'sep':i | 'oct':i | 'nov':i | 'dec':i
 
-#hebrew_month		~ 'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr'
-#						| 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' | 'aav' | 'ell'
+#hebrew_month_name		~ 'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr'
+#							| 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' | 'aav' | 'ell'
 
-interpreted			~ 'int':i
-						| 'interpreted':i
+interpreted				~ 'int':i
+							| 'interpreted':i
 
-number				~ digit+
+number					~ digit+
 
-one_or_two_digits	~ digit
-						| digit digit
+one_or_two_digits		~ digit
+							| digit digit
 
-to					~ 'to':i
+to						~ 'to':i
 
-two_digits			~ digit digit
+two_digits				~ digit digit
 
 # Boilerplate.
 
-:discard			~ whitespace
-whitespace			~ [\s]+
+:discard				~ whitespace
+whitespace				~ [\s]+
 
 END_OF_GRAMMAR
 	);
@@ -385,9 +387,7 @@ sub parse
 		})
 	);
 
-	# Return 0 for success and 1 for failure.
-
-	my($result) = 0;
+	my($result) = [];
 
 	try
 	{
@@ -397,7 +397,11 @@ sub parse
 
 		if ($ambiguity_metric <= 0)
 		{
-			die "Call to ambiguity_metric() returned $ambiguity_metric";
+			my($message) = "Call to ambiguity_metric() returned $ambiguity_metric";
+
+			$self -> error($message);
+
+			$self -> log(error => "Parse failed. $message");
 		}
 		elsif ($ambiguity_metric == 1)
 		{
@@ -405,6 +409,7 @@ sub parse
 
 			my($value) = $self -> recce -> value;
 			$value     = $self -> decode_result($$value);
+			$result    = [$value];
 
 			$self -> log(debug => "Only solution: \n" . Dumper($value) );
 		}
@@ -416,37 +421,18 @@ sub parse
 			{
 				$value = $self -> decode_result($$value);
 
+				push @$result, $value;
+
 				$self -> log(debug => "Solution @{[++$count]}: \n" . Dumper($_) ) for @$value;
 			}
 		}
-
-=pod
-
-		if ()
-		{
-		}
-		else
-		{
-			$result = 1;
-
-			$self -> error('Parse failed');
-
-			$self -> log(error => 'Parse failed');
-		}
-
-=cut
-
 	}
 	catch
 	{
-		$result = 1;
-
 		$self -> error($_);
 
 		$self -> log(error => "Parse failed. $_");
 	};
-
-	# Return 0 for success and 1 for failure.
 
 	return $result;
 
@@ -470,6 +456,9 @@ Genealogy::Gedcom::Date - Parse GEDCOM dates
 
 	use strict;
 	use warnings;
+
+	use Data::Dumper::Concise; # For Dumper().
+
 	use Genealogy::Gedcom::Date;
 
 	my($parser) = Genealogy::Gedcom::Date -> new;
@@ -486,17 +475,17 @@ Genealogy::Gedcom::Date - Parse GEDCOM dates
 
 		$result = $parser -> parse(date => $date);
 
-		if ($result)
-		{
-			print "Result: $result. \n";
-		}
-		else
+		if ($#$result < 0)
 		{
 			print $parser -> error();
 		}
+		else
+		{
+			print Dumper($_) for @$result;
+		}
 	}
 
-See the L</FAQ>'s first QA for the definition of $hashref.
+See the L</FAQ>'s first QA for the definition of $result.
 
 This code is a fragment of scripts/synopsis.pl.
 

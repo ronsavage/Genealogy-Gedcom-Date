@@ -162,6 +162,15 @@ sub gregorian_date
 		return $$t1[0];
 	}
 
+	# If it appears the day is missing, we set it to 1st.
+
+	if ($#$t1 < 2)
+	{
+		unshift @$t1, 1;
+	}
+
+	print 'gregorian_date shift 1 => ' . Dumper($t1) if ($DEBUG);
+
 	my($year) = $$t1[2];
 
 	if ($#$year > 0)
@@ -182,6 +191,25 @@ sub gregorian_date
 	};
 
 } # End of gregorian_date.
+
+# ------------------------------------------------
+
+sub gregorian_month
+{
+	my($cache, $t1) = @_;
+
+	print 'gregorian_month 1 => ' . Dumper($t1) if ($DEBUG);
+
+	if (ref $t1)
+	{
+		return $$t1[0];
+	}
+	else
+	{
+		return $t1;
+	}
+
+} # End of gregorian_month.
 
 # ------------------------------------------------
 
