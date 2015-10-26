@@ -145,8 +145,8 @@ gedcom_date				::= date
 date					::= calendar_date
 							| calendar_escape
 
-calendar_date			::= gregorian_date			action => gregorian_date
-							| julian_date			action => julian_date
+calendar_date			::= gregorian_date				action => gregorian_date
+							| julian_date				action => julian_date
 #							| french_date
 #							| german_date
 #							| hebrew_date
@@ -156,25 +156,25 @@ gregorian_date			::= day gregorian_month gregorian_year
 							| gregorian_year_bce
 							| gregorian_year
 
-day						::= one_or_two_digits		action => day
+day						::= one_or_two_digits			action => day
 
-gregorian_month			::= gregorian_month_name	action => gregorian_month
+gregorian_month			::= gregorian_month_name		action => gregorian_month
 
-gregorian_year			::= number
-							| number ('/') two_digits
+gregorian_year			::= number						action => year
+							| number ('/') two_digits	action => year
 
-gregorian_year_bce		::= gregorian_year bce		action => gregorian_year_bce
+gregorian_year_bce		::= gregorian_year bce			action => gregorian_year_bce
 
 julian_date				::= day gregorian_month_name year
 							| gregorian_month_name year
 							| julian_year_bce
 							| year
 
-julian_year_bce			::= year bce				action => julian_year_bce
+julian_year_bce			::= year bce					action => julian_year_bce
 
 #year_bce				::= year bce
 
-year					::= number
+year					::= number						action => year
 
 #french_date				::= year_bce
 #							| year
@@ -201,24 +201,24 @@ lds_ord_date			::= date_value
 date_value				::= date_period
 							| date_range
 							| approximated_date
-							| interpreted_date		action => interpreted_date
-							| '(' date_phrase ')'	action => date_phrase
+							| interpreted_date			action => interpreted_date
+							| '(' date_phrase ')'		action => date_phrase
 
 date_period				::= from_date
 							| to_date
 							| from_date to_date
 
-from_date				::= from date				action => from_date
+from_date				::= from date					action => from_date
 
-to_date					::= to date			 		action => to_date
+to_date					::= to date			 			action => to_date
 
-date_range				::= before date				action => before_date
-							| after date			action => after_date
-							| between date and date	action => between_date
+date_range				::= before date					action => before_date
+							| after date				action => after_date
+							| between date and date		action => between_date
 
-approximated_date		::= about date				action => about_date
-							| calculated date		action => calculated_date
-							| estimated date		action => estimated_date
+approximated_date		::= about date					action => about_date
+							| calculated date			action => calculated_date
+							| estimated date			action => estimated_date
 
 interpreted_date		::= interpreted date '(' date_phrase ')'
 
@@ -235,12 +235,12 @@ after					~ 'aft':i
 
 and						~ 'and':i
 
-bce						~ 'bc'
-							| 'b.c'
-							| 'b.c.'
-							| 'bc.'
-							| 'b c'
-							| 'bce'
+bce						~ 'bc':i
+							| 'b.c':i
+							| 'b.c.':i
+							| 'bc.':i
+							| 'b c':i
+							| 'bce':i
 
 before					~ 'bef':i
 							| 'before':i
@@ -430,8 +430,6 @@ sub parse
 	catch
 	{
 		$self -> error($_);
-
-		$self -> log(error => "Parse failed. $_");
 	};
 
 	return $result;

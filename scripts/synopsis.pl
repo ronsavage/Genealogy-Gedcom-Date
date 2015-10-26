@@ -70,10 +70,9 @@ for my $date
 	'1950 BC.',
 	'1950 B.C.',
 	'1950 BCE',
-	'21.mär.1999',
 )
 {
-	print "Date: $date. ";
+	print "Date: $date. \n";
 
 	$result = $parser -> parse(date => $date);
 
@@ -94,7 +93,7 @@ for my $date
 	'From Jan 2 2011 to 4 Mar 2011',	# Format is American.
 )
 {
-	print "Date: $date. ";
+	print "Date: $date. \n";
 
 	# Return 0 for success and 1 for failure.
 

@@ -162,6 +162,13 @@ sub gregorian_date
 		return $$t1[0];
 	}
 
+	# If it appears the day and month missing, we set the month to Jan.
+
+	if ($#$t1 < 1)
+	{
+		unshift @$t1, 'Jan';
+	}
+
 	# If it appears the day is missing, we set it to 1st.
 
 	if ($#$t1 < 2)
@@ -173,13 +180,16 @@ sub gregorian_date
 
 	my($year) = $$t1[2];
 
-	if ($#$year > 0)
+	if (ref $year)
 	{
-		$year = "$$year[0]/$$year[1]";
-	}
-	else
-	{
-		$year = $$year[0];
+		if ($#$year > 0)
+		{
+			$year = "$$year[0]/$$year[1]";
+		}
+		else
+		{
+			$year = $$year[0];
+		}
 	}
 
 	return
@@ -224,7 +234,7 @@ sub gregorian_year_bce
 	{
 		bce  => $t2,
 		type => 'gregorian_year',
-		year => $$t1[0],
+		year => $t1,
 	};
 
 } # End of gregorian_year_bce.
@@ -251,6 +261,8 @@ sub julian_date
 {
 	my($cache, $t1) = @_;
 
+	print 'julian_date 1 => ' . Dumper($t1) if ($DEBUG);
+
 	# Is it a BCE date? If so, it's already a hashref.
 
 	if (ref($$t1[0]) eq 'HASH')
@@ -258,9 +270,28 @@ sub julian_date
 		return $$t1[0];
 	}
 
-	print 'julian_date 1 => ' . Dumper($t1) if ($DEBUG);
+	# If it appears the day and month missing, we set the month to Jan.
 
-	my($year) = $$t1[2][0];
+	if ($#$t1 < 1)
+	{
+		unshift @$t1, 'Jan';
+	}
+
+	# If it appears the day is missing, we set it to 1st.
+
+	if ($#$t1 < 2)
+	{
+		unshift @$t1, 1;
+	}
+
+	print 'julian shift 1 => ' . Dumper($t1) if ($DEBUG);
+
+	my($year) = $$t1[2];
+
+	if (ref $year)
+	{
+		$year = $$year[0];
+	}
 
 	return
 	{
@@ -305,6 +336,25 @@ sub to_date
 	return $t2;
 
 } # End of to_date.
+
+# ------------------------------------------------
+
+sub year
+{
+	my($cache, $t1) = @_;
+
+	print 'year 1 => ' . Dumper($t1) if ($DEBUG);
+
+	if (ref $t1)
+	{
+		return $$t1[0];
+	}
+	else
+	{
+		return $t1;
+	}
+
+} # End of year.
 
 # ------------------------------------------------
 
