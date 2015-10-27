@@ -5,7 +5,10 @@ use warnings;
 
 use Data::Dumper::Concise; # For Dumper().
 
-our $DEBUG   = 1;
+our $calendar_escape;
+
+our $logger;
+
 our $VERSION = '1.08';
 
 # ------------------------------------------------
@@ -14,7 +17,7 @@ sub about_date
 {
 	my($cache, $t1, $t2) = @_;
 
-	print 'about_date 2 => ', Dumper($t2) if ($DEBUG);
+	$logger -> log(debug => 'about_date 2 => ' . Dumper($t2) );
 
 	$t2        = $$t2[0];
 	$$t2{flag} = 'about';
@@ -29,7 +32,7 @@ sub after_date
 {
 	my($cache, $t1, $t2) = @_;
 
-	print 'after_date 2 => ', Dumper($t2) if ($DEBUG);
+	$logger -> log(debug => 'after_date 2 => ' . Dumper($t2) );
 
 	$t2        = $$t2[0];
 	$$t2{flag} = 'after';
@@ -44,7 +47,7 @@ sub before_date
 {
 	my($cache, $t1, $t2) = @_;
 
-	print 'before_date 2 => ', Dumper($t2) if ($DEBUG);
+	$logger -> log(debug => 'before_date 2 => ' . Dumper($t2) );
 
 	$t2        = $$t2[0];
 	$$t2{flag} = 'before';
@@ -59,8 +62,8 @@ sub between_date
 {
 	my($cache, $t1, $t2, $t3, $t4) = @_;
 
-	print 'between_date 2 => ', Dumper($t2) if ($DEBUG);
-	print 'between_date 4 => ', Dumper($t4) if ($DEBUG);
+	$logger -> log(debug => 'between_date 2 => ' . Dumper($t2) );
+	$logger -> log(debug => 'between_date 4 => ' . Dumper($t4) );
 
 	$t2        = $$t2[0];
 	$$t2{flag} = 'between';
@@ -77,8 +80,8 @@ sub calculated_date
 {
 	my($cache, $t1, $t2) = @_;
 
-	print 'calculated_date 1 => ', Dumper($t1) if ($DEBUG);
-	print 'calculated_date 2 => ', Dumper($t2) if ($DEBUG);
+	$logger -> log(debug => 'calculated_date 1 => ' . Dumper($t1) );
+	$logger -> log(debug => 'calculated_date 2 => ' . Dumper($t2) );
 
 	$t2        = $$t2[0];
 	$$t2{flag} = 'calculated';
@@ -89,13 +92,26 @@ sub calculated_date
 
 # ------------------------------------------------
 
+sub calendar_escape
+{
+	my($cache, $t1)  = @_;
+	$calendar_escape = $t1;
+
+	$logger -> log(debug => 'calendar_escape 1 => ' . Dumper($t1) );
+
+	return $t1;
+
+} # End of calendar_escape.
+
+# ------------------------------------------------
+
 sub date_phrase
 {
 	my($cache, $t1, $t2, $t3) = @_;
 
-	print 'date_phrase 1 => ', Dumper($t1) if ($DEBUG);
-	print 'date_phrase 2 => ', Dumper($t2) if ($DEBUG);
-	print 'date_phrase 3 => ', Dumper($t3) if ($DEBUG);
+	$logger -> log(debug => 'date_phrase 1 => ' . Dumper($t1) );
+	$logger -> log(debug => 'date_phrase 2 => ' . Dumper($t2) );
+	$logger -> log(debug => 'date_phrase 3 => ' . Dumper($t3) );
 
 	return
 	{
@@ -110,7 +126,7 @@ sub day
 {
 	my($cache, $t1) = @_;
 
-	print 'day 1 => ', Dumper($t1) if ($DEBUG);
+	$logger -> log(debug => 'day 1 => ' . Dumper($t1) );
 
 	return $t1;
 
@@ -122,7 +138,7 @@ sub estimated_date
 {
 	my($cache, $t1, $t2) = @_;
 
-	print 'estimated_date 2 => ', Dumper($t2) if ($DEBUG);
+	$logger -> log(debug => 'estimated_date 2 => ' . Dumper($t2) );
 
 	$t2        = $$t2[0];
 	$$t2{flag} = 'estimated';
@@ -137,8 +153,8 @@ sub from_date
 {
 	my($cache, $t1, $t2) = @_;
 
-	print 'from_date 1 => ', Dumper($t1) if ($DEBUG);
-	print 'from_date 2 => ', Dumper($t2) if ($DEBUG);
+	$logger -> log(debug => 'from_date 1 => ' . Dumper($t1) );
+	$logger -> log(debug => 'from_date 2 => ' . Dumper($t2) );
 
 	$t2        = $$t2[0];
 	$$t2{flag} = 'from';
@@ -153,7 +169,7 @@ sub gregorian_date
 {
 	my($cache, $t1) = @_;
 
-	print 'gregorian_date 1 => ' . Dumper($t1) if ($DEBUG);
+	$logger -> log(debug => 'gregorian_date 1 => ' . Dumper($t1) );
 
 	# Is it a BCE date? If so, it's already a hashref.
 
@@ -176,7 +192,7 @@ sub gregorian_date
 		unshift @$t1, 1;
 	}
 
-	print 'gregorian_date shift 1 => ' . Dumper($t1) if ($DEBUG);
+	$logger -> log(debug => 'gregorian_date shift 1 => ' . Dumper($t1) );
 
 	my($year) = $$t1[2];
 
@@ -208,7 +224,7 @@ sub gregorian_month
 {
 	my($cache, $t1) = @_;
 
-	print 'gregorian_month 1 => ' . Dumper($t1) if ($DEBUG);
+	$logger -> log(debug => 'gregorian_month 1 => ' . Dumper($t1) );
 
 	if (ref $t1)
 	{
@@ -227,8 +243,8 @@ sub gregorian_year_bce
 {
 	my($cache, $t1, $t2) = @_;
 
-	print 'gregorian_year_bce 1 => ' . Dumper($t1) if ($DEBUG);
-	print 'gregorian_year_bce 2 => ' . Dumper($t2) if ($DEBUG);
+	$logger -> log(debug => 'gregorian_year_bce 1 => ' . Dumper($t1) );
+	$logger -> log(debug => 'gregorian_year_bce 2 => ' . Dumper($t2) );
 
 	return
 	{
@@ -245,7 +261,7 @@ sub interpreted_date
 {
 	my($cache, $t1) = @_;
 
-	print 'interpreted_date 1 => ', Dumper($t1) if ($DEBUG);
+	$logger -> log(debug => 'interpreted_date 1 => ' . Dumper($t1) );
 
 	my($t2)      = $$t1[1][0];
 	$$t2{flag}   = 'interpreted';
@@ -261,7 +277,7 @@ sub julian_date
 {
 	my($cache, $t1) = @_;
 
-	print 'julian_date 1 => ' . Dumper($t1) if ($DEBUG);
+	$logger -> log(debug => 'julian_date 1 => ' . Dumper($t1) );
 
 	# Is it a BCE date? If so, it's already a hashref.
 
@@ -284,7 +300,7 @@ sub julian_date
 		unshift @$t1, 1;
 	}
 
-	print 'julian shift 1 => ' . Dumper($t1) if ($DEBUG);
+	$logger -> log(debug => 'julian shift 1 => ' . Dumper($t1) );
 
 	my($year) = $$t1[2];
 
@@ -309,8 +325,8 @@ sub julian_year_bce
 {
 	my($cache, $t1, $t2) = @_;
 
-	print 'julian_year_bce 1 => ' . Dumper($t1) if ($DEBUG);
-	print 'julian_year_bce 2 => ' . Dumper($t2) if ($DEBUG);
+	$logger -> log(debug => 'julian_year_bce 1 => ' . Dumper($t1) );
+	$logger -> log(debug => 'julian_year_bce 2 => ' . Dumper($t2) );
 
 	return
 	{
@@ -327,8 +343,8 @@ sub to_date
 {
 	my($cache, $t1, $t2) = @_;
 
-	print 'to_date 1 => ', Dumper($t1) if ($DEBUG);
-	print 'to_date 2 => ', Dumper($t2) if ($DEBUG);
+	$logger -> log(debug => 'to_date 1 => ' . Dumper($t1) );
+	$logger -> log(debug => 'to_date 2 => ' . Dumper($t2) );
 
 	$t2        = $$t2[0];
 	$$t2{flag} = 'to';
@@ -343,7 +359,7 @@ sub year
 {
 	my($cache, $t1) = @_;
 
-	print 'year 1 => ' . Dumper($t1) if ($DEBUG);
+	$logger -> log(debug => 'year 1 => ' . Dumper($t1) );
 
 	if (ref $t1)
 	{

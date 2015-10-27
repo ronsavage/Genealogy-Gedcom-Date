@@ -125,7 +125,7 @@ sub BUILD
 	# The point is that we don't create an action instance.
 	# Marpa creates one but we can't get our hands on it.
 
-	$MarpaX::Languages::SVG::Parser::Actions::logger = $self -> logger;
+	$Genealogy::Gedcom::Date::Actions::logger = $self -> logger;
 
 	$self -> bnf
 	(
@@ -142,8 +142,7 @@ lexeme default			=  latm => 1		# Longest Acceptable Token Match.
 gedcom_date				::= date
 							| lds_ord_date
 
-date					::= calendar_date
-							| calendar_escape
+date					::= calendar_escape calendar_date
 
 calendar_date			::= gregorian_date				action => gregorian_date
 							| julian_date				action => julian_date
@@ -188,13 +187,14 @@ year					::= number						action => year
 #
 #german_year				::= year
 #							| year german_bce
-
-calendar_escape			::= ('@#') calendar_name ('@')
-
+#
 #hebrew_date			::= year_bce
 #							| year
 #							| hebrew_month year
 #							| day hebrew_month year
+
+calendar_escape			::=
+calendar_escape			::= ('@#d') calendar_name ('@')	action => calendar_escape
 
 lds_ord_date			::= date_value
 
@@ -251,12 +251,12 @@ between					~ 'bet':i
 calculated				~ 'cal':i
 							| 'calculated':i
 
-calendar_name			~ 'dfrench r'
-							| 'dfrenchr'
-							| 'dgerman'
-							| 'dgregorian'
-							| 'dhebrew'
-							| 'djulian'
+calendar_name			~ 'french r':i
+							| 'frenchr':i
+							| 'german':i
+							| 'gregorian':i
+							| 'hebrew':i
+							| 'julian':i
 
 date_text				~ [\w ]+
 
@@ -421,9 +421,15 @@ sub parse
 			{
 				$value = $self -> decode_result($$value);
 
-				push @$result, $value;
+#				$self -> log(debug => "Compare $Genealogy::Gedcom::Date::Actions::calendar_escape eq $$value{type}");
+				$self -> log(debug => 'value: ' . Dumper($value) );
 
-				$self -> log(debug => "Solution @{[++$count]}: \n" . Dumper($_) ) for @$value;
+				#if ($Genealogy::Gedcom::Date::Actions::calendar_escape eq $$value{type})
+				{
+					push @$result, $value;
+
+					$self -> log(debug => "Solution @{[++$count]}: \n" . Dumper($_) ) for @$value;
+				}
 			}
 		}
 	}
