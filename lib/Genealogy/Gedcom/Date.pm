@@ -107,12 +107,6 @@ sub BUILD
 {
 	my($self) = @_;
 
-	# 1 of 2: Initialize the action class via global variables - Yuk!
-	# The point is that we don't create an action instance.
-	# Marpa creates one but we can't get our hands on it.
-
-	$MarpaX::Languages::SVG::Parser::Actions::logger = $self -> logger;
-
 	if (! defined $self -> logger)
 	{
 		$self -> logger(Log::Handler -> new);
@@ -126,6 +120,12 @@ sub BUILD
 			}
 		);
 	}
+
+	# 1 of 2: Initialize the action class via global variables - Yuk!
+	# The point is that we don't create an action instance.
+	# Marpa creates one but we can't get our hands on it.
+
+	$MarpaX::Languages::SVG::Parser::Actions::logger = $self -> logger;
 
 	$self -> bnf
 	(
