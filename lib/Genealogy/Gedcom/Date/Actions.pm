@@ -99,7 +99,11 @@ sub calendar_escape
 
 	$logger -> log(debug => 'calendar_escape 1 => ' . Dumper($t1) );
 
-	return $t1;
+	return
+	{
+		kind => 'escape',
+		type => $t1,
+	};
 
 } # End of calendar_escape.
 
@@ -175,7 +179,19 @@ sub gregorian_date
 
 	if (ref($$t1[0]) eq 'HASH')
 	{
-		return $$t1[0];
+		my(@result);
+
+		push @result,
+		{
+			kind => 'escape',
+			type => 'gregorian',
+		};
+
+		$$t1{kind} = 'date';
+
+		push @result, $$t1;
+
+		return {@result};
 	}
 
 	# If it appears the day and month missing, we set the month to Jan.
@@ -211,6 +227,7 @@ sub gregorian_date
 	return
 	{
 		day   => $$t1[0],
+		kind  => 'date',
 		month => $$t1[1],
 		type  => 'gregorian',
 		year  => $year,
@@ -283,7 +300,19 @@ sub julian_date
 
 	if (ref($$t1[0]) eq 'HASH')
 	{
-		return $$t1[0];
+		my(@result);
+
+		push @result,
+		{
+			kind => 'escape',
+			type => 'julian',
+		};
+
+		$$t1{kind} = 'date';
+
+		push @result, $$t1;
+
+		return {@result};
 	}
 
 	# If it appears the day and month missing, we set the month to Jan.
@@ -312,6 +341,7 @@ sub julian_date
 	return
 	{
 		day   => $$t1[0],
+		kind  => 'date',
 		month => $$t1[1],
 		type  => 'julian',
 		year  => $year,

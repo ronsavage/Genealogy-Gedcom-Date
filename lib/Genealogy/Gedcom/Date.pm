@@ -407,28 +407,50 @@ sub parse
 		{
 			# No ambiguity.
 
-			my($value) = $self -> recce -> value;
-			$value     = $self -> decode_result($$value);
-			$result    = [$value];
+			my($calendar) = $self -> calendar;
+			my($value)    = $self -> recce -> value;
+			$value        = $self -> decode_result($$value);
 
-			$self -> log(debug => "Only solution: \n" . Dumper($value) );
+			if ($$value[0]{kind} eq 'escape')
+			{
+				$calendar = $$value[0]{type};
+				$value    = $$value[1];
+			}
+			else
+			{
+				$value = $$value[0];
+			}
+
+			if ($calendar eq $$value{type})
+			{
+				push @$result, $value;
+			}
 		}
 		else
 		{
-			my($count) = 0;
+			# Ambiguity.
+
+			my($calendar) = $self -> calendar;
+
+			my($item);
 
 			while (my $value = $self -> recce -> value)
 			{
 				$value = $self -> decode_result($$value);
 
-#				$self -> log(debug => "Compare $Genealogy::Gedcom::Date::Actions::calendar_escape eq $$value{type}");
-				$self -> log(debug => 'value: ' . Dumper($value) );
-
-				#if ($Genealogy::Gedcom::Date::Actions::calendar_escape eq $$value{type})
+				for $item (@$value)
 				{
-					push @$result, $value;
+					if ($$item{kind} eq 'escape')
+					{
+						$calendar = $$item{type};
 
-					$self -> log(debug => "Solution @{[++$count]}: \n" . Dumper($_) ) for @$value;
+						next;
+					}
+
+					if ($calendar eq $$item{type})
+					{
+						push @$result, $item;
+					}
 				}
 			}
 		}
@@ -437,6 +459,8 @@ sub parse
 	{
 		$self -> error($_);
 	};
+
+	$self -> log(info => Dumper($result) );
 
 	return $result;
 

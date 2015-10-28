@@ -9,7 +9,7 @@ use Genealogy::Gedcom::Date;
 
 # --------------------------
 
-my($parser) = Genealogy::Gedcom::Date -> new;
+my($parser) = Genealogy::Gedcom::Date -> new(maxlevel => 'info');
 
 print "Expected successes: \n";
 
