@@ -179,19 +179,7 @@ sub gregorian_date
 
 	if (ref($$t1[0]) eq 'HASH')
 	{
-		my(@result);
-
-		push @result,
-		{
-			kind => 'escape',
-			type => 'gregorian',
-		};
-
-		$$t1{kind} = 'date';
-
-		push @result, $$t1;
-
-		return {@result};
+		return $$t1[0];
 	}
 
 	# If it appears the day and month missing, we set the month to Jan.
@@ -300,19 +288,7 @@ sub julian_date
 
 	if (ref($$t1[0]) eq 'HASH')
 	{
-		my(@result);
-
-		push @result,
-		{
-			kind => 'escape',
-			type => 'julian',
-		};
-
-		$$t1{kind} = 'date';
-
-		push @result, $$t1;
-
-		return {@result};
+		return $$t1[0];
 	}
 
 	# If it appears the day and month missing, we set the month to Jan.

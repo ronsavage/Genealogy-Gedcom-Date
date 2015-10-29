@@ -460,7 +460,7 @@ sub parse
 		$self -> error($_);
 	};
 
-	$self -> log(info => Dumper($result) );
+	$self -> log(info => "Solution: \n" . Dumper($result) );
 
 	return $result;
 
