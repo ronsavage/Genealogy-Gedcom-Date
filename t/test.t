@@ -63,39 +63,45 @@ my(%candidates) =
 (
 	'1950' =>
 	{
-		elements => 1,
-		hashref  => {kind => 'date', type => 'gregorian', day => 1, month => 'Jan', year => '1950'},
+		elements =>  1,
+		hashref  =>  {kind => 'date', type => 'gregorian', year => '1950'},
+		order    =>  1,
 	},
 	'Jun 1950' =>
 	{
-		elements => 1,
-		hashref  => {kind => 'date', type => 'gregorian', day => 1, month => 'Jun', year => '1950'},
+		elements =>  1,
+		hashref  =>  {kind => 'date', type => 'gregorian', month => 'Jun', year => '1950'},
+		order    =>  2,
 	},
 	'21 Jun 1950' =>
 	{
-		elements => 1,
-		hashref  => {kind => 'date', type => 'gregorian', day => 21, month => 'Jun', year => '1950'},
+		elements =>  1,
+		hashref  =>  {kind => 'date', type => 'gregorian', day => 21, month => 'Jun', year => '1950'},
+		order    =>  3,
 	},
 	'1950/00' =>
 	{
-		elements => 1,
-		hashref  => {kind => 'date', type => 'gregorian', day => 1, month => 'Jan', year => '1950'},
+		elements =>  1,
+		hashref  =>  {kind => 'date', type => 'gregorian',year => '1950/00'},
+		order    =>  4,
 	},
 	'Jun 1950/00' =>
 	{
-		elements => 1,
-		hashref  => {kind => 'date', type => 'gregorian', day => 1, month => 'Jun', year => '1950'},
+		elements =>  1,
+		hashref  =>  {kind => 'date', type => 'gregorian', month => 'Jun', year => '1950/00'},
+		order    =>  5,
 	},
 	'21 Jun 1950/00' =>
 	{
-		elements => 1,
-		hashref  => {kind => 'date', type => 'gregorian', day => 21, month => 'Jun', year => '1950'},
+		elements =>  1,
+		hashref  =>  {kind => 'date', type => 'gregorian', day => 21, month => 'Jun', year => '1950/00'},
+		order    =>  6,
 	},
 );
 
 my($parser) = Genealogy::Gedcom::Date -> new;
 
-for my $date (sort keys %candidates)
+for my $date (sort{$candidates{$a}{order} <=> $candidates{$b}{order} } keys %candidates)
 {
 	my($result) = $parser -> parse(date => $date);
 

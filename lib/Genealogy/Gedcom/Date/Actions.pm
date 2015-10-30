@@ -183,44 +183,50 @@ sub gregorian_date
 		return $$t1[0];
 	}
 
-	# If it appears the day and month missing, we set the month to Jan.
-
-	if ($#$t1 < 1)
-	{
-		unshift @$t1, 'Jan';
-	}
-
-	# If it appears the day is missing, we set it to 1st.
-
-	if ($#$t1 < 2)
-	{
-		unshift @$t1, 1;
-	}
+	print STDERR 'gregorian_date 1 => ' . Dumper($t1);
 
 	$logger -> log(debug => 'gregorian_date shift 1 => ' . Dumper($t1) );
 
-	my($year) = $$t1[2];
+	my($day);
+	my($month);
+	my($year);
 
-	if (ref $year)
+	# Check for year, month, day.
+
+	if ($#$t1 == 0)
 	{
-		if ($#$year > 0)
-		{
-			$year = "$$year[0]/$$year[1]";
-		}
-		else
-		{
-			$year = $$year[0];
-		}
+		$year = $$t1[0];
+	}
+	elsif ($#$t1 == 1)
+	{
+		$month = $$t1[0];
+		$year  = $$t1[1];
+	}
+	else
+	{
+		$day   = $$t1[0];
+		$month = $$t1[1];
+		$year  = $$t1[2];
 	}
 
-	return
+	# Check for /00.
+
+	if ($#$t1 == 3)
 	{
-		day   => $$t1[0],
+		$year = "$$year[0]/$$year[1]";
+	}
+
+	my($result) =
+	{
 		kind  => 'date',
-		month => $$t1[1],
 		type  => 'gregorian',
 		year  => $year,
 	};
+
+	$$result{month} = $month if (defined $month);
+	$$result{day}   = $day if (defined $day);
+
+	return $result;
 
 } # End of gregorian_date.
 
@@ -364,18 +370,23 @@ sub to_date
 
 sub year
 {
-	my($cache, $t1) = @_;
+	my($cache, $t1, $t2) = @_;
 
 	$logger -> log(debug => 'year 1 => ' . Dumper($t1) );
+	$logger -> log(debug => 'year 2 => ' . Dumper($t2) );
 
-	if (ref $t1)
+	my($result);
+
+	if (defined $t2)
 	{
-		return $$t1[0];
+		$result = "$t1/$t2";
 	}
 	else
 	{
-		return $t1;
+		$result = $t1;
 	}
+
+	return $result;
 
 } # End of year.
 
