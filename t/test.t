@@ -3,23 +3,16 @@
 use strict;
 use warnings;
 
+use Data::Dumper::Concise; # For Dumper().
+
 use Genealogy::Gedcom::Date;
 
-# --------------------------
+use Test::Stream -V1;
 
-my($candidate) = shift;
-my($parser)    = Genealogy::Gedcom::Date -> new;
+# -------------------------
 
-print "Expected successes: \n";
+=pod
 
-my($result);
-
-for my $date
-(
-	'15 Jul 1954',
-	'10 JUL 2003',
-	'JUL 2003',
-	'2003',
 	'ABT 10 JUL 2003',
 	'CAL 1922',
 	'CAL 10 JUL 2003',
@@ -61,39 +54,59 @@ for my $date
 	'INT 10 JUL 2003 (foo)',
 	'(Once upon a time)',
 	'(foo)',
-)
-{
-	print "Date: $date. ";
 
-	$result = $parser -> parse(date => $date);
-
-	if ($result)
-	{
-		print "Result: $result. \n";
-	}
-	else
-	{
-		print $parser -> error();
-	}
-}
-
-print "Expected failures: \n";
-
-for my $date
-(
 	'From Jan 2 2011 to 4 Mar 2011',	# Is American.
-)
+
+=cut
+
+my(%candidates) =
+(
+	'1950' =>
+	{
+		elements => 1,
+		hashref  => {kind => 'date', type => 'gregorian', day => 1, month => 'Jan', year => '1950'},
+	},
+	'Jun 1950' =>
+	{
+		elements => 1,
+		hashref  => {kind => 'date', type => 'gregorian', day => 1, month => 'Jun', year => '1950'},
+	},
+	'21 Jun 1950' =>
+	{
+		elements => 1,
+		hashref  => {kind => 'date', type => 'gregorian', day => 21, month => 'Jun', year => '1950'},
+	},
+	'1950/00' =>
+	{
+		elements => 1,
+		hashref  => {kind => 'date', type => 'gregorian', day => 1, month => 'Jan', year => '1950'},
+	},
+	'Jun 1950/00' =>
+	{
+		elements => 1,
+		hashref  => {kind => 'date', type => 'gregorian', day => 1, month => 'Jun', year => '1950'},
+	},
+	'21 Jun 1950/00' =>
+	{
+		elements => 1,
+		hashref  => {kind => 'date', type => 'gregorian', day => 21, month => 'Jun', year => '1950'},
+	},
+);
+
+my($parser) = Genealogy::Gedcom::Date -> new;
+
+for my $date (sort keys %candidates)
 {
-	print "Date: $date. ";
+	my($result) = $parser -> parse(date => $date);
 
-	$result = $parser -> parse(date => $date);
+	if ($candidates{$date}{elements} == 1)
+	{
+		$result = $$result[0];
+	}
 
-	if ($result)
-	{
-		print "Result: $result. \n";
-	}
-	else
-	{
-		print $parser -> error();
-	}
+	note "Date: $date: \n", Dumper($result);
+
+	is($result, $candidates{$date}{hashref});
 }
+
+done_testing;

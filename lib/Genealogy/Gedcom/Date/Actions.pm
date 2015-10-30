@@ -32,6 +32,7 @@ sub after_date
 {
 	my($cache, $t1, $t2) = @_;
 
+	$logger -> log(debug => 'after_date 1 => ' . Dumper($t1) );
 	$logger -> log(debug => 'after_date 2 => ' . Dumper($t2) );
 
 	$t2        = $$t2[0];
