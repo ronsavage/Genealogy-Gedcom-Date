@@ -168,7 +168,8 @@ sub from_date
 	$logger -> log(debug => 'from_date 1 => ' . Dumper($t1) );
 	$logger -> log(debug => 'from_date 2 => ' . Dumper($t2) );
 
-	$t2        = $$t2[0];
+	$t2        = $$t2[1];
+	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
 	$$t2{flag} = 'From';
 
 	return $t2;
@@ -398,7 +399,8 @@ sub to_date
 	$logger -> log(debug => 'to_date 1 => ' . Dumper($t1) );
 	$logger -> log(debug => 'to_date 2 => ' . Dumper($t2) );
 
-	$t2        = $$t2[0];
+	$t2        = $$t2[1];
+	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
 	$$t2{flag} = 'To';
 
 	return $t2;

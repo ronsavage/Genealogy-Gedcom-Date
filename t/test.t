@@ -259,6 +259,66 @@ my(%candidates) =
 		hashref  =>  [{bce => 'BCE', flag => 'Estimated', kind => 'Date', type => 'Gregorian',year => '1950'}],
 		order    => 33,
 	},
+	'From 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'From', kind => 'Date', type => 'Gregorian',year => '1950'}],
+		order    => 34,
+	},
+	'From Jun 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'From', kind => 'Date', month => 'Jun', type => 'Gregorian',year => '1950'}],
+		order    => 35,
+	},
+	'From 21 Jun 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{day => 21, flag => 'From', kind => 'Date', month => 'Jun', type => 'Gregorian',year => '1950'}],
+		order    => 36,
+	},
+	'From 1950/00' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'From', kind => 'Date', type => 'Gregorian',year => '1950/00'}],
+		order    => 37,
+	},
+	'From 1950 bc' =>
+	{
+		elements =>  1,
+		hashref  =>  [{bce => 'BCE', flag => 'From', kind => 'Date', type => 'Gregorian',year => '1950'}],
+		order    => 38,
+	},
+	'To 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'To', kind => 'Date', type => 'Gregorian',year => '1950'}],
+		order    => 39,
+	},
+	'To Jun 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'To', kind => 'Date', month => 'Jun', type => 'Gregorian',year => '1950'}],
+		order    => 40,
+	},
+	'To 21 Jun 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{day => 21, flag => 'To', kind => 'Date', month => 'Jun', type => 'Gregorian',year => '1950'}],
+		order    => 41,
+	},
+	'To 1950/00' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'To', kind => 'Date', type => 'Gregorian',year => '1950/00'}],
+		order    => 42,
+	},
+	'To 1950 bc' =>
+	{
+		elements =>  1,
+		hashref  =>  [{bce => 'BCE', flag => 'To', kind => 'Date', type => 'Gregorian',year => '1950'}],
+		order    => 43,
+	},
 );
 
 my($parser) = Genealogy::Gedcom::Date -> new;
