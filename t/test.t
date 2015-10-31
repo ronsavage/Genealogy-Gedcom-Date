@@ -64,38 +64,200 @@ my(%candidates) =
 	'1950' =>
 	{
 		elements =>  1,
-		hashref  =>  {kind => 'date', type => 'gregorian', year => '1950'},
+		hashref  =>  [{kind => 'Date', type => 'Gregorian', year => '1950'}],
 		order    =>  1,
 	},
 	'Jun 1950' =>
 	{
 		elements =>  1,
-		hashref  =>  {kind => 'date', type => 'gregorian', month => 'Jun', year => '1950'},
+		hashref  =>  [{kind => 'Date', type => 'Gregorian', month => 'Jun', year => '1950'}],
 		order    =>  2,
 	},
 	'21 Jun 1950' =>
 	{
 		elements =>  1,
-		hashref  =>  {kind => 'date', type => 'gregorian', day => 21, month => 'Jun', year => '1950'},
+		hashref  =>  [{kind => 'Date', type => 'Gregorian', day => 21, month => 'Jun', year => '1950'}],
 		order    =>  3,
 	},
 	'1950/00' =>
 	{
 		elements =>  1,
-		hashref  =>  {kind => 'date', type => 'gregorian',year => '1950/00'},
+		hashref  =>  [{kind => 'Date', type => 'Gregorian',year => '1950/00'}],
 		order    =>  4,
 	},
 	'Jun 1950/00' =>
 	{
 		elements =>  1,
-		hashref  =>  {kind => 'date', type => 'gregorian', month => 'Jun', year => '1950/00'},
+		hashref  =>  [{kind => 'Date', type => 'Gregorian', month => 'Jun', year => '1950/00'}],
 		order    =>  5,
 	},
 	'21 Jun 1950/00' =>
 	{
 		elements =>  1,
-		hashref  =>  {kind => 'date', type => 'gregorian', day => 21, month => 'Jun', year => '1950/00'},
+		hashref  =>  [{kind => 'Date', type => 'Gregorian', day => 21, month => 'Jun', year => '1950/00'}],
 		order    =>  6,
+	},
+	'1950 BCE' =>
+	{
+		elements =>  1,
+		hashref  =>  [{bce => 'BCE', kind => 'Date', type => 'Gregorian', year => '1950'}],
+		order    =>  7,
+	},
+	'1950/00 BCE' =>
+	{
+		elements =>  1,
+		hashref  =>  [{bce => 'BCE', kind => 'Date', type => 'Gregorian',year => '1950/00'}],
+		order    =>  8,
+	},
+	'ABT 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'About', kind => 'Date', type => 'Gregorian',year => '1950'}],
+		order    =>  9,
+	},
+	'ABT Jun 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'About', kind => 'Date', month => 'Jun', type => 'Gregorian',year => '1950'}],
+		order    => 10,
+	},
+	'ABT 21 Jun 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{day => 21, flag => 'About', kind => 'Date', month => 'Jun', type => 'Gregorian',year => '1950'}],
+		order    => 11,
+	},
+	'ABT 1950/00' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'About', kind => 'Date', type => 'Gregorian',year => '1950/00'}],
+		order    => 12,
+	},
+	'ABT 1950 bc' =>
+	{
+		elements =>  1,
+		hashref  =>  [{bce => 'BCE', flag => 'About', kind => 'Date', type => 'Gregorian',year => '1950'}],
+		order    => 13,
+	},
+	'Aft 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'After', kind => 'Date', type => 'Gregorian',year => '1950'}],
+		order    => 14,
+	},
+	'Aft Jun 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'After', kind => 'Date', month => 'Jun', type => 'Gregorian',year => '1950'}],
+		order    => 15,
+	},
+	'Aft 21 Jun 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{day => 21, flag => 'After', kind => 'Date', month => 'Jun', type => 'Gregorian',year => '1950'}],
+		order    => 16,
+	},
+	'Aft 1950/00' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'After', kind => 'Date', type => 'Gregorian',year => '1950/00'}],
+		order    => 17,
+	},
+	'Aft 1950 bc' =>
+	{
+		elements =>  1,
+		hashref  =>  [{bce => 'BCE', flag => 'After', kind => 'Date', type => 'Gregorian',year => '1950'}],
+		order    => 18,
+	},
+	'Bef 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'Before', kind => 'Date', type => 'Gregorian',year => '1950'}],
+		order    => 19,
+	},
+	'Bef Jun 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'Before', kind => 'Date', month => 'Jun', type => 'Gregorian',year => '1950'}],
+		order    => 20,
+	},
+	'Bef 21 Jun 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{day => 21, flag => 'Before', kind => 'Date', month => 'Jun', type => 'Gregorian',year => '1950'}],
+		order    => 21,
+	},
+	'Bef 1950/00' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'Before', kind => 'Date', type => 'Gregorian',year => '1950/00'}],
+		order    => 22,
+	},
+	'Bef 1950 bc' =>
+	{
+		elements =>  1,
+		hashref  =>  [{bce => 'BCE', flag => 'Before', kind => 'Date', type => 'Gregorian',year => '1950'}],
+		order    => 23,
+	},
+	'Cal 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'Calculated', kind => 'Date', type => 'Gregorian',year => '1950'}],
+		order    => 24,
+	},
+	'Cal Jun 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'Calculated', kind => 'Date', month => 'Jun', type => 'Gregorian',year => '1950'}],
+		order    => 25,
+	},
+	'Cal 21 Jun 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{day => 21, flag => 'Calculated', kind => 'Date', month => 'Jun', type => 'Gregorian',year => '1950'}],
+		order    => 26,
+	},
+	'Cal 1950/00' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'Calculated', kind => 'Date', type => 'Gregorian',year => '1950/00'}],
+		order    => 27,
+	},
+	'Cal 1950 bc' =>
+	{
+		elements =>  1,
+		hashref  =>  [{bce => 'BCE', flag => 'Calculated', kind => 'Date', type => 'Gregorian',year => '1950'}],
+		order    => 28,
+	},
+	'Est 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'Estimated', kind => 'Date', type => 'Gregorian',year => '1950'}],
+		order    => 29,
+	},
+	'Est Jun 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'Estimated', kind => 'Date', month => 'Jun', type => 'Gregorian',year => '1950'}],
+		order    => 30,
+	},
+	'Est 21 Jun 1950' =>
+	{
+		elements =>  1,
+		hashref  =>  [{day => 21, flag => 'Estimated', kind => 'Date', month => 'Jun', type => 'Gregorian',year => '1950'}],
+		order    => 31,
+	},
+	'Est 1950/00' =>
+	{
+		elements =>  1,
+		hashref  =>  [{flag => 'Estimated', kind => 'Date', type => 'Gregorian',year => '1950/00'}],
+		order    => 32,
+	},
+	'Est 1950 bc' =>
+	{
+		elements =>  1,
+		hashref  =>  [{bce => 'BCE', flag => 'Estimated', kind => 'Date', type => 'Gregorian',year => '1950'}],
+		order    => 33,
 	},
 );
 
@@ -105,14 +267,7 @@ for my $date (sort{$candidates{$a}{order} <=> $candidates{$b}{order} } keys %can
 {
 	my($result) = $parser -> parse(date => $date);
 
-	if ($candidates{$date}{elements} == 1)
-	{
-		$result = $$result[0];
-	}
-
-	note "Date: $date: \n", Dumper($result);
-
-	is($result, $candidates{$date}{hashref});
+	is($result, $candidates{$date}{hashref}, "Parsing $date");
 }
 
 done_testing;

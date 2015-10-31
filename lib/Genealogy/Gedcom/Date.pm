@@ -29,7 +29,7 @@ has bnf =>
 
 has calendar =>
 (
-	default  => sub{return 'gregorian'},
+	default  => sub{return 'Gregorian'},
 	is       => 'rw',
 	isa      => Str,
 	required => 0,
@@ -387,7 +387,8 @@ sub parse
 		})
 	);
 
-	my($result) = [];
+	my($calendar) = ucfirst lc $self -> calendar;
+	my($result)   = [];
 
 	try
 	{
@@ -399,6 +400,8 @@ sub parse
 		{
 			my($message) = "Call to ambiguity_metric() returned $ambiguity_metric";
 
+			print STDERR "$message. \n";
+
 			$self -> error($message);
 
 			$self -> log(error => "Parse failed. $message");
@@ -407,11 +410,10 @@ sub parse
 		{
 			# No ambiguity.
 
-			my($calendar) = $self -> calendar;
 			my($value)    = $self -> recce -> value;
 			$value        = $self -> decode_result($$value);
 
-			if ($$value[0]{kind} eq 'escape')
+			if ($$value[0]{kind} eq 'Escape')
 			{
 				$calendar = $$value[0]{type};
 				$value    = $$value[1];
@@ -421,16 +423,13 @@ sub parse
 				$value = $$value[0];
 			}
 
-			if ($calendar eq $$value{type})
-			{
-				push @$result, $value;
-			}
+			$$result[0] = $value if ($calendar eq $$value{type});
+
+			print STDERR "Unambiguous result ($calendar): ", Dumper($result);
 		}
 		else
 		{
-			# Ambiguity.
-
-			my($calendar) = $self -> calendar;
+			$self -> log(info => 'Ambiguity');
 
 			my($item);
 
@@ -440,7 +439,7 @@ sub parse
 
 				for $item (@$value)
 				{
-					if ($$item{kind} eq 'escape')
+					if (defined($$item{kind}) && ($$item{kind} eq 'Escape') )
 					{
 						$calendar = $$item{type};
 
@@ -449,10 +448,14 @@ sub parse
 
 					if ($calendar eq $$item{type})
 					{
+						print STDERR "Push result ($calendar): ", Dumper($item);
+
 						push @$result, $item;
 					}
 				}
 			}
+
+			print STDERR "Ambiguous result ($calendar): ", Dumper($result);
 		}
 	}
 	catch
