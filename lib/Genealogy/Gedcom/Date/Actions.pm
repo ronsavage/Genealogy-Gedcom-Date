@@ -120,15 +120,15 @@ sub calendar_name
 
 sub date_phrase
 {
-	my($cache, $t1, $t2, $t3) = @_;
+	my($cache, $t1) = @_;
 
 	$logger -> log(debug => 'date_phrase 1 => ' . Dumper($t1) );
-	$logger -> log(debug => 'date_phrase 2 => ' . Dumper($t2) );
-	$logger -> log(debug => 'date_phrase 3 => ' . Dumper($t3) );
 
 	return
 	{
-		phrase => "$t1$$t2[0]$t3"
+		kind   => 'Phrase',
+		phrase => "($$t1[0])",
+		type   => 'Phrase',
 	};
 
 } # End of date_phrase.
@@ -286,9 +286,9 @@ sub interpreted_date
 
 	$logger -> log(debug => 'interpreted_date 1 => ' . Dumper($t1) );
 
-	my($t2)      = $$t1[1][0];
+	my($t2)      = $$t1[1][1][0];
 	$$t2{flag}   = 'INT';
-	$$t2{phrase} = "$$t1[2]$$t1[3][0]$$t1[4]";
+	$$t2{phrase} = "($$t1[2][0])";
 
 	return $t2;
 

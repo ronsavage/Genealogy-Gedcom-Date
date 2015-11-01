@@ -204,7 +204,7 @@ date_value				::= date_period
 							| date_range
 							| approximated_date
 							| interpreted_date			action => interpreted_date
-							| '(' date_phrase ')'		action => date_phrase
+							| ('(') date_phrase (')')	action => date_phrase
 
 date_period				::= from_date to_date
 							| from_date
@@ -222,7 +222,7 @@ approximated_date		::= about date					action => about_date
 							| calculated date			action => calculated_date
 							| estimated date			action => estimated_date
 
-interpreted_date		::= interpreted date '(' date_phrase ')'
+interpreted_date		::= interpreted date ('(') date_phrase (')')
 
 date_phrase				::= date_text
 
@@ -426,7 +426,7 @@ sub parse
 				$value = $$value[0];
 			}
 
-			$$result[0] = $value if ($calendar eq $$value{type});
+			$$result[0] = $value if ($$value{type} =~ /^(?:$calendar|Phrase)$/);
 		}
 		else
 		{
@@ -705,7 +705,7 @@ Keys:
 
 =item o bce
 
-If the date contains any one of the following (case-insensitive), the C<bce> key will be present:
+If the input contains any one of the following (case-insensitive), the C<bce> key will be present:
 
 =over 4
 
@@ -725,11 +725,11 @@ If the date contains any one of the following (case-insensitive), the C<bce> key
 
 =item o day => $integer
 
-If the date contains a day, then the C<day> key will be present.
+If the input contains a day, then the C<day> key will be present.
 
 =item o flag => $string
 
-If the date contains any of the following (case-insensitive), then the C<flag> key will be present:
+If the input contains any of the following (case-insensitive), then the C<flag> key will be present:
 
 =over 4
 
@@ -781,9 +781,11 @@ $string will take one of these values (case-sensitive):
 
 =back
 
-=item o kind => 'Date'
+=item o kind => 'Date' or 'Phrase'
 
-The C<kind> key is always present, and always takes the value 'Date'.
+The C<kind> key is always present, and always takes the value 'Date' or 'Phrase'.
+
+If the value is 'Phrase', see the C<phrase> key.
 
 During processing, there can be another - undocumented - element in the arrayref. It represents
 the calendar escape, and in that case C<kind> takes the value 'Calendar'. This element is discarded
@@ -791,8 +793,13 @@ before the final arrayref is returned to the caller.
 
 =item o month => $string
 
-If the date contains a month, then the C<month> key will be present. The case of $string will be
+If the input contains a month, then the C<month> key will be present. The case of $string will be
 exactly whatever was in the input.
+
+=item o phrase => "($string)"
+
+If the input contains a date phrase, then the C<phrase> key will be present. The case of $string
+will be exactly whatever was in the input.
 
 =item o suffix => $two_digits
 
@@ -815,7 +822,7 @@ The C<type> key is always present, and takes one of these case-sensitive values:
 
 =item o year => $integer
 
-The key C<year> is always present.
+If the input contains a year, then the C<year> key is present.
 
 If the year contains a suffix (/00), see also the C<suffix> key, above. This means the value of
 the C<year> key is never "$integer/$two_digits".
