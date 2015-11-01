@@ -517,13 +517,13 @@ sub process_unambiguous
 {
 	my($self, $calendar) = @_;
 
-	$self -> log(debug => 'Unambiguous');
+	$self -> log(info => 'Unambiguous');
 
 	my($result) = [];
 	my($value)  = $self -> recce -> value;
 	$value      = $self -> decode_result($$value);
 
-	$self -> log(debug => "Decoded Unambiguous: \n" . Dumper($value) );
+	$self -> log(info => "Decoded Unambiguous: \$#\$value: $#$value: \n" . Dumper($value) );
 
 	if ($#$value == 0)
 	{
@@ -532,7 +532,7 @@ sub process_unambiguous
 	}
 	elsif ($#$value == 3)
 	{
-		$$result[0] = [$$value[1], $$value[3] ];
+		$result = [$$value[1], $$value[3] ];
 	}
 	elsif ($$value[0]{kind} eq 'Calendar')
 	{

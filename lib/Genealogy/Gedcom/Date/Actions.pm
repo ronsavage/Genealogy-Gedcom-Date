@@ -68,10 +68,10 @@ sub between_date
 {
 	my($cache, $t1, $t2, $t3, $t4) = @_;
 
-	$logger -> log(debug => 'between_date 1 => ' . Dumper($t1) );
-	$logger -> log(debug => 'between_date 2 => ' . Dumper($t2) );
-	$logger -> log(debug => 'between_date 3 => ' . Dumper($t3) );
-	$logger -> log(debug => 'between_date 4 => ' . Dumper($t4) );
+	$logger -> log(info => 'between_date 1 => ' . Dumper($t1) );
+	$logger -> log(info => 'between_date 2 => ' . Dumper($t2) );
+	$logger -> log(info => 'between_date 3 => ' . Dumper($t3) );
+	$logger -> log(info => 'between_date 4 => ' . Dumper($t4) );
 
 	my($t_2)    = $$t2[1][0];
 	$$t_2{flag} = 'BET';
@@ -98,7 +98,7 @@ sub between_date
 
 	$t1 = [$t1, $t_2, $t3, $t_4];
 
-	$logger -> log(debug => 'between_date Exit => ' . Dumper($t1) );
+	$logger -> log(info => 'between_date Exit => ' . Dumper($t1) );
 
 	return $t1;
 

@@ -298,6 +298,142 @@ my(@candidates) =
 		result => [{bce => 'BCE', flag => 'BEF', kind => 'Date', type => 'Julian', year => '1950'}],
 	},
 	{
+		date   => 'Bet 1950 and 1956',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', type => 'Gregorian', year => '1950'},
+			{flag => 'AND', kind => 'Date', type => 'Gregorian', year => '1956'},
+		],
+	},
+	{
+		date   => 'Bet Gregorian 1950 and 1956',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', type => 'Gregorian', year => '1950'},
+			{flag => 'AND', kind => 'Date', type => 'Gregorian', year => '1956'},
+		],
+	},
+	{
+		date   => 'Bet 1950 and Gregorian 1956',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', type => 'Gregorian', year => '1950'},
+			{flag => 'AND', kind => 'Date', type => 'Gregorian', year => '1956'},
+		],
+	},
+	{
+		date   => 'Bet Gregorian 1950 and Gregorian 1956',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', type => 'Gregorian', year => '1950'},
+			{flag => 'AND', kind => 'Date', type => 'Gregorian', year => '1956'},
+		],
+	},
+	{
+		date   => 'Bet Julian 1950 and 1956',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', type => 'Julian', year => '1950'},
+			{flag => 'AND', kind => 'Date', type => 'Gregorian', year => '1956'},
+		],
+	},
+	{
+		date   => 'Bet 1950 and Julian 1956',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', type => 'Gregorian', year => '1950'},
+			{flag => 'AND', kind => 'Date', type => 'Julian', year => '1956'},
+		],
+	},
+	{
+		date   => 'Bet Julian 1950 and Julian 1956',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', type => 'Julian', year => '1950'},
+			{flag => 'AND', kind => 'Date', type => 'Julian', year => '1956'},
+		],
+	},
+	{
+		date   => 'Bet Gregorian 1950 and Julian 1956',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', type => 'Gregorian', year => '1950'},
+			{flag => 'AND', kind => 'Date', type => 'Julian', year => '1956'},
+		],
+	},
+	{
+		date   => 'Bet Julian 1950 and Gregorian 1956',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', type => 'Julian', year => '1950'},
+			{flag => 'AND', kind => 'Date', type => 'Gregorian', year => '1956'},
+		],
+	},
+	{
+		date   => 'Bet 1501/01 and 1510',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', suffix => '01', type => 'Gregorian', year => '1501'},
+			{flag => 'AND', kind => 'Date', type => 'Gregorian', year => '1510'},
+		],
+	},
+	{
+		date   => 'Bet 1501/01 and Julian 1510',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', suffix => '01', type => 'Gregorian', year => '1501'},
+			{flag => 'AND', kind => 'Date', type => 'Julian', year => '1510'},
+		],
+	},
+	{
+		date   => 'Bet 1501 and 1510/02',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', type => 'Gregorian', year => '1501'},
+			{flag => 'AND', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1510'},
+		],
+	},
+	{
+		date   => 'Bet Julian 1501 and 1510/02',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', type => 'Julian', year => '1501'},
+			{flag => 'AND', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1510'},
+		],
+	},
+	{
+		date   => 'Bet 1501/02 and 1503/04',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1501'},
+			{flag => 'AND', kind => 'Date', suffix => '04', type => 'Gregorian', year => '1503'},
+		],
+	},
+	{
+		date   => 'Bet Gregorian 1501/02 and 1503/04',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1501'},
+			{flag => 'AND', kind => 'Date', suffix => '04', type => 'Gregorian', year => '1503'},
+		],
+	},
+	{
+		date   => 'Bet 1501/02 and Gregorian 1503/04',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1501'},
+			{flag => 'AND', kind => 'Date', suffix => '04', type => 'Gregorian', year => '1503'},
+		],
+	},
+	{
+		date   => 'Bet Gregorian 1501/02 and Gregorian 1503/04',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1501'},
+			{flag => 'AND', kind => 'Date', suffix => '04', type => 'Gregorian', year => '1503'},
+		],
+	},
+	{
 		date   => 'Cal 1950',
 		result => [{flag => 'CAL', kind => 'Date', type => 'Gregorian', year => '1950'}],
 	},
@@ -598,35 +734,43 @@ my(@candidates) =
 		result => [{bce => 'BCE', flag => 'TO', kind => 'Date', type => 'Julian', year => '1950'}],
 	},
 	{
-		date   => 'Between 1950 and 1956',
+		date   => 'From 1950 to 1956',
 		result =>
 		[
-			{flag => 'BET', kind => 'Date', type => 'Gregorian', year => '1950'},
-			{flag => 'AND', kind => 'Date', type => 'Gregorian', year => '1956'},
+			{flag => 'FROM', kind => 'Date', type => 'Gregorian', year => '1950'},
+			{flag => 'TO', kind => 'Date', type => 'Gregorian', year => '1956'},
 		],
 	},
 	{
-		date   => 'Between 1501/01 and 1510',
+		date   => 'From Gregorian 1950 to 1956',
 		result =>
 		[
-			{flag => 'BET', kind => 'Date', suffix => '01', type => 'Gregorian', year => '1501'},
-			{flag => 'AND', kind => 'Date', type => 'Gregorian', year => '1510'},
+			{flag => 'FROM', kind => 'Date', type => 'Gregorian', year => '1950'},
+			{flag => 'TO', kind => 'Date', type => 'Gregorian', year => '1956'},
 		],
 	},
 	{
-		date   => 'Between 1501 and 1510/02',
+		date   => 'From 1950 to Gregorian  1956',
 		result =>
 		[
-			{flag => 'BET', kind => 'Date', type => 'Gregorian', year => '1501'},
-			{flag => 'AND', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1510'},
+			{flag => 'FROM', kind => 'Date', type => 'Gregorian', year => '1950'},
+			{flag => 'TO', kind => 'Date', type => 'Gregorian', year => '1956'},
 		],
 	},
 	{
-		date   => 'Between 1501/01 and 1510/02',
+		date   => 'From Gregorian 1950 to Gregorian 1956',
 		result =>
 		[
-			{flag => 'BET', kind => 'Date', suffix => '01', type => 'Gregorian', year => '1501'},
-			{flag => 'AND', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1510'},
+			{flag => 'FROM', kind => 'Date', type => 'Gregorian', year => '1950'},
+			{flag => 'TO', kind => 'Date', type => 'Gregorian', year => '1956'},
+		],
+	},
+	{
+		date   => 'From 1950 to Julian 1956',
+		result =>
+		[
+			{flag => 'FROM', kind => 'Date', type => 'Gregorian', year => '1950'},
+			{flag => 'TO', kind => 'Date', type => 'Julian', year => '1956'},
 		],
 	},
 );
@@ -640,7 +784,7 @@ my($result);
 for my $item (@candidates)
 {
 	$date    = $$item{date};
-	$message = "English. Date: $date";
+	$message = "English: $date";
 
 	if ($date =~ /Julian/)
 	{
