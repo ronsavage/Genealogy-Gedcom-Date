@@ -19,6 +19,7 @@ my(%option);
 if ($option_parser -> getoptions
 (
 	\%option,
+	'calendar=s',
 	'date=s',
 	'help',
 	'maxlevel=s',
@@ -49,6 +50,7 @@ parse.pl - Run Genealogy::Gedcom::Date.
 parse.pl [options]
 
 	Options:
+	-calendar aCalendarName
 	-date aDate
 	-help
 	-maxlevel logOption1
@@ -60,7 +62,13 @@ Exit value: 0 for success, 1 for failure. Die upon error.
 
 =over 4
 
-=item -date aDate
+=item o -calendar aCalendarName
+
+A calendar name in the Gedcom format, or with the '@#d' .. '@' removed.
+
+Default: Gregorian.
+
+=item o -date aDate
 
 A date in Gedcom format. Protect spaces from the shell by using single-quotes.
 
@@ -68,11 +76,11 @@ This option is mandatory.
 
 Default: ''.
 
-=item -help
+=item o -help
 
 Print help and exit.
 
-=item -maxlevel logOption1
+=item o -maxlevel logOption1
 
 This option affects Log::Handler.
 
@@ -80,7 +88,7 @@ See the Log::handler docs.
 
 Default: 'notice'.
 
-=item -minlevel logOption2
+=item o -minlevel logOption2
 
 This option affects Log::Handler.
 

@@ -430,29 +430,7 @@ sub parse
 		}
 		else
 		{
-			$self -> log(debug => 'Ambiguity');
-
-			my($item);
-
-			while (my $value = $self -> recce -> value)
-			{
-				$value = $self -> decode_result($$value);
-
-				for $item (@$value)
-				{
-					if (defined($$item{kind}) && ($$item{kind} eq 'Calendar') )
-					{
-						$calendar = $$item{type};
-
-						next;
-					}
-
-					if ($calendar eq $$item{type})
-					{
-						push @$result, $item;
-					}
-				}
-			}
+			$result = $self -> process_ambiguity($calendar);
 		}
 	}
 	catch
@@ -465,6 +443,62 @@ sub parse
 	return $result;
 
 } # End of parse.
+
+# --------------------------------------------------
+
+sub process_ambiguity
+{
+	my($self, $calendar)  = @_;
+	my(%count) =
+	(
+		AND  => 0,
+		BET  => 0,
+		FROM => 0,
+		TO   => 0,
+	);
+	my($result) = [];
+
+	my($item);
+
+	while (my $value = $self -> recce -> value)
+	{
+		$value = $self -> decode_result($$value);
+
+		for $item (@$value)
+		{
+			if (defined($$item{kind}) && ($$item{kind} eq 'Calendar') )
+			{
+				$calendar = $$item{type};
+
+				next;
+			}
+
+			if ($calendar eq $$item{type})
+			{
+				# We have to allow for the fact that when 'From .. To' or 'Between ... And'
+				# are used, both dates are ambiguous, and we end up with double the number
+				# of elements in the arrayref compared to what's expected.
+
+				if (exists $$item{flag} && exists $count{$$item{flag} })
+				{
+					if ($count{$$item{flag} } == 0)
+					{
+						$count{$$item{flag} }++;
+
+						push @$result, $item;
+					}
+				}
+				else
+				{
+					push @$result, $item;
+				}
+			}
+		}
+	}
+
+	return $result;
+
+} # End of process_ambiguity.
 
 # --------------------------------------------------
 
