@@ -38,22 +38,6 @@ sub fix_date
 my(@candidates) =
 (
 	{
-		date   => 'From 1950 to 1956',
-		result =>
-		[
-			{flag => 'FROM', kind => 'Date', type => 'Gregorian', year => '1950'},
-			{flag => 'TO',   kind => 'Date', type => 'Gregorian', year => '1956'},
-		],
-	},
-	{
-		date   => '(Unknown)',
-		result => [{kind => 'Phrase', phrase => '(Unknown)', type => 'Phrase'}],
-	},
-);
-
-@candidates =
-(
-	{
 		date   => '1950',
 		result => [{kind => 'Date', type => 'Gregorian', year => '1950'}],
 	},
@@ -658,26 +642,6 @@ my(@candidates) =
 		result => [{bce => 'BCE', flag => 'FROM', kind => 'Date', type => 'Julian', year => '1950'}],
 	},
 	{
-		date   => 'Int 1950 (Approx)',
-		result => [{flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'Gregorian', year => '1950'}],
-	},
-	{
-		date   => 'Int Gregorian 1950 (Approx)',
-		result => [{flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'Gregorian', year => '1950'}],
-	},
-	{
-		date   => 'Int Julian 1950 (Approx)',
-		result => [{flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'Julian', year => '1950'}],
-	},
-	{
-		date   => 'Int 1950/00 (Approx)',
-		result => [{flag => 'INT', kind => 'Date', phrase => '(Approx)', suffix => '00', type => 'Gregorian', year => '1950'}],
-	},
-	{
-		date   => 'Int Gregorian 1950/00 (Approx)',
-		result => [{flag => 'INT', kind => 'Date', phrase => '(Approx)', suffix => '00', type => 'Gregorian', year => '1950'}],
-	},
-	{
 		date   => 'To 1950',
 		result => [{flag => 'TO', kind => 'Date', type => 'Gregorian', year => '1950'}],
 	},
@@ -742,6 +706,78 @@ my(@candidates) =
 		],
 	},
 	{
+		date   => 'From 1901/02 to 1903',
+		result =>
+		[
+			{flag => 'FROM', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1901'},
+			{flag => 'TO', kind => 'Date', type => 'Gregorian', year => '1903'},
+		],
+	},
+	{
+		date   => 'From Gregorian 1901/02 to 1903',
+		result =>
+		[
+			{flag => 'FROM', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1901'},
+			{flag => 'TO', kind => 'Date', type => 'Gregorian', year => '1903'},
+		],
+	},
+	{
+		date   => 'From 1901/02 to Gregorian 1903',
+		result =>
+		[
+			{flag => 'FROM', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1901'},
+			{flag => 'TO', kind => 'Date', type => 'Gregorian', year => '1903'},
+		],
+	},
+	{
+		date   => 'From 1901/02 to Julian 1903',
+		result =>
+		[
+			{flag => 'FROM', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1901'},
+			{flag => 'TO', kind => 'Date', type => 'Julian', year => '1903'},
+		],
+	},
+	{
+		date   => 'From Gregorian 1901/02 to Julian 1903',
+		result =>
+		[
+			{flag => 'FROM', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1901'},
+			{flag => 'TO', kind => 'Date', type => 'Julian', year => '1903'},
+		],
+	},
+	{
+		date   => 'From 1901 to 1903/04',
+		result =>
+		[
+			{flag => 'FROM', kind => 'Date', type => 'Gregorian', year => '1901'},
+			{flag => 'TO', kind => 'Date', suffix => '04', type => 'Gregorian', year => '1903'},
+		],
+	},
+	{
+		date   => 'From Gregorian 1901 to 1903/04',
+		result =>
+		[
+			{flag => 'FROM', kind => 'Date', type => 'Gregorian', year => '1901'},
+			{flag => 'TO', kind => 'Date', suffix => '04', type => 'Gregorian', year => '1903'},
+		],
+	},
+	{
+		date   => 'From Julian 1901 to 1903/04',
+		result =>
+		[
+			{flag => 'FROM', kind => 'Date', type => 'Julian', year => '1901'},
+			{flag => 'TO', kind => 'Date', suffix => '04', type => 'Gregorian', year => '1903'},
+		],
+	},
+	{
+		date   => 'From 1901/02 to 1903/04',
+		result =>
+		[
+			{flag => 'FROM', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1901'},
+			{flag => 'TO', kind => 'Date', suffix => '04', type => 'Gregorian', year => '1903'},
+		],
+	},
+	{
 		date   => 'From Gregorian 1950 to 1956',
 		result =>
 		[
@@ -773,6 +809,30 @@ my(@candidates) =
 			{flag => 'TO', kind => 'Date', type => 'Julian', year => '1956'},
 		],
 	},
+	{
+		date   => 'Int 1950 (Approx)',
+		result => [{flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'Gregorian', year => '1950'}],
+	},
+	{
+		date   => 'Int Gregorian 1950 (Approx)',
+		result => [{flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'Gregorian', year => '1950'}],
+	},
+	{
+		date   => 'Int Julian 1950 (Approx)',
+		result => [{flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'Julian', year => '1950'}],
+	},
+	{
+		date   => 'Int 1950/00 (Approx)',
+		result => [{flag => 'INT', kind => 'Date', phrase => '(Approx)', suffix => '00', type => 'Gregorian', year => '1950'}],
+	},
+	{
+		date   => 'Int Gregorian 1950/00 (Approx)',
+		result => [{flag => 'INT', kind => 'Date', phrase => '(Approx)', suffix => '00', type => 'Gregorian', year => '1950'}],
+	},
+	{
+		date   => '(Unknown)',
+		result => [{kind => 'Phrase', phrase => '(Unknown)', type => 'Phrase'}],
+	},
 );
 
 my($parser) = Genealogy::Gedcom::Date -> new;
@@ -785,16 +845,6 @@ for my $item (@candidates)
 {
 	$date    = $$item{date};
 	$message = "English: $date";
-
-	if ($date =~ /Julian/)
-	{
-		$parser -> calendar('Julian');
-	}
-	else
-	{
-		$parser -> calendar('Gregorian');
-	}
-
 	$result  = $parser -> parse(date => $date);
 
 	is($result, $$item{result}, $message);

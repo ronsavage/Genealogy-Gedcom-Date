@@ -3,8 +3,6 @@ package Genealogy::Gedcom::Date::Actions;
 use strict;
 use warnings;
 
-use Data::Dumper::Concise; # For Dumper().
-
 our $calendar;
 
 our $logger;
@@ -16,15 +14,11 @@ our $VERSION = '1.08';
 sub about_date
 {
 	my($cache, $t1, $t2) = @_;
+	my($t3)    = $$t2[1];
+	$t3        = $$t3[0] if (ref $t3 eq 'ARRAY');
+	$$t3{flag} = 'ABT';
 
-	$logger -> log(debug => 'about_date 1 => ' . Dumper($t1) );
-	$logger -> log(debug => 'about_date 2 => ' . Dumper($t2) );
-
-	$t2        = $$t2[1];
-	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
-	$$t2{flag} = 'ABT';
-
-	return $t2;
+	return [$$t2[0], $t3];
 
 } # End of about_date.
 
@@ -33,15 +27,11 @@ sub about_date
 sub after_date
 {
 	my($cache, $t1, $t2) = @_;
+	my($t3)    = $$t2[1];
+	$t3        = $$t3[0] if (ref $t3 eq 'ARRAY');
+	$$t3{flag} = 'AFT';
 
-	$logger -> log(debug => 'after_date 1 => ' . Dumper($t1) );
-	$logger -> log(debug => 'after_date 2 => ' . Dumper($t2) );
-
-	$t2        = $$t2[1];
-	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
-	$$t2{flag} = 'AFT';
-
-	return $t2;
+	return [$$t2[0], $t3];
 
 } # End of after_date.
 
@@ -50,15 +40,11 @@ sub after_date
 sub before_date
 {
 	my($cache, $t1, $t2) = @_;
+	my($t3)    = $$t2[1];
+	$t3        = $$t3[0] if (ref $t3 eq 'ARRAY');
+	$$t3{flag} = 'BEF';
 
-	$logger -> log(debug => 'after_date 1 => ' . Dumper($t1) );
-	$logger -> log(debug => 'before_date 2 => ' . Dumper($t2) );
-
-	$t2        = $$t2[1];
-	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
-	$$t2{flag} = 'BEF';
-
-	return $t2;
+	return [$$t2[0], $t3];
 
 } # End of before_date.
 
@@ -67,12 +53,6 @@ sub before_date
 sub between_date
 {
 	my($cache, $t1, $t2, $t3, $t4) = @_;
-
-	$logger -> log(info => 'between_date 1 => ' . Dumper($t1) );
-	$logger -> log(info => 'between_date 2 => ' . Dumper($t2) );
-	$logger -> log(info => 'between_date 3 => ' . Dumper($t3) );
-	$logger -> log(info => 'between_date 4 => ' . Dumper($t4) );
-
 	my($t_2)    = $$t2[1][0];
 	$$t_2{flag} = 'BET';
 	my($t_4)    = $$t4[1][0];
@@ -96,11 +76,7 @@ sub between_date
 		$t3 = {kind => 'Calendar', type => $calendar};
 	}
 
-	$t1 = [$t1, $t_2, $t3, $t_4];
-
-	$logger -> log(info => 'between_date Exit => ' . Dumper($t1) );
-
-	return $t1;
+	return [$t1, $t_2, $t3, $t_4];
 
 } # End of between_date.
 
@@ -109,15 +85,11 @@ sub between_date
 sub calculated_date
 {
 	my($cache, $t1, $t2) = @_;
+	my($t3)    = $$t2[1];
+	$t3        = $$t3[0] if (ref $t3 eq 'ARRAY');
+	$$t3{flag} = 'CAL';
 
-	$logger -> log(debug => 'calculated_date 1 => ' . Dumper($t1) );
-	$logger -> log(debug => 'calculated_date 2 => ' . Dumper($t2) );
-
-	$t2        = $$t2[1];
-	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
-	$$t2{flag} = 'CAL';
-
-	return $t2;
+	return [$$t2[0], $t3];
 
 } # End of calculated_date.
 
@@ -126,9 +98,8 @@ sub calculated_date
 sub calendar_name
 {
 	my($cache, $t1) = @_;
+	$t1 =~ s/\@\#d(.+)\@/$1/; # Zap gobbledegook if present.
 	$t1 = ucfirst lc $t1;
-
-	$logger -> log(info => 'calendar_name 1 => ' . Dumper($t1) );
 
 	return
 	{
@@ -143,8 +114,6 @@ sub calendar_name
 sub date_phrase
 {
 	my($cache, $t1) = @_;
-
-	$logger -> log(debug => 'date_phrase 1 => ' . Dumper($t1) );
 
 	return
 	{
@@ -161,8 +130,6 @@ sub day
 {
 	my($cache, $t1) = @_;
 
-	$logger -> log(debug => 'day 1 => ' . Dumper($t1) );
-
 	return $t1;
 
 } # End of day.
@@ -172,14 +139,11 @@ sub day
 sub estimated_date
 {
 	my($cache, $t1, $t2) = @_;
+	my($t3)    = $$t2[1];
+	$t3        = $$t3[0] if (ref $t3 eq 'ARRAY');
+	$$t3{flag} = 'EST';
 
-	$logger -> log(debug => 'estimated_date 2 => ' . Dumper($t2) );
-
-	$t2        = $$t2[1];
-	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
-	$$t2{flag} = 'EST';
-
-	return $t2;
+	return [$$t2[0], $t3];
 
 } # End of estimated_date.
 
@@ -188,10 +152,6 @@ sub estimated_date
 sub from_date
 {
 	my($cache, $t1, $t2) = @_;
-
-	$logger -> log(info => 'from_date 1 => ' . Dumper($t1) );
-	$logger -> log(info => 'from_date 2 => ' . Dumper($t2) );
-
 	my($t3)    = $$t2[0];
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
@@ -204,8 +164,6 @@ sub from_date
 		$t2 = [$t3, $t2];
 	}
 
-	$logger -> log(info => 'from_date 3 => ' . Dumper($t2) );
-
 	return $t2;
 
 } # End of from_date.
@@ -215,8 +173,6 @@ sub from_date
 sub gregorian_date
 {
 	my($cache, $t1) = @_;
-
-	$logger -> log(debug => 'gregorian_date 1 => ' . Dumper($t1) );
 
 	# Is it a BCE date? If so, it's already a hashref.
 
@@ -276,17 +232,9 @@ sub gregorian_date
 sub gregorian_month
 {
 	my($cache, $t1) = @_;
+	$t1 = $$t1[0] if (ref $t1);
 
-	$logger -> log(debug => 'gregorian_month 1 => ' . Dumper($t1) );
-
-	if (ref $t1)
-	{
-		return $$t1[0];
-	}
-	else
-	{
-		return $t1;
-	}
+	return $t1;
 
 } # End of gregorian_month.
 
@@ -295,9 +243,6 @@ sub gregorian_month
 sub gregorian_year_bce
 {
 	my($cache, $t1, $t2) = @_;
-
-	$logger -> log(debug => 'gregorian_year_bce 1 => ' . Dumper($t1) );
-	$logger -> log(debug => 'gregorian_year_bce 2 => ' . Dumper($t2) );
 
 	return
 	{
@@ -314,14 +259,11 @@ sub gregorian_year_bce
 sub interpreted_date
 {
 	my($cache, $t1) = @_;
-
-	$logger -> log(debug => 'interpreted_date 1 => ' . Dumper($t1) );
-
 	my($t2)      = $$t1[1][1][0];
 	$$t2{flag}   = 'INT';
 	$$t2{phrase} = "($$t1[2][0])";
 
-	return $t2;
+	return [$$t1[1][0], $t2];
 
 } # End of interpreted_date.
 
@@ -331,8 +273,6 @@ sub julian_date
 {
 	my($cache, $t1) = @_;
 
-	$logger -> log(debug => 'julian_date 1 => ' . Dumper($t1) );
-
 	# Is it a BCE date? If so, it's already a hashref.
 
 	if (ref($$t1[0]) eq 'HASH')
@@ -341,8 +281,6 @@ sub julian_date
 
 		return $$t1[0];
 	}
-
-	$logger -> log(debug => 'julian_date shift 1 => ' . Dumper($t1) );
 
 	my($day);
 	my($month);
@@ -387,9 +325,6 @@ sub julian_year_bce
 {
 	my($cache, $t1, $t2) = @_;
 
-	$logger -> log(debug => 'julian_year_bce 1 => ' . Dumper($t1) );
-	$logger -> log(debug => 'julian_year_bce 2 => ' . Dumper($t2) );
-
 	return
 	{
 		bce  => $t2,
@@ -405,10 +340,6 @@ sub julian_year_bce
 sub to_date
 {
 	my($cache, $t1, $t2) = @_;
-
-	$logger -> log(info => 'to_date 1 => ' . Dumper($t1) );
-	$logger -> log(info => 'to_date 2 => ' . Dumper($t2) );
-
 	my($t3)    = $$t2[0];
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
@@ -421,8 +352,6 @@ sub to_date
 		$t2 = [$t3, $t2];
 	}
 
-	$logger -> log(info => 'to_date 3 => ' . Dumper($t2) );
-
 	return $t2;
 
 } # End of to_date.
@@ -432,22 +361,9 @@ sub to_date
 sub year
 {
 	my($cache, $t1, $t2) = @_;
+	$t1 = "$t1/$t2" if (defined $t2);
 
-	$logger -> log(debug => 'year 1 => ' . Dumper($t1) );
-	$logger -> log(debug => 'year 2 => ' . Dumper($t2) );
-
-	my($result);
-
-	if (defined $t2)
-	{
-		$result = "$t1/$t2";
-	}
-	else
-	{
-		$result = $t1;
-	}
-
-	return $result;
+	return $t1;
 
 } # End of year.
 

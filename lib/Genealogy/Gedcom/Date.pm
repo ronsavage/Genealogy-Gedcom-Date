@@ -329,6 +329,19 @@ END_OF_GRAMMAR
 
 # ------------------------------------------------
 
+sub clean_calendar
+{
+	my($self)     = @_;
+	my($calendar) = $self -> calendar;
+	$calendar     =~ s/\@\#d(.+)\@/$1/; # Zap gobbledegook if present.
+	$calendar     = ucfirst lc $calendar;
+
+	return $self -> calendar($calendar);
+
+} # End of clean_calendar.
+
+# ------------------------------------------------
+
 sub decode_result
 {
 	my($self, $result) = @_;
@@ -381,10 +394,11 @@ sub log
 sub parse
 {
 	my($self, %args) = @_;
-	my($date)        = $self -> date;
-	$date            = defined($args{date}) ? $args{date} : $date;
+	my($calendar)    = defined($args{calendar}) ? $args{calendar} : $self -> calendar;
+	my($date)        = defined($args{date}) ? $args{date} : $self -> date;
 	$date            =~ tr/,/ /s;
 
+	$self -> calendar($calendar);
 	$self -> date($date);
 	$self -> error('');
 	$self -> recce
@@ -397,8 +411,7 @@ sub parse
 		})
 	);
 
-	my($calendar) = $self -> calendar;
-	my($result)   = [];
+	my($result) = [];
 
 	try
 	{
@@ -416,11 +429,11 @@ sub parse
 		}
 		elsif ($ambiguity_metric == 1)
 		{
-			$result = $self -> process_unambiguous($calendar);
+			$result = $self -> process_unambiguous();
 		}
 		else
 		{
-			$result = $self -> process_ambiguous($calendar);
+			$result = $self -> process_ambiguous();
 		}
 	}
 	catch
@@ -428,7 +441,7 @@ sub parse
 		$self -> error($_);
 	};
 
-	$self -> log(info => "Solution: \n" . Dumper($result) );
+	$self -> log(debug => Dumper($result) );
 
 	return $result;
 
@@ -438,11 +451,9 @@ sub parse
 
 sub process_ambiguous
 {
-	my($self, $calendar) = @_;
-
-	$self -> log(debug => 'Ambiguous');
-
-	my(%count) =
+	my($self)     = @_;
+	my($calendar) = $self -> clean_calendar;
+	my(%count)    =
 	(
 		AND  => 0,
 		BET  => 0,
@@ -459,16 +470,12 @@ sub process_ambiguous
 
 		for $item (@$value)
 		{
-			$self -> log(debug => "Ambiguity: \n" . Dumper($item) );
-
 			if ($$item{kind} eq 'Calendar')
 			{
 				$calendar = $$item{type};
 
 				next;
 			}
-
-			$self -> log(debug => "Compare $calendar eq $$item{type}");
 
 			if ($calendar eq $$item{type})
 			{
@@ -504,6 +511,10 @@ sub process_ambiguous
 					($$result[0], $$result[1]) = ($$result[1], $$result[0]);
 				}
 			}
+
+			# Reset the calendar. Note: The 'next' above skips this statement.
+
+			$calendar = $self -> clean_calendar;
 		}
 	}
 
@@ -515,15 +526,11 @@ sub process_ambiguous
 
 sub process_unambiguous
 {
-	my($self, $calendar) = @_;
-
-	$self -> log(info => 'Unambiguous');
-
-	my($result) = [];
-	my($value)  = $self -> recce -> value;
-	$value      = $self -> decode_result($$value);
-
-	$self -> log(info => "Decoded Unambiguous: \$#\$value: $#$value: \n" . Dumper($value) );
+	my($self)     = @_;
+	my($calendar) = $self -> clean_calendar;
+	my($result)   = [];
+	my($value)    = $self -> recce -> value;
+	$value        = $self -> decode_result($$value);
 
 	if ($#$value == 0)
 	{
@@ -566,42 +573,34 @@ Genealogy::Gedcom::Date - Parse GEDCOM dates
 
 =head1 Synopsis
 
+A script:
+
 	#!/usr/bin/env perl
 
 	use strict;
 	use warnings;
 
-	use Data::Dumper::Concise; # For Dumper().
+	use Data::Dumper::Concise;
 
 	use Genealogy::Gedcom::Date;
 
+	# --------------------------
+
 	my($parser) = Genealogy::Gedcom::Date -> new;
 
-	for my $candidate
-	(
-		'ABT 10 JUL 2003',
-		'CAL 10 JUL 2003',
-		'EST 1700',
-		'FROM 1522 TO 1534',
-	)
-	{
-		print "Date: $date. ";
+	print '1: ', Dumper($parser -> parse(calendar => 'Julian', date => '1950') );
+	print '2: ', Dumper($parser -> parse(calendar => '@#dJulian@', date => '1951') );
+	print '3: ', Dumper($parser -> parse(date => 'Julian 1952') );
+	print '4: ', Dumper($parser -> parse(date => '@#dJulian@ 1953') );
+	print '5: ', Dumper($parser -> parse(date => 'From @#dJulian@ 1954 to Gregorian 1955/56') );
 
-		$result = $parser -> parse(date => $date);
+See scripts/synopsis.pl.
 
-		if ($#$result < 0)
-		{
-			print $parser -> error();
-		}
-		else
-		{
-			print Dumper($_) for @$result;
-		}
-	}
+A one-liner
 
-See the L</FAQ>'s first QA for the definition of $result.
+	perl -Ilib scripts/parse.pl -max debug -d 'Between Gregorian 1701/02 And Julian 1703'
 
-This code is a fragment of scripts/synopsis.pl.
+See the L</FAQ> for the explanation of the output arrayrefs.
 
 =head1 Description
 
@@ -652,16 +651,15 @@ The name of the calendar to use as the default.
 
 See L</calendar([$name])> for details.
 
-Default: 'Gregorian'.
+Default: 'Gregorian' aka '@#dgregorian@'.
 
 =item o date => $date
 
 The string to be parsed.
 
-This string is always converted to lower case before being processed. Further, ',' and '.' are
-replaced by spaces. See the L</FAQ> for details.
+Each ',' is replaced by a space. See the L</FAQ> for details.
 
-See L</date([$date])> for details.
+See also L</date([$date])>.
 
 Default: ''.
 
@@ -675,7 +673,10 @@ Note: These parameters can also be provided in the call to L</parse([%args])>.
 
 Here, [ and ] indicate an optional parameter.
 
-Gets or sets the name of the default calendar.
+Gets or sets the name of the default calendar. $name is case-insensitive.
+
+Calendar names of the form '@#d$name@' are converted internally into $name. This means you can
+always just use $name, as in parse(date => 'Julian 1950').
 
 The name in C<< parse(calendar => $name) >> takes precedence over C<< new(calendar => $name) >>
 and C<calendar($name)>.
@@ -720,13 +721,9 @@ The constructor. See L</Constructor and Initialization>.
 
 Here, [ and ] indicate an optional parameter.
 
-C<parser()> returns 0 for success and 1 for failure.
+C<parse()> returns an arrayref. See the L</FAQ> for details.
 
-C<parse()> is often the only method you'll need to call, after calling C<new()>.
-
-Upon success, call L</result()> to retrieve the hashref discussed in the first FAQ.
-
-Upon failure, call L</error()> to retrieve the error message.
+If the arrayref is empty, call L</error()> to retrieve the error message.
 
 C<parse()> takes the same parameters as C<new()>.
 
@@ -837,7 +834,7 @@ $string will take one of these values (case-sensitive):
 
 The C<kind> key is always present, and always takes the value 'Date' or 'Phrase'.
 
-If the value is 'Phrase', see the C<phrase> key.
+If the value is 'Phrase', see the C<phrase> and C<type> keys.
 
 During processing, there can be another - undocumented - element in the arrayref. It represents
 the calendar escape, and in that case C<kind> takes the value 'Calendar'. This element is discarded
@@ -852,6 +849,30 @@ exactly whatever was in the input.
 
 If the input contains a date phrase, then the C<phrase> key will be present. The case of $string
 will be exactly whatever was in the input.
+
+parse(date => 'Int 1950 (Approx)') returns:
+
+	[
+	  {
+	    flag => "INT",
+	    kind => "Date",
+	    phrase => "(Approx)",
+	    type => "Gregorian",
+	    year => 1950
+	  }
+	]
+
+parse(date => '(Unknown)') returns:
+
+	[
+	  {
+	    kind => "Phrase",
+	    phrase => "(Unknown)",
+	    type => "Phrase"
+	  }
+	]
+
+See also the C<kind> and C<type> keys.
 
 =item o suffix => $two_digits
 
@@ -869,6 +890,10 @@ The C<type> key is always present, and takes one of these case-sensitive values:
 =item o Gregorian
 
 =item o Julian
+
+=item o Phrase
+
+See also the C<kind> and C<phrase> keys.
 
 =back
 
@@ -889,29 +914,33 @@ Possible values (case-insensitive):
 
 =item o calendar => 'French'
 
-Expect dates in 'month day year' format, as in From Jan 2 2011 BC to Mar 4 2011.
+Expects dates in 'month day year' format, as in From Jan 2 2011 BC to Mar 4 2011.
 
 =item o calendar => 'German'
 
 =item o calendar => 'Gregorian'
 
-Expect dates in 'day month year' format, as in From 1 Jan 2001 to 25 Dec 2002.
+Expects dates in 'day month year' format, as in From 1 Jan 2001 to 25 Dec 2002.
+
+Expects years in either the 1950 format or the 1950/00 format.
 
 This is the default.
 
 =item o calendar => 'Hebrew'
 
-Expect dates in 'year month day' format, as in 2011-01-02 to 2011-03-04.
+Expects dates in 'year month day' format, as in 2011-01-02 to 2011-03-04.
 
 =item o calendar => 'Julian'
 
-Expect dates in 'year month day' format, as in 2011-01-02 to 2011-03-04.
+Expects dates in 'year month day' format, as in 2011-01-02 to 2011-03-04.
+
+Expects years in the 1950 format.
 
 =back
 
 =head2 Are dates massaged before being processed?
 
-No.
+Yes. Commas are replaced by spaces.
 
 =head2 French month names
 
@@ -928,15 +957,18 @@ One of (case-insensitive):
 | 'okt' | 'nov' | 'dez'.
 
 
-=back
-
 =head2 Your module rejected my date!
 
 There are many possible reasons for this. One is:
 
 =over 4
 
-=item o The date is in American format (month day year).
+=item o The date is in American format (month day year)
+
+=item o You used a Julian calendar with a Gregorian year
+
+Dates - such as 1900/01 - which do not fit the Gedcom definition of a Julian year, are filtered
+out.
 
 =back
 
@@ -956,15 +988,7 @@ types I choose as method return values.
 
 My policy is to use the lightweight L<Moo> for all modules and applications.
 
-=head1 TODO
-
-Input containing a mixture of date escapes does not parse properly.
-
-E.g.: 'From Gregorian 1500/00 to Julian 1501'.
-
 =head1 See Also
-
-=head2 Modules
 
 L<Genealogy::Gedcom>.
 
