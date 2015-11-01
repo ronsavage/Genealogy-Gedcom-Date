@@ -1,19 +1,20 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
 2.00  Tue Oct 13 20:43:00 2015
-	- Re-write using Marpa::R2, which uses the Gedcom grammar to define dates. Further, some
-		flexability is permitted in that German month names are accepted, and BC/BCE can contain
-		full-stops.
-		See the FAQ for all such extensions to the Gedcom grammar.
-	- Accept Unicode input.
+	- Re-write using Marpa::R2, which uses the Gedcom grammar to define dates.
 	- Remove methods: parse_approximate_date(), parse_date_escape(), parse_datetime(),
 		parse_date_period(), parse_date_range(), parse_date_value(), parse_interpreted_date(),
 		debug(), method_index(), months_in_gregorian() and style().
 	- Add methods: parse(), calendar(), error().
-	- Remove all reference to DataTime.
+	- See the FAQ for the format of the value returned by parse().
+	- See the FAQ for various extensions to the Gedcom grammar.
+	- Accept Unicode input.
+	- Add support for French and German dates.
+	- Accept date escapes with or without '@#d' ... '@'.
+	- Accept dates and escapes in any case.
+	- Remove all reference to DateTime.
 	- Remove code which supplied a default day and/or month when they were missing.
 	- Add scripts/synopsis.pl.
-	- Add support for French and German dates.
 	- Rewrite all tests. See t/English.t, etc.
 	- Reduce the max line length of this file, and of the docs, to (an arbitrary) 100 chars.
 

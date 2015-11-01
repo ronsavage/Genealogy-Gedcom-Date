@@ -20,7 +20,7 @@ sub about_date
 
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
-	$$t2{flag} = 'About';
+	$$t2{flag} = 'ABT';
 
 	return $t2;
 
@@ -37,7 +37,7 @@ sub after_date
 
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
-	$$t2{flag} = 'After';
+	$$t2{flag} = 'AFT';
 
 	return $t2;
 
@@ -54,7 +54,7 @@ sub before_date
 
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
-	$$t2{flag} = 'Before';
+	$$t2{flag} = 'BEF';
 
 	return $t2;
 
@@ -73,10 +73,10 @@ sub between_date
 
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
-	$$t2{flag} = 'Between';
+	$$t2{flag} = 'BET';
 	$t4        = $$t4[1];
 	$t4        = $$t4[0] if (ref $t4 eq 'ARRAY');
-	$$t4{flag} = 'And';
+	$$t4{flag} = 'AND';
 
 	return [$t2, $t4];
 
@@ -93,7 +93,7 @@ sub calculated_date
 
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
-	$$t2{flag} = 'Calculated';
+	$$t2{flag} = 'CAL';
 
 	return $t2;
 
@@ -155,7 +155,7 @@ sub estimated_date
 
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
-	$$t2{flag} = 'Estimated';
+	$$t2{flag} = 'EST';
 
 	return $t2;
 
@@ -172,7 +172,7 @@ sub from_date
 
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
-	$$t2{flag} = 'From';
+	$$t2{flag} = 'FROM';
 
 	return $t2;
 
@@ -217,13 +217,6 @@ sub gregorian_date
 		$year  = $$t1[2];
 	}
 
-	# Check for /00.
-
-	if ($#$t1 == 3)
-	{
-		$year = "$$year[0]/$$year[1]";
-	}
-
 	my($result) =
 	{
 		kind  => 'Date',
@@ -231,8 +224,16 @@ sub gregorian_date
 		year  => $year,
 	};
 
+	# Check for /00.
+
+	if ($#$t1 == 3)
+	{
+		$$result{year}   = $$year[0];
+		$$result{suffix} = $$year[1];
+	}
+
 	$$result{month} = $month if (defined $month);
-	$$result{day}   = $day if (defined $day);
+	$$result{day}   = $day   if (defined $day);
 	$result         = [$result];
 
 	return $result;
@@ -286,7 +287,7 @@ sub interpreted_date
 	$logger -> log(debug => 'interpreted_date 1 => ' . Dumper($t1) );
 
 	my($t2)      = $$t1[1][0];
-	$$t2{flag}   = 'Interpreted';
+	$$t2{flag}   = 'INT';
 	$$t2{phrase} = "$$t1[2]$$t1[3][0]$$t1[4]";
 
 	return $t2;
@@ -379,7 +380,7 @@ sub to_date
 
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
-	$$t2{flag} = 'To';
+	$$t2{flag} = 'TO';
 
 	return $t2;
 

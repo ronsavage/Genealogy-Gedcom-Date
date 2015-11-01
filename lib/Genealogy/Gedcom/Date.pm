@@ -145,8 +145,9 @@ gedcom_date				::= date
 date					::= calendar_escape calendar_date
 
 calendar_escape			::=
-calendar_escape			::= calendar_name 				action => calendar_name
-calendar_escape			::= ('@#d') calendar_name ('@')	action => calendar_name
+calendar_escape			::= calendar_name 					action => calendar_name
+							| ('@#d') calendar_name ('@')	action => calendar_name
+							| ('@#D') calendar_name ('@')	action => calendar_name
 
 calendar_date			::= gregorian_date				action => gregorian_date
 							| julian_date				action => julian_date
@@ -645,219 +646,145 @@ C<parse()> takes the same parameters as C<new()>.
 
 =head1 FAQ
 
-=head2 What is the format of the hashref returned by result()?
+=head2 Does this module accept Unicode?
 
-It has these key => value pairs:
+Yes.
 
-=over 4
+=head2 What is the format of the value returned by parse()?
 
-=item o one => $first_date_in_range
+It is always an arrayref.
 
-Returns the first (or only) date as a string, after 'Abt', 'Bef', 'From' or whatever.
+If the date is like '1950' or 'Bef 1950 BCE', there will be 1 element in the arrayref.
 
-This is for cases like '1999' in 'abt 1999', '1999' in 'bef 1999, '1999' in 'from 1999', and for
-'1999' in 'from 1999 to 2000'.
+If the date contains both 'From' and 'To', or both 'Between' and 'And', then the arrayref will
+contain 2 elements.
 
-A missing month defaults to 01. A missing day defaults to 01.
+Each element is a hashref, with various combinations of the following keys. You need to check the
+existence of some keys before processing the date.
 
-'500BC' will be returned as '0500-01-01', with the 'one_bc' flag set. See also the key 'one_date'.
+This means missing values (day, month, bce) are never fabricated. These keys only appear in the
+hashref if such a token was found in the input.
 
-Default: DateTime::Infinite::Past -> new, which stringifies to '-inf'.
-
-Note: On some systems (MS Windows), DateTime::Infinite::Past -> new stringifies to '-1.#INF', but,
-as of V 1.09, the code changes this to '-Inf'.
-Likewise, on some systems (Solaris), DateTime::Infinite::Past -> new stringifies to '-Infinity',
-but, as of V 1.09, the code changes this to '-Inf'.
-
-The default value does I<not> set the one_ambiguous and one_bc flags.
-
-=item o one_ambiguous => $Boolean
-
-Returns 1 if the first (or only) date is ambiguous. Possibilities:
+Keys:
 
 =over 4
 
-=item o Only the year is present
+=item o bce
 
-=item o Only the year and month are present
+If the date contains any one of the following (case-insensitive), the C<bce> key will be present:
 
-=item o The day and month are reversible
+=over 4
 
-This is checked for by testing whether or not the day is <= 12, since in that case it could be a
-month.
+=item o 'bc'
+
+=item o 'b.c'
+
+=item o 'b.c.'
+
+=item o 'bc.'
+
+=item o 'b c'
+
+=item o 'bce'
 
 =back
 
-Obviously, the 'one_ambiguous' flag can be set for a date specified in a non-ambiguous way, e.g.
-'From 1 Jan 2000',
-since the numeric value of the month is 1 and the day is also 1.
+=item o day => $integer
 
-Default: 0.
+If the date contains a day, then the C<day> key will be present.
 
-=item o one_bc => $Boolean
+=item o flag => $string
 
-Returns 1 if the first date is followed by one of (case-insensitive): 'B.C.', 'BC.' or 'BC'. 'BC'
-may be written as 'BCE', with or without full-stops.
-
-In the input, this suffix can be separated from the year by spaces, so both '500BC' and '500 B.C.'
-are accepted.
-
-Default: 0.
-
-=item o one_date => $a_date_object
-
-This object is of type L<DateTime>.
-
-Warning: Since these objects only accept 4-digit years, any year 0 .. 999 will have 1000 added to
-it.
-Of course, the value for the 'one' key will I<not> have 1000 added it.
-
-This means that if the value of the 'one' key does not match the stringified value of the 'one_date'
-key (assuming the latter is not '-Inf'), then the year is < 1000.
-
-Alternately, if the stringified value of the 'one_date' key is '-Inf', the period supplied did not
-have a 'From' date.
-
-Default: DateTime::Infinite::Past -> new, which stringifies to '-Inf'.
-
-Note: On some systems (MS Windows), DateTime::Infinite::Past -> new stringifies to '-1.#INF', but,
-as of V 1.09, the code changes this to '-Inf'. Likewise, on some systems (Solaris),
-DateTime::Infinite::Past -> new stringifies to '-Infinity', but, as of V 1.09, the code changes
-this to '-Inf'.
-
-=item o one_default_day => $Boolean
-
-Returns 1 if the input date had no value for the first date's day. The code sets the default day to
-1.
-
-Default: 0.
-
-=item o one_default_month => $Boolean
-
-Returns 1 if the input date had no value for the first date's month. The code sets the default month
-to 1.
-
-Default: 0.
-
-=item o phrase => $string
-
-This holds the text, if any, between '(' and ')' in an interpreted date.
-
-Default: ''.
-
-=item o prefix => $string
-
-Possible values for the prefix:
+If the date contains any of the following (case-insensitive), then the C<flag> key will be present:
 
 =over 4
 
-=item o 'abt', given the approximate date 'Abt 1999'
+=item o Abt or About
 
-=item o 'aft', given the date range 'Aft 1999'
+=item o Aft or After
 
-=item o 'bef', given the date range 'Bef 1999'
+=item o And
 
-=item o 'bet', given the date range 'Bet 1999 and 2000'
+=item o Bef or Before
 
-=item o 'cal', given the approximate date 'Cal 1999'
+=item o Bet or Between
 
-=item o 'est', given the approximate date 'Est 1999'
+=item o Cal or Calculated
 
-=item o 'from', given the date period 'From 1999' or 'From 1999 to 2000'
+=item o Est or Estimated
 
-=item o 'int', given the interpreted date 'Int 1999 (Guesswork)'
+=item o From
 
-=item o 'phrase', given the date phrase '(Unknown)'
+=item o Int or Interpreted
 
-=item o 'to', given the date period 'To 2000'
+=item o To
 
 =back
 
-Default: ''.
-
-=item o two => $second_date_in_range
-
-Returns the second (or only) date as a string, after 'and' in 'bet 1999 and 2000', or 'to' in 'from
-1999 to 2000', or '2000' in 'to 2000'.
-
-A missing month defaults to 01. A missing day defaults to 01.
-
-'500BC' will be returned as '0500-01-01', with the 'two_bc' flag set. See also the key 'two_date'.
-
-Default: DateTime::Infinite::Future -> new, which stringifies to 'inf'.
-
-Note: On some systems (MS Windows), DateTime::Infinite::Future -> new stringifies to '1.#INF', but,
-as of V 1.03, the code changes this to 'Inf'. Likewise, on some systems (Solaris),
-DateTime::Infinite::Future -> new stringifies to 'Infinity', but, as of V 1.07, the code changes
-this to 'Inf'.
-
-The default value does I<not> set the two_ambiguous and two_bc flags.
-
-=item o two_ambiguous => $Boolean
-
-Returns 1 if the second (or only) date is ambiguous. Possibilities:
+$string will take one of these values (case-sensitive):
 
 =over 4
 
-=item o Only the year is present
+=item o ABT
 
-=item o Only the year and month are present
+=item o AFT
 
-=item o The day and month are reversible
+=item o AND
 
-This is checked for by testing whether or not the day is <= 12, since in that case it could be a
-month.
+=item o BEF
+
+=item o BET
+
+=item o CAL
+
+=item o EST
+
+=item o FROM
+
+=item o INT
+
+=item o TO
 
 =back
 
-Obviously, the 'two_ambiguous' flag can be set for a date specified in a non-ambiguous way, e.g.
-'To 1 Jan 2000', since the numeric value of the month is 1 and the day is also 1.
+=item o kind => 'Date'
 
-Default: 0.
+The C<kind> key is always present, and always takes the value 'Date'.
 
-=item o two_bc => $Boolean
+During processing, there can be another - undocumented - element in the arrayref. It represents
+the calendar escape, and in that case C<kind> takes the value 'Calendar'. This element is discarded
+before the final arrayref is returned to the caller.
 
-Returns 1 if the second date is followed by one of (case-insensitive): 'B.C.', 'BC.' or 'BC'. 'BC'
-may be written as 'BCE', with or without full-stops.
+=item o month => $string
 
-In the input, this suffix can be separated from the year by spaces, so both '500BC' and '500 B.C.'
-are accepted.
+If the date contains a month, then the C<month> key will be present. The case of $string will be
+exactly whatever was in the input.
 
-Default: 0.
+=item o suffix => $two_digits
 
-=item o two_date => $a_date_object
+If the year contains a suffix (/00), then the C<suffix> key will be present. The '/' is
+discarded.
 
-This object is of type L<DateTime>.
+See also the C<year> key below.
 
-Warning: Since these objects only accept 4-digit years, any year 0 .. 999 will have 1000 added to
-it. Of course, the value for the 'two' key will I<not> have 1000 added it.
+=item o type => $string
 
-This means that if the value of the 'two' key does not match the stringified value of the
-'two_date' key (assuming the latter is not 'Inf'), then the year is < 1000.
+The C<type> key is always present, and takes one of these case-sensitive values:
 
-Alternately, if the stringified value of the 'two_date' key is 'Inf', the period supplied did not
-have a 'To' date.
+=over 4
 
-Default: DateTime::Infinite::Future -> new, which stringifies to 'inf'.
+=item o Gregorian
 
-Note: On some systems (MS Windows), DateTime::Infinite::Future -> new stringifies to '1.#INF', but,
-as of V 1.09, the code changes this to 'Inf'. Likewise, on some systems (Solaris),
-DateTime::Infinite::Future -> new stringifies to 'Infinity', but, as of V 1.09, the code changes
-this to 'Inf'.
+=item o Julian
 
-=item o two_default_day => $Boolean
+=back
 
-Returns 1 if the input date had no value for the second date's day. The code sets the default day
-to 1.
+=item o year => $integer
 
-Default: 0.
+The key C<year> is always present.
 
-=item o two_default_month => $Boolean
-
-Returns 1 if the input date had no value for the second date's month. The code sets the default
-month to 1.
-
-Default: 0.
+If the year contains a suffix (/00), see also the C<suffix> key, above. This means the value of
+the C<year> key is never "$integer/$two_digits".
 
 =back
 
@@ -889,79 +816,26 @@ Expect dates in 'year month day' format, as in 2011-01-02 to 2011-03-04.
 
 =back
 
-=head2 Does this module accept Unicode characters?
-
-Yes. Seel scripts/synopsis.pl.
-
 =head2 Are dates massaged before being processed?
 
-Yes. They are lower-cased, and commas are replaced with spaces. So that's how they are returned if
-you call L</date($date)> to retrieve the date actually processed.
+No.
 
-=head2 What extensions to the Gedcom grammar are supported?
+=head2 French month names
 
-Note: Please read the preceeding QA first!
+One of (case-insensitive):
 
-Calendar names:
-
-Use 'dfrench r', 'dfrenchr', 'dgerman', 'dgregorian', 'dhebrew' or 'djulian'.
-
-Date types:
-
-=over 4
-
-=item o 'about' may be spelled as 'abt', 'about' or 'circa'
-
-=item o 'after' may be spelled as 'aft' or 'after'
-
-=item o 'before' may be spelled as 'bef' or 'before'
-
-=item o 'between' may be spelled as 'bet' or 'between'
-
-=item o 'calculated' may be spelled as 'cal' or 'calculated'
-
-=item o 'estimated' may be spelled as 'est' or 'estimated'
-
-=item o 'interpreted' may be spelled as 'int' or 'interpreted'
-
-=back
-
-Month names:
-
-=over 4
-
-=item o French months
-
-Use 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent' | 'germ' | 'flor' | 'prai' | 'mess' | 'ther'
+'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent' | 'germ' | 'flor' | 'prai' | 'mess' | 'ther'
 | 'fruc' | 'comp'.
 
-=item o German months
+=head2 German month names
 
-Use 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun' | 'jul' | 'aug' | 'sep' | 'sept'
+One of (case-insensitive):
+
+'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun' | 'jul' | 'aug' | 'sep' | 'sept'
 | 'okt' | 'nov' | 'dez'.
 
 
 =back
-
-BC:
-
-=over 4
-
-=item o Gregorian BC may be spelled as 'bc', 'b c' or 'bce'
-
-=item o German BC may be spelled as 'vc', 'v c', 'v chr', 'vchr', 'vuz' or 'v u z'
-
-=back
-
-=head2 Do you accept suggestion regarding other extensions?
-
-Yes, but they must not be ambiguous.
-
-=head2 Are Gregorian dates of the form 1699/00 handled?
-
-Yes. Specifically, '1 Dec 1699/00' is returned as '1 dec 1699 00'.
-
-See scripts/synopsis.pl.
 
 =head2 Your module rejected my date!
 
@@ -969,79 +843,13 @@ There are many possible reasons for this. One is:
 
 =over 4
 
-=item o The date is in American format (month before year), but the code was not warned
-
-See L</calendar([$name])> for a list of supported calendars.
+=item o The date is in American format (month day year).
 
 =back
-
-=head2 Does this module respect the ENV{LANG} variable?
-
-Yes. When DateTime objects are created, the C<locale> parameter is set to $ENV{LANG} if the latter
-is set.
-
-=head2 On what systems do DateTime::Inifinite::(Past, Future) return '-1.#INF' and '1.#INF'?
-
-So far (as reported by CPAN Testers):
-
-=over 4
-
-=item o Win32::GetOSName = Win7
-
-=item o Win32::GetOSName = WinXP/.Net
-
-=back
-
-=head2 On what systems do DateTime::Inifinite::(Past, Future) return '-Infinity' and 'Infinity'?
-
-So far (as reported by CPAN Testers):
-
-=over 4
-
-=item o osname=solaris, osvers=2.11
-
-=back
-
-=head2 How do I format dates for output?
-
-Use the hashref keys 'one' and 'two', to get dates in the form 2011-06-21. Re-format as necessary.
-
-Such a hashref is returned from the L</result()> method.
-
-=head2 Does this module handle non-Gregorian calendars?
-
-Yes. See L</calendar([$name])> for more details.
-
-=head2 How are incomplete dates handled?
-
-A missing month is set to 1 and a missing day is set to 1.
-
-Further, in the hashref returned by the L</result()>, the flags one_default_month,
-one_default_day, two_default_month and two_default_day are set to 1, as appropriate, so you can
-tell that the code supplied the value.
-
-Note: These flags take a Boolean value; it is only by coincidence that they can take the value of
-the default month or day.
-
-=head2 Why are dates returned as objects of type L<DateTime>?
-
-Because such objects have the sophistication required to handle such a complex topic.
-
-See L<DateTime> and L<http://datetime.perl.org/wiki/datetime/dashboard> for details.
 
 =head2 What happens if C<parse()> is given a string like 'From 2000 to 1999'?
 
-Then the returned hashref will have:
-
-=over 4
-
-=item o one => '2000-01-01T00:00:00'
-
-=item o two => '1999-01-01T00:00:00'
-
-=back
-
-Clearly then, the code I<does not> reorder the dates.
+The code I<does not> reorder the dates.
 
 =head2 Why was this module renamed from DateTime::Format::Gedcom?
 
@@ -1069,31 +877,7 @@ Sample code to overload '<' and '>' as in L<Gedcom::Date>.
 
 =head2 Modules
 
-L<DateTime>.
-
-L<DateTime::Moonpig>.
-
-L<DateTimeX::Lite>.
-
 L<Genealogy::Gedcom>.
-
-L<Time::Duration>, which is more sophisticated than L<Time::Elapsed>.
-
-L<Time::Moment> implements L<ISO 8601|https://en.wikipedia.org/wiki/ISO_8601>.
-
-L<Time::ParseDate>.
-
-L<Time::Piece>, which is in Perl core.
-
-=head2 Articles
-
-L<http://perltricks.com/article/59/2014/1/10/Solve-almost-any-datetime-need-with-Time-Piece>.
-
-The next two articles discuss a wide range of modules:
-
-L<http://blogs.perl.org/users/buddy_burden/2015/09/a-date-with-cpan-part-1-state-of-the-union.html>.
-
-L<http://blogs.perl.org/users/buddy_burden/2015/10/a-date-with-cpan-part-2-target-first-aim-afterwards.html>.
 
 =head1 Machine-Readable Change Log
 
