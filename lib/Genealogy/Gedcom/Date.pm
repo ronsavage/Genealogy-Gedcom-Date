@@ -413,20 +413,27 @@ sub parse
 		{
 			# No ambiguity.
 
+			$self -> log(debug => 'No ambiguity');
+
 			my($value)    = $self -> recce -> value;
 			$value        = $self -> decode_result($$value);
+
+			$self -> log(debug => "Decoded: \n" . Dumper($value) );
 
 			if ($$value[0]{kind} eq 'Calendar')
 			{
 				$calendar = $$value[0]{type};
-				$value    = $$value[1];
+				$result   = $$value[1];
 			}
-			else
+			elsif ($#$value == 0)
 			{
-				$value = $$value[0];
+				$value      = $$value[0];
+				$$result[0] = $value if ($$value{type} =~ /^(?:$calendar|Phrase)$/);
 			}
-
-			$$result[0] = $value if ($$value{type} =~ /^(?:$calendar|Phrase)$/);
+			elsif ( ($$value[0]{type} eq $calendar) && ($$value[1]{type} eq $calendar) )
+			{
+				$result = $value;
+			}
 		}
 		else
 		{
@@ -448,7 +455,10 @@ sub parse
 
 sub process_ambiguity
 {
-	my($self, $calendar)  = @_;
+	my($self, $calendar) = @_;
+
+	$self -> log(debug => 'Ambiguity');
+
 	my(%count) =
 	(
 		AND  => 0,
@@ -466,7 +476,9 @@ sub process_ambiguity
 
 		for $item (@$value)
 		{
-			if (defined($$item{kind}) && ($$item{kind} eq 'Calendar') )
+			$self -> log(debug => "Ambiguity: \n" . Dumper($item) );
+
+			if ($$item{kind} eq 'Calendar')
 			{
 				$calendar = $$item{type};
 
@@ -906,13 +918,9 @@ My policy is to use the lightweight L<Moo> for all modules and applications.
 
 =head1 TODO
 
-=over 4
+Input containing a mixture of date escapes does not parse properly.
 
-=item o Comparisons between dates
-
-Sample code to overload '<' and '>' as in L<Gedcom::Date>.
-
-=back
+E.g.: 'From Gregorian 1500/00 to Julian 1501'.
 
 =head1 See Also
 

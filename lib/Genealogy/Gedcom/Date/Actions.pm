@@ -77,8 +77,11 @@ sub between_date
 	$t4        = $$t4[1];
 	$t4        = $$t4[0] if (ref $t4 eq 'ARRAY');
 	$$t4{flag} = 'AND';
+	$t1        = [$t2, $t4];
 
-	return [$t2, $t4];
+	print STDERR "between: \n", Dumper($t1);
+
+	return $t1;
 
 } # End of between_date.
 
@@ -106,7 +109,7 @@ sub calendar_name
 	my($cache, $t1) = @_;
 	$t1 = ucfirst lc $t1;
 
-	$logger -> log(debug => 'calendar_name 1 => ' . Dumper($t1) );
+	$logger -> log(info => 'calendar_name 1 => ' . Dumper($t1) );
 
 	return
 	{
@@ -167,12 +170,22 @@ sub from_date
 {
 	my($cache, $t1, $t2) = @_;
 
-	$logger -> log(debug => 'from_date 1 => ' . Dumper($t1) );
-	$logger -> log(debug => 'from_date 2 => ' . Dumper($t2) );
+	$logger -> log(info => 'from_date 1 => ' . Dumper($t1) );
+	$logger -> log(info => 'from_date 2 => ' . Dumper($t2) );
 
+	my($t3)    = $$t2[0];
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
 	$$t2{flag} = 'FROM';
+
+	# Is there a calendar hash present?
+
+	if (ref $t3 eq 'HASH')
+	{
+		$t2 = [$t3, $t2];
+	}
+
+	$logger -> log(info => 'from_date 3 => ' . Dumper($t2) );
 
 	return $t2;
 
@@ -226,10 +239,9 @@ sub gregorian_date
 
 	# Check for /00.
 
-	if ($#$t1 == 3)
+	if ($year =~ m|/|)
 	{
-		$$result{year}   = $$year[0];
-		$$result{suffix} = $$year[1];
+		($$result{year}, $$result{suffix}) = split(m|/|, $year);
 	}
 
 	$$result{month} = $month if (defined $month);
@@ -375,12 +387,22 @@ sub to_date
 {
 	my($cache, $t1, $t2) = @_;
 
-	$logger -> log(debug => 'to_date 1 => ' . Dumper($t1) );
-	$logger -> log(debug => 'to_date 2 => ' . Dumper($t2) );
+	$logger -> log(info => 'to_date 1 => ' . Dumper($t1) );
+	$logger -> log(info => 'to_date 2 => ' . Dumper($t2) );
 
+	my($t3)    = $$t2[0];
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
 	$$t2{flag} = 'TO';
+
+	# Is there a calendar hash present?
+
+	if (ref $t3 eq 'HASH')
+	{
+		$t2 = [$t3, $t2];
+	}
+
+	$logger -> log(info => 'to_date 3 => ' . Dumper($t2) );
 
 	return $t2;
 
