@@ -145,7 +145,8 @@ gedcom_date				::= date
 date					::= calendar_escape calendar_date
 
 calendar_escape			::=
-calendar_escape			::= ('@#d':i) calendar_name ('@')	action => calendar_name
+calendar_escape			::= calendar_name 				action => calendar_name
+calendar_escape			::= ('@#d') calendar_name ('@')	action => calendar_name
 
 calendar_date			::= gregorian_date				action => gregorian_date
 							| julian_date				action => julian_date
@@ -388,7 +389,9 @@ sub parse
 		})
 	);
 
-	my($calendar) = ucfirst lc $self -> calendar;
+	my($calendar) = $self -> calendar;
+	$calendar     =~ s/\@\#d(.+)\@/$1/; # Zap gobbledegook if present.
+	$calendar     = ucfirst lc $calendar;
 	my($result)   = [];
 
 	try
@@ -426,7 +429,7 @@ sub parse
 		}
 		else
 		{
-			$self -> log(info => 'Ambiguity');
+			$self -> log(debug => 'Ambiguity');
 
 			my($item);
 
@@ -436,8 +439,6 @@ sub parse
 
 				for $item (@$value)
 				{
-					$self -> log(debug => "Process: \n" . Dumper($item) );
-
 					if (defined($$item{kind}) && ($$item{kind} eq 'Calendar') )
 					{
 						$calendar = $$item{type};

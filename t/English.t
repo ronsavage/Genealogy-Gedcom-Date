@@ -3,8 +3,6 @@
 use strict;
 use warnings;
 
-use Data::Dumper::Concise; # For Dumper().
-
 use Genealogy::Gedcom::Date;
 
 use Test::Stream -V1;
@@ -203,6 +201,7 @@ my($date);
 my(@field);
 my($message);
 my($result);
+my($temp_date);
 
 for my $calendar ('', 'Gregorian', 'Julian')
 {
@@ -212,25 +211,46 @@ for my $calendar ('', 'Gregorian', 'Julian')
 
 		next if ( ($calendar eq 'Julian') && ($date =~ m|/|) );
 
-		$message = "Date: $date";
+		$message = "English. Date: $date";
 
 		if ($calendar)
 		{
+			# This must not be inside the next loop as calendar($escape).
+			# The Perl code only uses 'Gregorian' and 'Julian'.
+
 			$parser -> calendar($calendar);
 
-			$message                .= ". Calendar: $calendar";
-			$$item{result}[0]{type} = $calendar;
-			@field                  = split(/\s+/, $date);
+			# We can't include '@#d' in $message, because then Test::Stream aborts.
 
-			if ($prefix{$field[0]})
+			$$item{result}[0]{type} = $calendar;
+			$message                .= ". Calendar: $calendar";
+
+			for my $escape ($calendar, "\@#d$calendar\@")
 			{
-				$date = join(' ', $field[0], "\@#d$calendar\@", @field[1 .. $#field]);
+				@field = split(/\s+/, $date);
+
+				# Splice the calendar escape into the date.
+
+				if ($prefix{$field[0]})
+				{
+					$temp_date = join(' ', $field[0], lc $escape, @field[1 .. $#field]);
+				}
+				else
+				{
+					$temp_date = "$escape $date";
+				}
+
+				$result = $parser -> parse(date => $temp_date);
+
+				is($result, $$item{result}, $message);
 			}
 		}
+		else
+		{
+			$result = $parser -> parse(date => $date);
 
-		$result = $parser -> parse(date => $date);
-
-		is($result, $$item{result}, $message);
+			is($result, $$item{result}, $message);
+		}
 	}
 }
 
