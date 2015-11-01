@@ -125,7 +125,14 @@ sub BUILD
 	# The point is that we don't create an action instance.
 	# Marpa creates one but we can't get our hands on it.
 
-	$Genealogy::Gedcom::Date::Actions::logger = $self -> logger;
+	my($calendar) =	$self -> calendar;
+	$calendar     =~ s/\@\#d(.+)\@/$1/; # Zap gobbledegook if present.
+	$calendar     = ucfirst lc $calendar;
+
+	$self -> calendar($calendar);
+
+	$Genealogy::Gedcom::Date::Actions::calendar = $calendar;
+	$Genealogy::Gedcom::Date::Actions::logger   = $self -> logger;
 
 	$self -> bnf
 	(
@@ -391,8 +398,6 @@ sub parse
 	);
 
 	my($calendar) = $self -> calendar;
-	$calendar     =~ s/\@\#d(.+)\@/$1/; # Zap gobbledegook if present.
-	$calendar     = ucfirst lc $calendar;
 	my($result)   = [];
 
 	try
@@ -411,33 +416,11 @@ sub parse
 		}
 		elsif ($ambiguity_metric == 1)
 		{
-			# No ambiguity.
-
-			$self -> log(debug => 'No ambiguity');
-
-			my($value)    = $self -> recce -> value;
-			$value        = $self -> decode_result($$value);
-
-			$self -> log(debug => "Decoded: \n" . Dumper($value) );
-
-			if ($$value[0]{kind} eq 'Calendar')
-			{
-				$calendar = $$value[0]{type};
-				$result   = $$value[1];
-			}
-			elsif ($#$value == 0)
-			{
-				$value      = $$value[0];
-				$$result[0] = $value if ($$value{type} =~ /^(?:$calendar|Phrase)$/);
-			}
-			elsif ( ($$value[0]{type} eq $calendar) && ($$value[1]{type} eq $calendar) )
-			{
-				$result = $value;
-			}
+			$result = $self -> process_unambiguous($calendar);
 		}
 		else
 		{
-			$result = $self -> process_ambiguity($calendar);
+			$result = $self -> process_ambiguous($calendar);
 		}
 	}
 	catch
@@ -453,11 +436,11 @@ sub parse
 
 # --------------------------------------------------
 
-sub process_ambiguity
+sub process_ambiguous
 {
 	my($self, $calendar) = @_;
 
-	$self -> log(debug => 'Ambiguity');
+	$self -> log(debug => 'Ambiguous');
 
 	my(%count) =
 	(
@@ -485,6 +468,8 @@ sub process_ambiguity
 				next;
 			}
 
+			$self -> log(debug => "Compare $calendar eq $$item{type}");
+
 			if ($calendar eq $$item{type})
 			{
 				# We have to allow for the fact that when 'From .. To' or 'Between ... And'
@@ -505,12 +490,67 @@ sub process_ambiguity
 					push @$result, $item;
 				}
 			}
+
+			# Sometimes we must reverse the array elements.
+
+			if ($#$result == 1)
+			{
+				if ( ($$result[0]{flag} eq 'AND') && ($$result[1]{flag} eq 'BET') )
+				{
+					($$result[0], $$result[1]) = ($$result[1], $$result[0]);
+				}
+				elsif ( ($$result[0]{flag} eq 'TO') && ($$result[1]{flag} eq 'FROM') )
+				{
+					($$result[0], $$result[1]) = ($$result[1], $$result[0]);
+				}
+			}
 		}
 	}
 
 	return $result;
 
-} # End of process_ambiguity.
+} # End of process_ambiguous.
+
+# --------------------------------------------------
+
+sub process_unambiguous
+{
+	my($self, $calendar) = @_;
+
+	$self -> log(debug => 'Unambiguous');
+
+	my($result) = [];
+	my($value)  = $self -> recce -> value;
+	$value      = $self -> decode_result($$value);
+
+	$self -> log(debug => "Decoded Unambiguous: \n" . Dumper($value) );
+
+	if ($#$value == 0)
+	{
+		$value      = $$value[0];
+		$$result[0] = $value if ($$value{type} =~ /^(?:$calendar|Phrase)$/);
+	}
+	elsif ($#$value == 3)
+	{
+		$$result[0] = [$$value[1], $$value[3] ];
+	}
+	elsif ($$value[0]{kind} eq 'Calendar')
+	{
+		$calendar = $$value[0]{type};
+
+		if ($calendar eq $$value[1]{type})
+		{
+			$result = [$$value[1]];
+		}
+	}
+	elsif ( ($$value[0]{type} eq $calendar) && ($$value[1]{type} eq $calendar) )
+	{
+		$result = $value;
+	}
+
+	return $result;
+
+} # End of process_unambiguous.
 
 # --------------------------------------------------
 

@@ -5,6 +5,8 @@ use warnings;
 
 use Data::Dumper::Concise; # For Dumper().
 
+our $calendar;
+
 our $logger;
 
 our $VERSION = '1.08';
@@ -71,15 +73,32 @@ sub between_date
 	$logger -> log(debug => 'between_date 3 => ' . Dumper($t3) );
 	$logger -> log(debug => 'between_date 4 => ' . Dumper($t4) );
 
-	$t2        = $$t2[1];
-	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
-	$$t2{flag} = 'BET';
-	$t4        = $$t4[1];
-	$t4        = $$t4[0] if (ref $t4 eq 'ARRAY');
-	$$t4{flag} = 'AND';
-	$t1        = [$t2, $t4];
+	my($t_2)    = $$t2[1][0];
+	$$t_2{flag} = 'BET';
+	my($t_4)    = $$t4[1][0];
+	$$t_4{flag} = 'AND';
 
-	print STDERR "between: \n", Dumper($t1);
+	if (ref $$t2[0] eq 'HASH')
+	{
+		$t1 = $$t2[0];
+	}
+	else
+	{
+		$t1 = {kind => 'Calendar', type => $calendar};
+	}
+
+	if (ref $$t4[0] eq 'HASH')
+	{
+		$t3 = $$t4[0];
+	}
+	else
+	{
+		$t3 = {kind => 'Calendar', type => $calendar};
+	}
+
+	$t1 = [$t1, $t_2, $t3, $t_4];
+
+	$logger -> log(debug => 'between_date Exit => ' . Dumper($t1) );
 
 	return $t1;
 
