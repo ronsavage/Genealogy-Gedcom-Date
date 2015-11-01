@@ -5,8 +5,6 @@ use warnings;
 
 use Data::Dumper::Concise; # For Dumper().
 
-our $calendar_escape;
-
 our $logger;
 
 our $VERSION = '1.08';
@@ -68,13 +66,17 @@ sub between_date
 {
 	my($cache, $t1, $t2, $t3, $t4) = @_;
 
+	$logger -> log(debug => 'between_date 1 => ' . Dumper($t1) );
 	$logger -> log(debug => 'between_date 2 => ' . Dumper($t2) );
+	$logger -> log(debug => 'between_date 3 => ' . Dumper($t3) );
 	$logger -> log(debug => 'between_date 4 => ' . Dumper($t4) );
 
-	$t2        = $$t2[0];
+	$t2        = $$t2[1];
+	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
 	$$t2{flag} = 'Between';
-	$t4        = $$t4[0];
-	$$t4{and}  = 'And';
+	$t4        = $$t4[1];
+	$t4        = $$t4[0] if (ref $t4 eq 'ARRAY');
+	$$t4{flag} = 'And';
 
 	return [$t2, $t4];
 
@@ -99,20 +101,20 @@ sub calculated_date
 
 # ------------------------------------------------
 
-sub calendar_escape
+sub calendar_name
 {
-	my($cache, $t1)  = @_;
-	$calendar_escape = $t1;
+	my($cache, $t1) = @_;
+	$t1 = ucfirst lc $t1;
 
-	$logger -> log(debug => 'calendar_escape 1 => ' . Dumper($t1) );
+	$logger -> log(debug => 'calendar_name 1 => ' . Dumper($t1) );
 
 	return
 	{
-		kind => 'Escape',
+		kind => 'Calendar',
 		type => $t1,
 	};
 
-} # End of calendar_escape.
+} # End of calendar_name.
 
 # ------------------------------------------------
 
@@ -182,8 +184,6 @@ sub gregorian_date
 {
 	my($cache, $t1) = @_;
 
-	print STDERR 'gregorian_date 1 => ' . Dumper($t1);
-
 	$logger -> log(debug => 'gregorian_date 1 => ' . Dumper($t1) );
 
 	# Is it a BCE date? If so, it's already a hashref.
@@ -192,12 +192,8 @@ sub gregorian_date
 	{
 		$$t1[0]{bce} = 'BCE';
 
-		print STDERR 'gregorian_date return => ' . Dumper($$t1[0]);
-
 		return $$t1[0];
 	}
-
-	$logger -> log(debug => 'gregorian_date shift 1 => ' . Dumper($t1) );
 
 	my($day);
 	my($month);
@@ -239,8 +235,6 @@ sub gregorian_date
 	$$result{day}   = $day if (defined $day);
 	$result         = [$result];
 
-	print STDERR 'gregorian_date result => ' . Dumper($result);
-
 	return $result;
 
 } # End of gregorian_date.
@@ -269,9 +263,6 @@ sub gregorian_month
 sub gregorian_year_bce
 {
 	my($cache, $t1, $t2) = @_;
-
-	print STDERR 'gregorian_year bce 1 => ' . Dumper($t1);
-	print STDERR 'gregorian_year bce 2 => ' . Dumper($t2);
 
 	$logger -> log(debug => 'gregorian_year_bce 1 => ' . Dumper($t1) );
 	$logger -> log(debug => 'gregorian_year_bce 2 => ' . Dumper($t2) );
@@ -308,8 +299,6 @@ sub julian_date
 {
 	my($cache, $t1) = @_;
 
-	print STDERR 'julian_date 1 => ' . Dumper($t1);
-
 	$logger -> log(debug => 'julian_date 1 => ' . Dumper($t1) );
 
 	# Is it a BCE date? If so, it's already a hashref.
@@ -317,8 +306,6 @@ sub julian_date
 	if (ref($$t1[0]) eq 'HASH')
 	{
 		$$t1[0]{bce} = 'BCE';
-
-		print STDERR 'julian_date return => ' . Dumper($$t1[0]);
 
 		return $$t1[0];
 	}
@@ -347,13 +334,6 @@ sub julian_date
 		$year  = $$t1[2];
 	}
 
-	# Check for /00.
-
-	if ($#$t1 == 3)
-	{
-		$year = "$$year[0]/$$year[1]";
-	}
-
 	my($result) =
 	{
 		kind  => 'Date',
@@ -364,8 +344,6 @@ sub julian_date
 	$$result{month} = $month if (defined $month);
 	$$result{day}   = $day if (defined $day);
 	$result         = [$result];
-
-	print STDERR 'julian_date result => ' . Dumper($result);
 
 	return $result;
 

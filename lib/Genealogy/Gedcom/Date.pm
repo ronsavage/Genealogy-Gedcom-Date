@@ -121,7 +121,7 @@ sub BUILD
 		);
 	}
 
-	# 1 of 2: Initialize the action class via global variables - Yuk!
+	# Initialize the action class via global variables - Yuk!
 	# The point is that we don't create an action instance.
 	# Marpa creates one but we can't get our hands on it.
 
@@ -143,6 +143,9 @@ gedcom_date				::= date
 							| lds_ord_date
 
 date					::= calendar_escape calendar_date
+
+calendar_escape			::=
+calendar_escape			::= ('@#d':i) calendar_name ('@')	action => calendar_name
 
 calendar_date			::= gregorian_date				action => gregorian_date
 							| julian_date				action => julian_date
@@ -171,14 +174,14 @@ julian_date				::= day gregorian_month_name year
 
 julian_year_bce			::= year bce					action => julian_year_bce
 
-#year_bce				::= year bce
-
 year					::= number						action => year
 
 #french_date				::= year_bce
 #							| year
 #							| french_month_name year
 #							| day french_month_name year
+#
+#year_bce				::= year bce
 #
 #german_date				::= german_year
 #							| german_month_name dot german_year
@@ -193,9 +196,6 @@ year					::= number						action => year
 #							| hebrew_month year
 #							| day hebrew_month year
 
-calendar_escape			::=
-calendar_escape			::= ('@#d') calendar_name ('@')	action => calendar_escape
-
 lds_ord_date			::= date_value
 
 date_value				::= date_period
@@ -204,9 +204,9 @@ date_value				::= date_period
 							| interpreted_date			action => interpreted_date
 							| '(' date_phrase ')'		action => date_phrase
 
-date_period				::= from_date
+date_period				::= from_date to_date
+							| from_date
 							| to_date
-							| from_date to_date
 
 from_date				::= from date					action => from_date
 
@@ -383,6 +383,7 @@ sub parse
 		Marpa::R2::Scanless::R -> new
 		({
 			grammar           => $self -> grammar,
+			ranking_method    => 'high_rule_only',
 			semantics_package => 'Genealogy::Gedcom::Date::Actions',
 		})
 	);
@@ -400,8 +401,6 @@ sub parse
 		{
 			my($message) = "Call to ambiguity_metric() returned $ambiguity_metric";
 
-			print STDERR "$message. \n";
-
 			$self -> error($message);
 
 			$self -> log(error => "Parse failed. $message");
@@ -413,7 +412,7 @@ sub parse
 			my($value)    = $self -> recce -> value;
 			$value        = $self -> decode_result($$value);
 
-			if ($$value[0]{kind} eq 'Escape')
+			if ($$value[0]{kind} eq 'Calendar')
 			{
 				$calendar = $$value[0]{type};
 				$value    = $$value[1];
@@ -424,8 +423,6 @@ sub parse
 			}
 
 			$$result[0] = $value if ($calendar eq $$value{type});
-
-			print STDERR "Unambiguous result ($calendar): ", Dumper($result);
 		}
 		else
 		{
@@ -439,7 +436,9 @@ sub parse
 
 				for $item (@$value)
 				{
-					if (defined($$item{kind}) && ($$item{kind} eq 'Escape') )
+					$self -> log(debug => "Process: \n" . Dumper($item) );
+
+					if (defined($$item{kind}) && ($$item{kind} eq 'Calendar') )
 					{
 						$calendar = $$item{type};
 
@@ -448,14 +447,10 @@ sub parse
 
 					if ($calendar eq $$item{type})
 					{
-						print STDERR "Push result ($calendar): ", Dumper($item);
-
 						push @$result, $item;
 					}
 				}
 			}
-
-			print STDERR "Ambiguous result ($calendar): ", Dumper($result);
 		}
 	}
 	catch
