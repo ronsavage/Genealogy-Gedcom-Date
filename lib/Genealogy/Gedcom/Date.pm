@@ -397,6 +397,7 @@ sub parse
 	my($calendar)    = defined($args{calendar}) ? $args{calendar} : $self -> calendar;
 	my($date)        = defined($args{date}) ? $args{date} : $self -> date;
 	$date            =~ tr/,/ /s;
+	my($result)      = [];
 
 	$self -> calendar($calendar);
 	$self -> date($date);
@@ -410,8 +411,6 @@ sub parse
 			semantics_package => 'Genealogy::Gedcom::Date::Actions',
 		})
 	);
-
-	my($result) = [];
 
 	try
 	{
@@ -850,15 +849,17 @@ exactly whatever was in the input.
 If the input contains a date phrase, then the C<phrase> key will be present. The case of $string
 will be exactly whatever was in the input.
 
-parse(date => 'Int 1950 (Approx)') returns:
+parse(date => 'Int 10 Nov 1200 (Approx)') returns:
 
 	[
 	  {
+	    day => 10,
 	    flag => "INT",
 	    kind => "Date",
+	    month => "Nov",
 	    phrase => "(Approx)",
 	    type => "Gregorian",
-	    year => 1950
+	    year => 1200
 	  }
 	]
 
