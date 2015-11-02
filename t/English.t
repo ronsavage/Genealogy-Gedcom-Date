@@ -8,32 +8,6 @@ use Genealogy::Gedcom::Date;
 use Test::Stream -V1;
 
 # ------------------------------------------------
-# We have to find the words in %prefix, and put the calendar escape after each of them.
-
-sub fix_date
-{
-	my($escape, $field) = @_;
-	my(%prefix) =
-	(
-		AND  => 1,
-		BET  => 1,
-		FROM => 1,
-		TO   => 1,
-	);
-
-	my(@result);
-
-	for my $i (0 .. $#$field)
-	{
-		push @result, $$field[$i];
-		push @result, $escape if (exists $prefix{$$field[$i]});
-	}
-
-	return join(' ', @result);
-
-} # End of fix_date.
-
-# ------------------------------------------------
 
 my(@candidates) =
 (
@@ -843,11 +817,9 @@ my($result);
 
 for my $item (@candidates)
 {
-	$date    = $$item{date};
-	$message = "English: $date";
-	$result  = $parser -> parse(date => $date);
+	$result = $parser -> parse(date => $$item{date});
 
-	is($result, $$item{result}, $message);
+	is($result, $$item{result}, "English: $$item{date}");
 }
 
 done_testing;

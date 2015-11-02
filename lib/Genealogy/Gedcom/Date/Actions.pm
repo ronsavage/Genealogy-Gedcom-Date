@@ -383,14 +383,14 @@ See L<Genealogy::Gedcom::Date/Synopsis>.
 
 =head1 Description
 
-Basically just utility routines for L<Genealogy::Gedcom::Date>. Only used indirectly by L<Marpa::R2>.
+Basically just utility routines for L<Genealogy::Gedcom::Date>. Only used indirectly by
+L<Marpa::R2>.
 
-Specifially, calls to functions are triggered by items in the input stream matching elements of the current
-grammar (and Marpa does the calling).
+Specifially, calls to functions are triggered by items in the input stream matching elements of
+the current grammar (and Marpa does the calling).
 
-Each action function returns a hashref, which Marpa gathers. The calling code
-L<Genealogy::Gedcom::Date> decodes the result and puts the hashrefs into a stack, described in
-the L<Genealogy::Gedcom::Dater/FAQ>.
+Each action function returns a arrayref or hashref, which Marpa gathers. The calling code in
+L<Genealogy::Gedcom::Date> decodes the result so that its C<parse()> method can return an arrayref.
 
 =head1 Installation
 
@@ -398,7 +398,8 @@ See L<Genealogy::Gedcom::Date/Installation>.
 
 =head1 Constructor and Initialization
 
-This class has no constructor. L<Marpa::R2> fabricates an instance, but won't let us get access to it.
+This class has no constructor. L<Marpa::R2> fabricates an instance, but won't let us get access to
+it.
 
 So, we use a global variable, C<$logger>, initialized in L<Genealogy::Gedcom::Date>,
 in case we need logging. Details:
@@ -408,14 +409,14 @@ in case we need logging. Details:
 =item o logger => aLog::HandlerObject
 
 By default, an object of type L<Log::Handler> is created which prints to STDOUT,
-but given the default, nothing is actually printed unless the C<maxlevel> attribute of this object is changed
-in L<Genealogy::Gedcom::Date>.
+but given the default, nothing is actually printed unless the C<maxlevel> attribute of this object
+is changed in L<Genealogy::Gedcom::Date>.
 
 Default: anObjectOfTypeLogHandler.
 
-=back
+Usage (in this module): $logger -> log(info => $string).
 
-Also, each new parse is preceeded by a call to the L</init()> function, to reset some counters global to this file.
+=back
 
 =head1 Methods
 
@@ -423,33 +424,11 @@ None.
 
 =head1 Functions
 
-=head2 boolean($t1)
+Many.
 
-Returns a hashref identifying the boolean $t1.
+=head1 Globals
 
-=head2 command($t1, @t2)
-
-Returns a hashref identifying the command $t1 and its parameters in @t2.
-
-=head2 float($t1)
-
-Returns a hashref identifying the float $t1.
-
-=head2 init()
-
-Resets some counters global to the file. This must be called at the start of each new parse.
-
-=head2 integer($t1)
-
-Returns a hashref identifying the integer $t1.
-
-=head2 log($level, $s)
-
-Calls $logger -> log($level => $s) if ($logger).
-
-=head2 string($t1)
-
-Returns a hashref identifying the string $t1.
+Yes, some C<our> variables are used to communicate the C<Genealogy::Gedcom::Date>.
 
 =head1 FAQ
 

@@ -595,11 +595,57 @@ A script:
 
 See scripts/synopsis.pl.
 
-A one-liner
+One-liners:
 
 	perl -Ilib scripts/parse.pl -max debug -d 'Between Gregorian 1701/02 And Julian 1703'
 
+Output:
+
+	[
+	  {
+	    flag => "BET",
+	    kind => "Date",
+	    suffix => "02",
+	    type => "Gregorian",
+	    year => 1701
+	  },
+	  {
+	    flag => "AND",
+	    kind => "Date",
+	    type => "Julian",
+	    year => 1703
+	  }
+	]
+
+	perl -Ilib scripts/parse.pl -max debug -d 'Int 10 Nov 1200 (Approx)'
+
+Output:
+
+	[
+	  {
+	    day => 10,
+	    flag => "INT",
+	    kind => "Date",
+	    month => "Nov",
+	    phrase => "(Approx)",
+	    type => "Gregorian",
+	    year => 1200
+	  }
+	]
+
+	perl -Ilib scripts/parse.pl -max debug -d '(Unknown)'
+
+	[
+	  {
+	    kind => "Phrase",
+	    phrase => "(Unknown)",
+	    type => "Phrase"
+	  }
+	]
+
 See the L</FAQ> for the explanation of the output arrayrefs.
+
+Lastly, you are I<strongly> encouraged to peruse t/English.t.
 
 =head1 Description
 
@@ -640,17 +686,15 @@ C<new()> is called as C<< my($parser) = Genealogy::Gedcom::Date -> new(k1 => v1,
 It returns a new object of type C<Genealogy::Gedcom::Date>.
 
 Key-value pairs accepted in the parameter list (see corresponding methods for details
-[e.g. date()]):
+[e.g. L</date([$date])>]):
 
 =over 4
 
 =item o calendar => $name
 
-The name of the calendar to use as the default.
+The name (case-insensitive) of the calendar to use as the default.
 
-See L</calendar([$name])> for details.
-
-Default: 'Gregorian' aka '@#dgregorian@'.
+Default: 'Gregorian' aka '@#dgregorian@'. Either format is acceptable.
 
 =item o date => $date
 
@@ -658,13 +702,39 @@ The string to be parsed.
 
 Each ',' is replaced by a space. See the L</FAQ> for details.
 
-See also L</date([$date])>.
-
 Default: ''.
+
+=item o logger => $aLoggerObject
+
+Specify a logger compatible with L<Log::Handler>, for the lexer and parser to use.
+
+Default: A logger of type L<Log::Handler> which writes to the screen.
+
+To disable logging, just set 'logger' to the empty string (not undef).
+
+=item o maxlevel => $logOption1
+
+This option affects L<Log::Handler>.
+
+See the L<Log::Handler::Levels> docs.
+
+By default nothing is printed.
+
+Default: 'notice'.
+
+=item o minlevel => $logOption2
+
+This option affects L<Log::Handler>.
+
+See the L<Log::Handler::Levels> docs.
+
+Default: 'error'.
+
+No lower levels are used.
 
 =back
 
-Note: These parameters can also be provided in the call to L</parse([%args])>.
+Note: The parameters C<calendar> and C<date> can also be passed to L</parse([%args])>.
 
 =head1 Methods
 
@@ -677,10 +747,13 @@ Gets or sets the name of the default calendar. $name is case-insensitive.
 Calendar names of the form '@#d$name@' are converted internally into $name. This means you can
 always just use $name, as in parse(date => 'Julian 1950').
 
-The name in C<< parse(calendar => $name) >> takes precedence over C<< new(calendar => $name) >>
+That is: This module allows you to specify the calendar name without the Gedcom-mandated prefix and
+suffix. Obviously, such a format will more likely not be acceptable to other software.
+
+$name in C<< parse(calendar => $name) >> takes precedence over both C<< new(calendar => $name) >>
 and C<calendar($name)>.
 
-This means if you call C<parse()> as C<< parse(calendar => $name) >>, then the value C<$name> is
+Also: If you call C<parse()> as C<< parse(calendar => $name) >>, then the value C<$name> is
 stored so that if you subsequently call C<calendar()>, that value is returned.
 
 See L</What extensions to the Gedcom grammar are supported?> for details.
@@ -693,9 +766,9 @@ Note: C<calendar> is a parameter to new().
 
 Here, [ and ] indicate an optional parameter.
 
-Gets or sets the date to be parsed, or the date which was just parsed.
+Gets or sets the date to be parsed.
 
-The date in C<< parse(date => $date) >> takes precedence over C<< new(date => $date) >>
+The date in C<< parse(date => $date) >> takes precedence over both C<< new(date => $date) >>
 and C<date($date)>.
 
 This means if you call C<parse()> as C<< parse(date => $date) >>, then the value C<$date> is stored
@@ -712,6 +785,50 @@ Returns '' (the empty string) if there have been no errors.
 If L<Marpa::R2> throws an exception, it is caught by a try/catch block, and the C<Marpa> error
 is returned by this method.
 
+=head2 log($level, $s)
+
+If a logger is defined, this logs the message $s at level $level.
+
+=head2 logger([$logger_object])
+
+Here, the [] indicate an optional parameter.
+
+Get or set the logger object.
+
+To disable logging, just set 'logger' to the empty string (not undef), in the call to L</new()>.
+
+This logger is passed to other modules.
+
+'logger' is a parameter to L</new()>. See L</Constructor and Initialization> for details.
+
+=head2 maxlevel([$string])
+
+Here, the [] indicate an optional parameter.
+
+Get or set the value used by the logger object.
+
+This option is only used if an object of type L<Log::Handler> is ceated.
+See L<Log::Handler::Levels>.
+
+Typical values are: 'notice', 'info', 'debug'. The default, 'notice', produces no output.
+
+The code emits a message with log level 'error' if Marpa throws an exception, and it displays
+the result of the parse at level 'debug' if maxlevel is set that high. The latter display uses
+L<Data::Dumper::Concise>'s function Dumper().
+
+'maxlevel' is a parameter to L</new()>. See L</Constructor and Initialization> for details.
+
+=head2 minlevel([$string])
+
+Here, the [] indicate an optional parameter.
+
+Get or set the value used by the logger object.
+
+This option is only used if an object of type L<Log::Handler> is created.
+See L<Log::Handler::Levels>.
+
+'minlevel' is a parameter to L</new()>. See L</Constructor and Initialization> for details.
+
 =head2 new([%args])
 
 The constructor. See L</Constructor and Initialization>.
@@ -725,6 +842,10 @@ C<parse()> returns an arrayref. See the L</FAQ> for details.
 If the arrayref is empty, call L</error()> to retrieve the error message.
 
 C<parse()> takes the same parameters as C<new()>.
+
+Warning: The array can contain 1 element when 2 are expected. This can happen if your input contains
+'From ... To ...' or 'Between ... And ...', and one of the dates is invalid. That is, the return
+value from C<parse()> will contain the valid date but no indicator of the invalid one.
 
 =head1 FAQ
 
@@ -880,6 +1001,8 @@ See also the C<kind> and C<type> keys.
 If the year contains a suffix (/00), then the C<suffix> key will be present. The '/' is
 discarded.
 
+Obviously, this key can only appear when the year is of the Gregorian form 1700/00.
+
 See also the C<year> key below.
 
 =item o type => $string
@@ -915,13 +1038,13 @@ Possible values (case-insensitive):
 
 =item o calendar => 'French'
 
-Expects dates in 'month day year' format, as in From Jan 2 2011 BC to Mar 4 2011.
+Expects dates in 'day month year' format, as in the Gedcom spec.
 
 =item o calendar => 'German'
 
 =item o calendar => 'Gregorian'
 
-Expects dates in 'day month year' format, as in From 1 Jan 2001 to 25 Dec 2002.
+Expects dates in 'day month year' format, as in 'From 1 Jan 2001 to 31 Dec 2002'.
 
 Expects years in either the 1950 format or the 1950/00 format.
 
@@ -929,13 +1052,13 @@ This is the default.
 
 =item o calendar => 'Hebrew'
 
-Expects dates in 'year month day' format, as in 2011-01-02 to 2011-03-04.
+Expects dates in 'day month year' format, as in the Gedcom spec.
 
 =item o calendar => 'Julian'
 
-Expects dates in 'year month day' format, as in 2011-01-02 to 2011-03-04.
+Expects dates in 'day month year' format, as in 'From 1 Jan 2001 to 25 Dec 2002'.
 
-Expects years in the 1950 format.
+Expects years in the 1950 format but never the (Gregorian) 1950/00 format.
 
 =back
 
@@ -957,12 +1080,40 @@ One of (case-insensitive):
 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun' | 'jul' | 'aug' | 'sep' | 'sept'
 | 'okt' | 'nov' | 'dez'.
 
+=head2 Hebrew month names
+
+One of (case-insensitive):
+
+'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr' | 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' |
+'aav' | 'ell'
 
 =head2 Your module rejected my date!
 
-There are many possible reasons for this. One is:
+There are many possible reasons for this:
 
 =over 4
+
+=item o You mistyped the calendar escape
+
+Check: Are any of these valid?
+
+=over 4
+
+=item o @#djulian
+
+=item o @#julian@
+
+=item o @#juliand
+
+=item o @#djuliand
+
+=item o @#dJulian@
+
+=item o @#dJULIAN@
+
+=back
+
+Yes, the last 2 are valid.
 
 =item o The date is in American format (month day year)
 
