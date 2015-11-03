@@ -3,6 +3,8 @@ package Genealogy::Gedcom::Date::Actions;
 use strict;
 use warnings;
 
+use Data::Dumper::Concise; # For Dumper().
+
 our $calendar;
 
 our $logger;
@@ -101,6 +103,8 @@ sub calendar_name
 	$t1 =~ s/\@\#d(.+)\@/$1/; # Zap gobbledegook if present.
 	$t1 = ucfirst lc $t1;
 
+	#$logger -> log(debug => "calendar_name t1: \n" . Dumper($t1) );
+
 	return
 	{
 		kind => 'Calendar',
@@ -130,6 +134,8 @@ sub day
 {
 	my($cache, $t1) = @_;
 
+	#$logger -> log(debug => "day t1: \n" . Dumper($t1) );
+
 	return $t1;
 
 } # End of day.
@@ -146,6 +152,62 @@ sub estimated_date
 	return [$$t2[0], $t3];
 
 } # End of estimated_date.
+
+# ------------------------------------------------
+
+sub french_date
+{
+	my($cache, $t1) = @_;
+
+	$logger -> log(debug => "french_date t1: \n" . Dumper($t1) );
+
+	# Is it a BCE date? If so, it's already a hashref.
+
+	if (ref($$t1[0]) eq 'HASH')
+	{
+		$$t1[0]{bce} = 'BCE';
+
+		return $$t1[0];
+	}
+
+	my($day);
+	my($month);
+	my($year);
+
+	# Check for year, month, day.
+
+	if ($#$t1 == 0)
+	{
+		$year = $$t1[0];
+	}
+	elsif ($#$t1 == 1)
+	{
+		$month = $$t1[0];
+		$year  = $$t1[1];
+	}
+	else
+	{
+		$day   = $$t1[0];
+		$month = $$t1[1];
+		$year  = $$t1[2];
+	}
+
+	my($result) =
+	{
+		kind  => 'Date',
+		type  => 'French r',
+		year  => $year,
+	};
+
+	$$result{month} = $month if (defined $month);
+	$$result{day}   = $day if (defined $day);
+	$result         = [$result];
+
+	$logger -> log(debug => "french_date result: \n" . Dumper($result) );
+
+	return $result;
+
+} # End of french_date.
 
 # ------------------------------------------------
 
@@ -173,6 +235,8 @@ sub from_date
 sub gregorian_date
 {
 	my($cache, $t1) = @_;
+
+	#$logger -> log(debug => "gregorian_date t1: \n" . Dumper($t1) );
 
 	# Is it a BCE date? If so, it's already a hashref.
 
@@ -273,6 +337,8 @@ sub julian_date
 {
 	my($cache, $t1) = @_;
 
+	#$logger -> log(debug => "julian_date t1: \n" . Dumper($t1) );
+
 	# Is it a BCE date? If so, it's already a hashref.
 
 	if (ref($$t1[0]) eq 'HASH')
@@ -362,6 +428,9 @@ sub year
 {
 	my($cache, $t1, $t2) = @_;
 	$t1 = "$t1/$t2" if (defined $t2);
+
+	#$logger -> log(debug => "year t1: \n" . Dumper($t1) );
+	#$logger -> log(debug => "year t2: \n" . Dumper($t2) );
 
 	return $t1;
 

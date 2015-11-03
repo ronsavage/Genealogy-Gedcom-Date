@@ -158,7 +158,7 @@ calendar_escape			::= calendar_name 					action => calendar_name
 
 calendar_date			::= gregorian_date				action => gregorian_date
 							| julian_date				action => julian_date
-#							| french_date
+							| french_date				action => french_date
 #							| german_date
 #							| hebrew_date
 
@@ -185,13 +185,11 @@ julian_year_bce			::= year bce					action => julian_year_bce
 
 year					::= number						action => year
 
-#french_date				::= year_bce
-#							| year
-#							| french_month_name year
-#							| day french_month_name year
-#
-#year_bce				::= year bce
-#
+french_date				::= day french_month_name year
+							| year bce
+							| year
+							| french_month_name year
+
 #german_date				::= german_year
 #							| german_month_name dot german_year
 #							| day dot german_month_name dot german_year
@@ -276,8 +274,9 @@ digit					~ [0-9]
 estimated				~ 'est':i
 							| 'estimated':i
 
-#french_month_name		~ 'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent'
-#							| 'germ' | 'flor' | 'prai' | 'mess' | 'ther' | 'fruc' | 'comp'
+french_month_name		~ 'vend':i | 'brum':i | 'frim':i | 'nivo':i | 'pluv':i | 'vent':i
+							| 'germ':i | 'flor':i | 'prai':i | 'mess':i | 'ther':i
+							| 'fruc':i | 'comp':i
 
 from					~ 'from':i
 
