@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use Data::Dumper::Concise; # For Dumper().
+
 use Genealogy::Gedcom::Date;
 
 use Test::Stream -V1;
@@ -52,8 +54,8 @@ my(@candidates) =
 		result => [{day => 21, flag => 'ABT', kind => 'Date', month => 'Vend', type => 'French r', year => '1950'}],
 	},
 	{
-		date   => 'Abt French r 1950 bc',
-		result => [{bce => 'BCE', flag => 'ABT', kind => 'Date', type => 'French r', year => '1950'}],
+		date   => 'Abt French r 1950 BC',
+		result => [{bce => 'BC', flag => 'ABT', kind => 'Date', type => 'French r', year => '1950'}],
 	},
 	{
 		date   => 'Aft French r 1950',
@@ -77,7 +79,7 @@ my(@candidates) =
 	},
 	{
 		date   => 'Aft French r 1950 bc',
-		result => [{bce => 'BCE', flag => 'AFT', kind => 'Date', type => 'French r', year => '1950'}],
+		result => [{bce => 'bc', flag => 'AFT', kind => 'Date', type => 'French r', year => '1950'}],
 	},
 	{
 		date   => 'Bef French r 1950',
@@ -100,7 +102,7 @@ my(@candidates) =
 		result => [{day => 21, flag => 'BEF', kind => 'Date', month => 'Vend', type => 'French r', year => '1950'}],
 	},
 	{
-		date   => 'Bef French r 1950 bc',
+		date   => 'Bef French r 1950 BCE',
 		result => [{bce => 'BCE', flag => 'BEF', kind => 'Date', type => 'French r', year => '1950'}],
 	},
 	{
@@ -108,14 +110,14 @@ my(@candidates) =
 		result =>
 		[
 			{flag => 'BET', kind => 'Date', type => 'French r', year => '1950'},
-			{flag => 'AND', kind => 'Date', type => 'French r', year => '1956'},
+			{flag => 'AND', kind => 'Date', type => 'Gregorian', year => '1956'},
 		],
 	},
 	{
 		date   => 'Bet 1950 and French r 1956',
 		result =>
 		[
-			{flag => 'BET', kind => 'Date', type => 'French r', year => '1950'},
+			{flag => 'BET', kind => 'Date', type => 'Gregorian', year => '1950'},
 			{flag => 'AND', kind => 'Date', type => 'French r', year => '1956'},
 		],
 	},
@@ -147,7 +149,7 @@ my(@candidates) =
 		date   => 'Bet 1501/01 and French r 1510',
 		result =>
 		[
-			{flag => 'BET', kind => 'Date', suffix => '01', type => 'French r', year => '1501'},
+			{flag => 'BET', kind => 'Date', suffix => '01', type => 'Gregorian', year => '1501'},
 			{flag => 'AND', kind => 'Date', type => 'French r', year => '1510'},
 		],
 	},
@@ -156,7 +158,7 @@ my(@candidates) =
 		result =>
 		[
 			{flag => 'BET', kind => 'Date', type => 'French r', year => '1501'},
-			{flag => 'AND', kind => 'Date', suffix => '02', type => 'French r', year => '1510'},
+			{flag => 'AND', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1510'},
 		],
 	},
 	{
@@ -180,8 +182,8 @@ my(@candidates) =
 		result => [{day => 21, flag => 'CAL', kind => 'Date', month => 'Vend', type => 'French r', year => '1950'}],
 	},
 	{
-		date   => 'Cal French r 1950 bc',
-		result => [{bce => 'BCE', flag => 'CAL', kind => 'Date', type => 'French r', year => '1950'}],
+		date   => 'Cal French r 1950 bce',
+		result => [{bce => 'bce', flag => 'CAL', kind => 'Date', type => 'French r', year => '1950'}],
 	},
 	{
 		date   => 'Est French r 1950',
@@ -205,7 +207,7 @@ my(@candidates) =
 	},
 	{
 		date   => 'Est French r 1950 bc',
-		result => [{bce => 'BCE', flag => 'EST', kind => 'Date', type => 'French r', year => '1950'}],
+		result => [{bce => 'bc', flag => 'EST', kind => 'Date', type => 'French r', year => '1950'}],
 	},
 	{
 		date   => 'Est French r 1950',
@@ -229,7 +231,7 @@ my(@candidates) =
 	},
 	{
 		date   => 'Est French r 1950 bc',
-		result => [{bce => 'BCE', flag => 'EST', kind => 'Date', type => 'French r', year => '1950'}],
+		result => [{bce => 'bc', flag => 'EST', kind => 'Date', type => 'French r', year => '1950'}],
 	},
 	{
 		date   => 'From French r 1950',
@@ -253,7 +255,7 @@ my(@candidates) =
 	},
 	{
 		date   => 'From French r 1950 bc',
-		result => [{bce => 'BCE', flag => 'FROM', kind => 'Date', type => 'French r', year => '1950'}],
+		result => [{bce => 'bc', flag => 'FROM', kind => 'Date', type => 'French r', year => '1950'}],
 	},
 	{
 		date   => 'To French r 1950',
@@ -277,13 +279,13 @@ my(@candidates) =
 	},
 	{
 		date   => 'To French r 1950 bc',
-		result => [{bce => 'BCE', flag => 'TO', kind => 'Date', type => 'French r', year => '1950'}],
+		result => [{bce => 'bc', flag => 'TO', kind => 'Date', type => 'French r', year => '1950'}],
 	},
 	{
 		date   => 'From 1901/02 to French r 1903',
 		result =>
 		[
-			{flag => 'FROM', kind => 'Date', suffix => '02', type => 'French r', year => '1901'},
+			{flag => 'FROM', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1901'},
 			{flag => 'TO', kind => 'Date', type => 'French r', year => '1903'},
 		],
 	},
@@ -296,11 +298,11 @@ my(@candidates) =
 		],
 	},
 	{
-		date   => 'From French r 1901 to 1903/04',
+		date   => 'From French r 1901 to Gregorian 1903/04',
 		result =>
 		[
 			{flag => 'FROM', kind => 'Date', type => 'French r', year => '1901'},
-			{flag => 'TO', kind => 'Date', suffix => '04', type => 'French r', year => '1903'},
+			{flag => 'TO', kind => 'Date', suffix => '04', type => 'Gregorian', year => '1903'},
 		],
 	},
 	{
@@ -320,8 +322,6 @@ my(@candidates) =
 my($count)  = 0;
 my($parser) = Genealogy::Gedcom::Date -> new;
 
-$parser -> calendar('French r');
-
 my($date);
 my($message);
 my($result);
@@ -331,6 +331,8 @@ for my $item (@candidates)
 	$count++;
 
 	$result = $parser -> parse(date => $$item{date});
+
+	print STDERR "Result: \n", Dumper($result);
 
 	is($result, $$item{result}, "$count. French: $$item{date}");
 }

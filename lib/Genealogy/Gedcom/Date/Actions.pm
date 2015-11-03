@@ -134,8 +134,6 @@ sub day
 {
 	my($cache, $t1) = @_;
 
-	#$logger -> log(debug => "day t1: \n" . Dumper($t1) );
-
 	return $t1;
 
 } # End of day.
@@ -159,17 +157,9 @@ sub french_date
 {
 	my($cache, $t1) = @_;
 
-	$logger -> log(debug => "french_date t1: \n" . Dumper($t1) );
+	#$logger -> log(debug => "french_date t1: \n" . Dumper($t1) );
 
-	# Is it a BCE date? If so, it's already a hashref.
-
-	if (ref($$t1[0]) eq 'HASH')
-	{
-		$$t1[0]{bce} = 'BCE';
-
-		return $$t1[0];
-	}
-
+	my($bce);
 	my($day);
 	my($month);
 	my($year);
@@ -182,8 +172,18 @@ sub french_date
 	}
 	elsif ($#$t1 == 1)
 	{
-		$month = $$t1[0];
-		$year  = $$t1[1];
+		# First check for BCE.
+
+		if ($$t1[1] =~ /[0-9]/)
+		{
+			$month = $$t1[0];
+			$year  = $$t1[1];
+		}
+		else
+		{
+			$bce  = $$t1[1];
+			$year = $$t1[0];
+		}
 	}
 	else
 	{
@@ -199,11 +199,10 @@ sub french_date
 		year  => $year,
 	};
 
-	$$result{month} = $month if (defined $month);
+	$$result{bce}   = $bce if (defined $bce);
 	$$result{day}   = $day if (defined $day);
+	$$result{month} = $month if (defined $month);
 	$result         = [$result];
-
-	$logger -> log(debug => "french_date result: \n" . Dumper($result) );
 
 	return $result;
 
@@ -214,6 +213,10 @@ sub french_date
 sub from_date
 {
 	my($cache, $t1, $t2) = @_;
+
+	$logger -> log(debug => "from_date t1: \n" . Dumper($t1) );
+	$logger -> log(debug => "from_date t2: \n" . Dumper($t2) );
+
 	my($t3)    = $$t2[0];
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
@@ -225,6 +228,8 @@ sub from_date
 	{
 		$t2 = [$t3, $t2];
 	}
+
+	$logger -> log(debug => "from_date result: \n" . Dumper($t2) );
 
 	return $t2;
 
@@ -406,6 +411,10 @@ sub julian_year_bce
 sub to_date
 {
 	my($cache, $t1, $t2) = @_;
+
+	$logger -> log(debug => "to_date t1: \n" . Dumper($t1) );
+	$logger -> log(debug => "to_date t2: \n" . Dumper($t2) );
+
 	my($t3)    = $$t2[0];
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
@@ -418,6 +427,8 @@ sub to_date
 		$t2 = [$t3, $t2];
 	}
 
+	$logger -> log(debug => "to_date result: \n" . Dumper($t2) );
+
 	return $t2;
 
 } # End of to_date.
@@ -428,9 +439,6 @@ sub year
 {
 	my($cache, $t1, $t2) = @_;
 	$t1 = "$t1/$t2" if (defined $t2);
-
-	#$logger -> log(debug => "year t1: \n" . Dumper($t1) );
-	#$logger -> log(debug => "year t2: \n" . Dumper($t2) );
 
 	return $t1;
 
