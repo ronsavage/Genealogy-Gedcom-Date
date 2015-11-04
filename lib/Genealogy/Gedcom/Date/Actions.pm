@@ -55,6 +55,12 @@ sub before_date
 sub between_date
 {
 	my($cache, $t1, $t2, $t3, $t4) = @_;
+
+	#$logger -> log(debug => "between_date t1: \n" . Dumper($t1) );
+	#$logger -> log(debug => "between_date t2: \n" . Dumper($t2) );
+	#$logger -> log(debug => "between_date t3: \n" . Dumper($t3) );
+	#$logger -> log(debug => "between_date t4: \n" . Dumper($t4) );
+
 	my($t_2)    = $$t2[1][0];
 	$$t_2{flag} = 'BET';
 	my($t_4)    = $$t4[1][0];
@@ -78,7 +84,11 @@ sub between_date
 		$t3 = {kind => 'Calendar', type => $calendar};
 	}
 
-	return [$t1, $t_2, $t3, $t_4];
+	$t1 = [$t1, $t_2, $t3, $t_4];
+
+	#$logger -> log(debug => "between_date result: \n" . Dumper($t1) );
+
+	return $t1;
 
 } # End of between_date.
 
@@ -204,6 +214,8 @@ sub french_date
 	$$result{month} = $month if (defined $month);
 	$result         = [$result];
 
+	#$logger -> log(debug => "french_date result: \n" . Dumper($result) );
+
 	return $result;
 
 } # End of french_date.
@@ -214,8 +226,8 @@ sub from_date
 {
 	my($cache, $t1, $t2) = @_;
 
-	$logger -> log(debug => "from_date t1: \n" . Dumper($t1) );
-	$logger -> log(debug => "from_date t2: \n" . Dumper($t2) );
+	#$logger -> log(debug => "from_date t1: \n" . Dumper($t1) );
+	#$logger -> log(debug => "from_date t2: \n" . Dumper($t2) );
 
 	my($t3)    = $$t2[0];
 	$t2        = $$t2[1];
@@ -229,7 +241,7 @@ sub from_date
 		$t2 = [$t3, $t2];
 	}
 
-	$logger -> log(debug => "from_date result: \n" . Dumper($t2) );
+	#$logger -> log(debug => "from_date result: \n" . Dumper($t2) );
 
 	return $t2;
 
@@ -412,8 +424,8 @@ sub to_date
 {
 	my($cache, $t1, $t2) = @_;
 
-	$logger -> log(debug => "to_date t1: \n" . Dumper($t1) );
-	$logger -> log(debug => "to_date t2: \n" . Dumper($t2) );
+	#$logger -> log(debug => "to_date t1: \n" . Dumper($t1) );
+	#$logger -> log(debug => "to_date t2: \n" . Dumper($t2) );
 
 	my($t3)    = $$t2[0];
 	$t2        = $$t2[1];
@@ -427,7 +439,7 @@ sub to_date
 		$t2 = [$t3, $t2];
 	}
 
-	$logger -> log(debug => "to_date result: \n" . Dumper($t2) );
+	#$logger -> log(debug => "to_date result: \n" . Dumper($t2) );
 
 	return $t2;
 

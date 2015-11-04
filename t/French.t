@@ -270,10 +270,6 @@ my(@candidates) =
 		result => [{flag => 'TO', kind => 'Date', month => 'Vend', type => 'French r', year => '1950'}],
 	},
 	{
-		date   => 'To 21 Vend 1950',
-		result => [{day => 21, flag => 'TO', kind => 'Date', month => 'Vend', type => 'French r', year => '1950'}],
-	},
-	{
 		date   => 'To French r 21 Vend 1950',
 		result => [{day => 21, flag => 'TO', kind => 'Date', month => 'Vend', type => 'French r', year => '1950'}],
 	},
@@ -309,13 +305,41 @@ my(@candidates) =
 		date   => 'From 1950 to French r 1956',
 		result =>
 		[
-			{flag => 'FROM', kind => 'Date', type => 'French r', year => '1950'},
+			{flag => 'FROM', kind => 'Date', type => 'Gregorian', year => '1950'},
 			{flag => 'TO', kind => 'Date', type => 'French r', year => '1956'},
 		],
 	},
 	{
 		date   => 'Int French r 1950 (Approx)',
 		result => [{flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'French r', year => '1950'}],
+	},
+	{
+		date   => 'To 21 Vend 1950',
+		result => [{day => 21, flag => 'TO', kind => 'Date', month => 'Vend', type => 'French r', year => '1950'}],
+	},
+	{
+		date   => 'Bet French r 1501 and Julian 1510',
+		result =>
+		[
+			{flag => 'BET', kind => 'Date', type => 'French r', year => '1501'},
+			{flag => 'AND', kind => 'Date', type => 'Julian', year => '1510'},
+		],
+	},
+	{
+		date   => 'From French r 1501 to Julian 1510',
+		result =>
+		[
+			{flag => 'FROM', kind => 'Date', type => 'French r', year => '1501'},
+			{flag => 'TO', kind => 'Date', type => 'Julian', year => '1510'},
+		],
+	},
+	{
+		date   => 'From Julian 1950 to French r 1956',
+		result =>
+		[
+			{flag => 'FROM', kind => 'Date', type => 'Julian', year => '1950'},
+			{flag => 'TO', kind => 'Date', type => 'French r', year => '1956'},
+		],
 	},
 );
 
@@ -332,7 +356,7 @@ for my $item (@candidates)
 
 	$result = $parser -> parse(date => $$item{date});
 
-	print STDERR "Result: \n", Dumper($result);
+	#print STDERR "Result: \n", Dumper($result);
 
 	is($result, $$item{result}, "$count. French: $$item{date}");
 }

@@ -439,7 +439,7 @@ sub parse
 		$self -> error($_);
 	};
 
-	$self -> log(debug => Dumper($result) );
+	$self -> log(debug => "Return value from parse(): \n" . Dumper($result) );
 
 	return $result;
 
@@ -465,9 +465,6 @@ sub process_ambiguous
 	while (my $value = $self -> recce -> value)
 	{
 		$value = $self -> decode_result($$value);
-
-		print STDERR 'Date: ', $self -> date, ". \n";
-		print STDERR "Ambiguous: \n", Dumper($value);
 
 		for $item (@$value)
 		{
@@ -533,32 +530,29 @@ sub process_unambiguous
 	my($value)    = $self -> recce -> value;
 	$value        = $self -> decode_result($$value);
 
-	print STDERR 'Date: ', $self -> date, ". \n";
-	print STDERR "Unambiguous: \n", Dumper($value);
-
 	if ($#$value == 0)
 	{
-		print STDERR "0. \n";
+		$value = $$value[0];
 
-		$value      = $$value[0];
-		$$result[0] = $value if ($$value{type} =~ /^(?:$calendar|Phrase)$/);
+		if ($$value{type} =~ /^(?:$calendar|Phrase)$/)
+		{
+			$$result[0] = $value;
+		}
+		else
+		{
+			$result = [$value];
+		}
 	}
 	elsif ($#$value == 2)
 	{
-		print STDERR "2. \n";
-
 		$result = [$$value[0], $$value[1] ];
 	}
 	elsif ($#$value == 3)
 	{
-		print STDERR "3. \n";
-
 		$result = [$$value[1], $$value[3] ];
 	}
 	elsif ($$value[0]{kind} eq 'Calendar')
 	{
-		print STDERR "kind. \n";
-
 		$calendar = $$value[0]{type};
 
 		if ($calendar eq $$value[1]{type})
@@ -568,8 +562,6 @@ sub process_unambiguous
 	}
 	elsif ( ($$value[0]{type} eq $calendar) && ($$value[1]{type} eq $calendar) )
 	{
-		print STDERR "cal. \n";
-
 		$result = $value;
 	}
 
