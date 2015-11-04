@@ -78,8 +78,8 @@ my(@candidates) =
 		result => [{day => 21, flag => 'AFT', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Aft German 1950 vchr',
-		result => [{bce => 'vchr', flag => 'AFT', kind => 'Date', type => 'German', year => '1950'}],
+		date   => 'Aft German 1950 v.u.z.',
+		result => [{bce => 'v.u.z.', flag => 'AFT', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Bef German 1950',
@@ -206,8 +206,8 @@ my(@candidates) =
 		result => [{day => 21, flag => 'EST', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est German 1950 vc',
-		result => [{bce => 'vc', flag => 'EST', kind => 'Date', type => 'German', year => '1950'}],
+		date   => 'Est German 1950 vuz',
+		result => [{bce => 'vuz', flag => 'EST', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Est German 1950',
