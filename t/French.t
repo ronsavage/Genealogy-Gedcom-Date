@@ -356,8 +356,6 @@ for my $item (@candidates)
 
 	$result = $parser -> parse(date => $$item{date});
 
-	#print STDERR "Result: \n", Dumper($result);
-
 	is($result, $$item{result}, "$count. French: $$item{date}");
 }
 

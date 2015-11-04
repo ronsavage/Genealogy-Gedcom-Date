@@ -1,4 +1,4 @@
-package Genealogy::Gedcom::Date;
+﻿package Genealogy::Gedcom::Date;
 
 use strict;
 use warnings;
@@ -117,6 +117,7 @@ sub BUILD
 				maxlevel       => $self -> maxlevel,
 				message_layout => '%m',
 				minlevel       => $self -> minlevel,
+				utf8           => 1,
 			}
 		);
 	}
@@ -159,7 +160,7 @@ calendar_escape			::= calendar_name 					action => calendar_name
 calendar_date			::= gregorian_date				action => gregorian_date
 							| julian_date				action => julian_date
 							| french_date				action => french_date
-#							| german_date
+							| german_date				action => german_date
 #							| hebrew_date
 
 gregorian_date			::= day gregorian_month gregorian_year
@@ -190,14 +191,14 @@ french_date				::= day french_month_name year
 							| year
 							| french_month_name year
 
-#german_date				::= german_year
-#							| german_month_name dot german_year
-#							| day dot german_month_name dot german_year
-#							| german_month_name german_year
-#
-#german_year				::= year
-#							| year german_bce
-#
+german_date				::= german_year
+							| german_month_name dot german_year
+							| day dot german_month_name dot german_year
+							| german_month_name german_year
+
+german_year				::= year
+							| year german_bce
+
 #hebrew_date			::= year_bce
 #							| year
 #							| hebrew_month year
@@ -243,10 +244,6 @@ after					~ 'aft':i
 and						~ 'and':i
 
 bce						~ 'bc':i
-							| 'b.c':i
-							| 'b.c.':i
-							| 'bc.':i
-							| 'b c':i
 							| 'bce':i
 
 before					~ 'bef':i
@@ -269,7 +266,7 @@ date_text				~ [\w ]+
 
 digit					~ [0-9]
 
-#dot					~ '.'
+dot					~ '.'
 
 estimated				~ 'est':i
 							| 'estimated':i
@@ -280,21 +277,22 @@ french_month_name		~ 'vend':i | 'brum':i | 'frim':i | 'nivo':i | 'pluv':i | 'ven
 
 from					~ 'from':i
 
-#german_bce				~ 'vc'
-#							| 'v.c.'
-#							| 'v.chr.'
-#							| 'vchr'
-#							| 'vuz'
-#							| 'v.u.z.'
-#
-#german_month_name		~ 'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun'
-#							| 'jul' | 'aug' | 'sep' | 'sept' | 'okt' | 'nov' | 'dez'
+german_bce				~ 'vc':i
+							| 'v.c.':i
+							| 'v.chr.':i
+							| 'vchr':i
+							| 'vuz':i
+							| 'v.u.z.':i
+
+german_month_name		~ 'jan':i | 'feb':i | 'mär':i | 'maer':i | 'mrz':i | 'apr':i | 'mai':i
+							| 'jun':i | 'jul':i | 'aug':i | 'sep':i | 'sept':i | 'okt':i
+							| 'nov':i | 'dez':i
 
 gregorian_month_name		~ 'jan':i | 'feb':i | 'mar':i | 'apr':i | 'may':i | 'jun':i
 							| 'jul':i | 'aug':i | 'sep':i | 'oct':i | 'nov':i | 'dec':i
 
-#hebrew_month_name		~ 'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr'
-#							| 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' | 'aav' | 'ell'
+#hebrew_month_name		~ 'tsh':i | 'csh':i | 'ksl':i | 'tvt':i | 'shv':i | 'adr':i
+#							| 'ads':i | 'nsn':i | 'iyr':i | 'svn':i | 'tmz':i | 'aav':i | 'ell':i
 
 interpreted				~ 'int':i
 							| 'interpreted':i
@@ -890,14 +888,6 @@ If the input contains any one of the following (case-insensitive), the C<bce> ke
 =over 4
 
 =item o 'bc'
-
-=item o 'b.c'
-
-=item o 'b.c.'
-
-=item o 'bc.'
-
-=item o 'b c'
 
 =item o 'bce'
 

@@ -113,7 +113,7 @@ sub calendar_name
 	$t1 =~ s/\@\#d(.+)\@/$1/; # Zap gobbledegook if present.
 	$t1 = ucfirst lc $t1;
 
-	#$logger -> log(debug => "calendar_name t1: \n" . Dumper($t1) );
+	$logger -> log(debug => "calendar_name t1: \n" . Dumper($t1) );
 
 	return
 	{
@@ -246,6 +246,58 @@ sub from_date
 	return $t2;
 
 } # End of from_date.
+
+# ------------------------------------------------
+
+sub german_date
+{
+	my($cache, $t1) = @_;
+
+	$logger -> log(debug => "german_date t1: \n" . Dumper($t1) );
+
+	my($bce);
+	my($day);
+	my($month);
+	my($year);
+
+	# Check for year, month, day.
+
+	if ($#$t1 == 0)
+	{
+		$year = $$t1[0][0];
+		$bce  = $$t1[0][1];
+	}
+	elsif ($#$t1 == 2)
+	{
+		$month = $$t1[0];
+		$year  = $$t1[2][0];
+		$bce   = $$t1[2][1];
+	}
+	else
+	{
+		$day   = $$t1[0];
+		$month = $$t1[2];
+		$year  = $$t1[4][0];
+		$bce   = $$t1[4][1];
+	}
+
+	my($result) =
+	{
+		kind  => 'Date',
+		type  => 'German',
+		year  => $year,
+	};
+
+	$$result{bce}   = $bce if (defined $bce);
+	$$result{day}   = $day if (defined $day);
+	$$result{month} = $month if (defined $month);
+	$result         = [$result];
+
+	$logger -> log(debug => "german_date result: \n" . Dumper($result) );
+
+	return $result;
+
+} # End of german_date.
 
 # ------------------------------------------------
 
@@ -450,7 +502,13 @@ sub to_date
 sub year
 {
 	my($cache, $t1, $t2) = @_;
+
+	#$logger -> log(debug => "year t1: \n" . Dumper($t1) );
+	#$logger -> log(debug => "year t2: \n" . Dumper($t2) );
+
 	$t1 = "$t1/$t2" if (defined $t2);
+
+	#$logger -> log(debug => "year result: \n" . Dumper($t1) );
 
 	return $t1;
 
