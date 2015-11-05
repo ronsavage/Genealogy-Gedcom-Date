@@ -113,7 +113,7 @@ sub calendar_name
 	$t1 =~ s/\@\#d(.+)\@/$1/; # Zap gobbledegook if present.
 	$t1 = ucfirst lc $t1;
 
-	$logger -> log(debug => "calendar_name t1: \n" . Dumper($t1) );
+	#$logger -> log(debug => "calendar_name t1: \n" . Dumper($t1) );
 
 	return
 	{
@@ -253,7 +253,7 @@ sub german_date
 {
 	my($cache, $t1) = @_;
 
-	$logger -> log(debug => "german_date t1: \n" . Dumper($t1) );
+	#$logger -> log(debug => "german_date t1: \n" . Dumper($t1) );
 
 	my($bce);
 	my($day);
@@ -293,7 +293,7 @@ sub german_date
 	$$result{month} = $month if (defined $month);
 	$result         = [$result];
 
-	$logger -> log(debug => "german_date result: \n" . Dumper($result) );
+	#$logger -> log(debug => "german_date result: \n" . Dumper($result) );
 
 	return $result;
 

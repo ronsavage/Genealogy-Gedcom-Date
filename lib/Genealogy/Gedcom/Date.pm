@@ -35,6 +35,14 @@ has _calendar =>
 	required => 0,
 );
 
+has canonical =>
+(
+	default  => sub{return 0},
+	is       => 'rw',
+	isa      => Int,
+	required => 0,
+);
+
 has date =>
 (
 	default  => sub{return ''},
@@ -320,6 +328,80 @@ END_OF_GRAMMAR
 
 # ------------------------------------------------
 
+sub canonical_date
+{
+	my($self, $result) = @_;
+	my($date) = '';
+
+	my($separator);
+
+	if ($$result{type} =~ /(?:French|Gregorian|Hebrew|Julian)/)
+	{
+		$separator = ' ';
+	}
+	else # German.
+	{
+		$separator = '.';
+	}
+
+	if ($$result{type} =~ /(French|German|Hebrew|Julian)/)
+	{
+		$date = '@#d' . "\U$1" . '@';
+	}
+
+	$date .= defined($$result{day}) ? $date ? " $$result{day}" : $$result{day} : '';
+
+	if ($$result{month})
+	{
+		if (defined $$result{day})
+		{
+			$date .= $date ? "$separator$$result{month}" : $$result{month};
+		}
+		else
+		{
+			$date .= $date ? " $$result{month}" : $$result{month};
+		}
+
+		$date .= $date ? "$separator$$result{year}" : $$result{year};
+	}
+	else
+	{
+		$date .= $$result{year} if (defined $$result{year});
+	}
+
+	$date .= "/$$result{suffix}" if ($$result{suffix});
+	$date .= " $$result{bce}"    if ($$result{bce});
+
+	if ($$result{phrase})
+	{
+		$date .= $date ? " $$result{phrase}" : $$result{phrase};
+	}
+
+	return $date;
+
+} # End of canonical_date.
+
+# ------------------------------------------------
+
+sub canonical_form
+{
+	my($self, $result) = @_;
+	my(@date) = ('', '');
+
+	my($separator);
+
+	for my $i (0 .. $#$result)
+	{
+		$date[$i] = $self -> canonical_date($$result[$i]);
+		$date[$i] = $$result[$i]{flag} ? $date[$i] ? "$$result[$i]{flag} $date[$i]" : $$result[$i]{flag} : '';
+	}
+
+	return $#$result > 0 ? "$date[0] $date[1]" : $date[0];
+
+} # End of canonical_form.
+
+# ------------------------------------------------
+
 sub clean_calendar
 {
 	my($self)     = @_;
@@ -380,69 +462,6 @@ sub log
 
 } # End of log.
 
-# ------------------------------------------------
-
-sub normalize
-{
-	my($self, $result) = @_;
-	my(@date) = ('', '');
-
-	my($separator);
-
-	for my $i (0 .. $#$result)
-	{
-		if ($$result[$i]{type} =~ /(?:French|Gregorian|Hebrew|Julian)/)
-		{
-			$separator = ' ';
-		}
-		else # German.
-		{
-			$separator = '.';
-		}
-
-		$date[$i] .= $$result[$i]{flag} ? $date[$i] ? " $$result[$i]{flag}" : $$result[$i]{flag} : '';
-
-		if ($$result[$i]{type} =~ /(French|German|Hebrew|Julian)/)
-		{
-			$date[$i] .= $date[$i] ? " \@#d\U$1\@" : '';
-		}
-
-		$date[$i] .= defined($$result[$i]{day}) ? $date[$i] ? " $$result[$i]{day}" : $$result[$i]{day} : '';
-
-		if ($$result[$i]{month})
-		{
-			if (defined $$result[$i]{day})
-			{
-				$date[$i] .= $date[$i] ? "$separator$$result[$i]{month}" : $$result[$i]{month};
-			}
-			else
-			{
-				$date[$i] .= $date[$i] ? " $$result[$i]{month}" : $$result[$i]{month};
-			}
-		}
-
-		if ($$result[$i]{month})
-		{
-			$date[$i] .= $date[$i] ? "$separator$$result[$i]{year}" : $$result[$i]{year};
-		}
-		else
-		{
-			$date[$i] .= $$result[$i]{year} if (defined $$result[$i]{year});
-		}
-
-		$date[$i] .= "/$$result[$i]{suffix}" if ($$result[$i]{suffix});
-		$date[$i] .= $$result[$i]{bce} ? " $$result[$i]{bce}" : '';
-
-		if ($$result[$i]{phrase})
-		{
-			$date[$i] .= $date[$i] ? " $$result[$i]{phrase}" : $$result[$i]{phrase};
-		}
-	}
-
-	return $#$result > 0 ? "$date[0] $date[1]" : $date[0];
-
-} # End of normalize.
-
 # --------------------------------------------------
 
 sub parse
@@ -494,7 +513,23 @@ sub parse
 		$self -> error($_);
 	};
 
-	$self -> log(debug => "Return value from parse(): \n" . Dumper($result) );
+	for my $i (0 .. $#$result)
+	{
+		$$result[$i]{canonical} = $self -> canonical_date($$result[$i]);
+	}
+
+	if ($self -> canonical == 0)
+	{
+		$self -> log(debug => "Return value from parse(): \n" . Dumper($result) );
+	}
+	elsif ($self -> canonical == 1)
+	{
+		$self -> log(debug => $self -> canonical_form($result) );
+	}
+	else
+	{
+		$self -> log(debug => $self -> canonical_date($$result[$_]) ) for (0 .. $#$result);
+	}
 
 	return $result;
 
