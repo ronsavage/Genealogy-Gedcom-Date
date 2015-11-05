@@ -4,8 +4,6 @@ use strict;
 use warnings;
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
-use Data::Dumper::Concise;
-
 use Getopt::Long;
 
 use Genealogy::Gedcom::Date;
@@ -30,9 +28,9 @@ if ($option_parser -> getoptions
 {
 	pod2usage(1) if ($option{help});
 
-	# Return 0 for success and 1 for failure.
-
 	Genealogy::Gedcom::Date -> new(%option) -> parse;
+
+	# Return 0 for success and 1 for failure.
 
 	exit 0;
 }

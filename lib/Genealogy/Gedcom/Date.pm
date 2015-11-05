@@ -531,6 +531,8 @@ sub parse
 		$self -> log(debug => $self -> canonical_date($$result[$_]) ) for (0 .. $#$result);
 	}
 
+	$self -> error("Unable to parse '" . $self -> date . "'") if ($#$result < 0);
+
 	return $result;
 
 } # End of parse.
@@ -669,7 +671,7 @@ sub process_unambiguous
 
 =head1 NAME
 
-Genealogy::Gedcom::Date - Parse GEDCOM dates
+Genealogy::Gedcom::Date - Parse GEDCOM dates in Gregorian/Julian/French/German
 
 =head1 Synopsis
 
@@ -711,7 +713,7 @@ A script (scripts/synopsis.pl):
 
 One-liners:
 
-	perl -Ilib scripts/parse.pl -max debug -d 'Between Gregorian 1701/02 And Julian 1703'
+	perl scripts/parse.pl -max debug -d 'Between Gregorian 1701/02 And Julian 1703'
 
 Output:
 
@@ -734,7 +736,7 @@ Output:
 	  }
 	]
 
-	perl -Ilib scripts/parse.pl -max debug -d 'Int 10 Nov 1200 (Approx)'
+	perl scripts/parse.pl -max debug -d 'Int 10 Nov 1200 (Approx)'
 
 Output:
 
@@ -751,7 +753,7 @@ Output:
 	  }
 	]
 
-	perl -Ilib scripts/parse.pl -max debug -d '(Unknown)'
+	perl scripts/parse.pl -max debug -d '(Unknown)'
 
 Output:
 
@@ -767,11 +769,11 @@ Output:
 
 See the L</FAQ> for the explanation of the output arrayrefs.
 
-Lastly, you are I<strongly> encouraged to peruse t/English.t.
+Lastly, you are I<strongly> encouraged to peruse t/English.t, t/French.t and t/German.t.
 
 =head1 Description
 
-L<Genealogy::Gedcom::Date> provides a parser for GEDCOM dates.
+L<Genealogy::Gedcom::Date> provides a L<Marpa|Marpa::R2>-based parser for GEDCOM dates.
 
 See L<the GEDCOM Specification|http://wiki.webtrees.net/en/Main_Page>.
 
@@ -812,6 +814,29 @@ Key-value pairs accepted in the parameter list (see corresponding methods for de
 
 =over 4
 
+=item o canonical => $integer
+
+Note: Nothing is printed unless C<maxlevel> is set to C<debug>.
+
+=over 4
+
+=item o canonical => 0
+
+Data::Dumper::Concise's Dumper() prints the output of the parse.
+
+=item o canonical => 1
+
+canonical_form() is called on the output of parse() to print a string.
+
+=item o canonical => 2
+
+canonocal_date() is called on each element in the result from parse(), to print strings on
+separate lines.
+
+=back
+
+Default: 0.
+
 =item o date => $date
 
 The string to be parsed.
@@ -836,6 +861,8 @@ See the L<Log::Handler::Levels> docs.
 
 By default nothing is printed.
 
+Typical values are: 'notice', 'info' and 'debug'. The default, 'notice', produces no output.
+
 Default: 'notice'.
 
 =item o minlevel => $logOption2
@@ -850,9 +877,20 @@ No lower levels are used.
 
 =back
 
-Note: The parameters C<calendar> and C<date> can also be passed to L</parse([%args])>.
+Note: The parameters C<canonical> and C<date> can also be passed to L</parse([%args])>.
 
 =head1 Methods
+
+=head2 canonical([$integer])
+
+Here, the [] indicate an optionall parameter.
+
+Gets or sets the C<canonical> option, which controls what exactly L</parse([%args])> prints when
+L</maxlevel([$string])> is set to C<debug>.
+
+By default nothing is printed.
+
+See L</canonical_date($hashref)>, next, for sample code.
 
 =head2 canonical_date($hashref)
 
@@ -865,11 +903,11 @@ Returns a date string (or the empty string) normalized in various ways:
 
 =item o If Gregorian (in any form) was in the original string, it is discarded
 
-This done because it's the default.
+This is done because it's the default.
 
 =item o If any other calendar escape was in the original string, it is preserved
 
-And it's in call caps.
+And it's output in all caps.
 
 =item o If About, etc were in the orginal string, they are discarded
 
@@ -877,18 +915,18 @@ This means the C<flag> key in the hashref is ignored.
 
 =back
 
-Note: This method is called by L</parse([%args])> to populate the C<canonical> key in the arraref
+Note: This method is called by L</parse([%args])> to populate the C<canonical> key in the arrayref
 of hashrefs returned by C<parse()>.
 
 Try:
 
-	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Mär.2015'
+	perl scripts/parse.pl -max debug -d 'From 21 Jun 1950 to @#dGerman@ 05.Mär.2015'
 
-	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Mär.2015' -n 0
+	perl scripts/parse.pl -max debug -d 'From 21 Jun 1950 to @#dGerman@ 05.Mär.2015' -c 0
 
-	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Mär.2015' -n 1
+	perl scripts/parse.pl -max debug -d 'From 21 Jun 1950 to @#dGerman@ 05.Mär.2015' -c 1
 
-	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Mär.2015' -n 2
+	perl scripts/parse.pl -max debug -d 'From 21 Jun 1950 to @#dGerman@ 05.Mär.2015' -c 2
 
 =head2 canonical_form($arrayref)
 
@@ -924,6 +962,8 @@ Returns '' (the empty string) if there have been no errors.
 If L<Marpa::R2> throws an exception, it is caught by a try/catch block, and the C<Marpa> error
 is returned by this method.
 
+See L</parse([%args])> for more about C<error()>.
+
 =head2 log($level, $s)
 
 If a logger is defined, this logs the message $s at level $level.
@@ -949,7 +989,7 @@ Get or set the value used by the logger object.
 This option is only used if an object of type L<Log::Handler> is ceated.
 See L<Log::Handler::Levels>.
 
-Typical values are: 'notice', 'info', 'debug'. The default, 'notice', produces no output.
+Typical values are: 'notice', 'info' and 'debug'. The default, 'notice', produces no output.
 
 The code emits a message with log level 'error' if Marpa throws an exception, and it displays
 the result of the parse at level 'debug' if maxlevel is set that high. The latter display uses
@@ -1009,15 +1049,8 @@ Keys:
 
 =item o bce
 
-If the input contains any one of the following (case-insensitive), the C<bce> key will be present:
-
-=over 4
-
-=item o 'bc'
-
-=item o 'bce'
-
-=back
+If the input contains any (case-insensitive) BCE indicator, under any calendar escape, the C<bce>
+key will hold the exact indicator.
 
 =item o canonical => $string
 
@@ -1141,6 +1174,10 @@ See also the C<year> key below.
 The C<type> key is always present, and takes one of these case-sensitive values:
 
 =over 4
+
+=item o 'French r'
+
+=item o German
 
 =item o Gregorian
 
