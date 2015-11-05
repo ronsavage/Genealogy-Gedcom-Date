@@ -1,14 +1,17 @@
 Changelog.ini
 Changes
 lib/Genealogy/Gedcom/Date.pm
+lib/Genealogy/Gedcom/Date/Actions.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
 README
-t/date.t
-t/escape.t
-t/style.t
-t/value.t
+scripts/parse.pl
+scripts/pod2html.sh
+scripts/synopsis.pl
+t/English.t
+t/French.t
+t/German.t
 xt/author/pod.t

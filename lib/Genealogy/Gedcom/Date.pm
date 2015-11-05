@@ -27,7 +27,7 @@ has bnf =>
 	required => 0,
 );
 
-has calendar =>
+has _calendar =>
 (
 	default  => sub{return 'Gregorian'},
 	is       => 'rw',
@@ -126,13 +126,7 @@ sub BUILD
 	# The point is that we don't create an action instance.
 	# Marpa creates one but we can't get our hands on it.
 
-	my($calendar) =	$self -> calendar;
-	$calendar     =~ s/\@\#d(.+)\@/$1/; # Zap gobbledegook if present.
-	$calendar     = ucfirst lc $calendar;
-
-	$self -> calendar($calendar);
-
-	$Genealogy::Gedcom::Date::Actions::calendar = $calendar;
+	$Genealogy::Gedcom::Date::Actions::calendar = $self -> clean_calendar;
 	$Genealogy::Gedcom::Date::Actions::logger   = $self -> logger;
 
 	$self -> bnf
@@ -329,11 +323,11 @@ END_OF_GRAMMAR
 sub clean_calendar
 {
 	my($self)     = @_;
-	my($calendar) = $self -> calendar;
+	my($calendar) = $self -> _calendar;
 	$calendar     =~ s/\@\#d(.+)\@/$1/; # Zap gobbledegook if present.
 	$calendar     = ucfirst lc $calendar;
 
-	return $self -> calendar($calendar);
+	return $self -> _calendar($calendar);
 
 } # End of clean_calendar.
 
@@ -386,17 +380,80 @@ sub log
 
 } # End of log.
 
+# ------------------------------------------------
+
+sub normalize
+{
+	my($self, $result) = @_;
+	my(@date) = ('', '');
+
+	my($separator);
+
+	for my $i (0 .. $#$result)
+	{
+		if ($$result[$i]{type} =~ /(?:French|Gregorian|Hebrew|Julian)/)
+		{
+			$separator = ' ';
+		}
+		else # German.
+		{
+			$separator = '.';
+		}
+
+		$date[$i] .= $$result[$i]{flag} ? $date[$i] ? " $$result[$i]{flag}" : $$result[$i]{flag} : '';
+
+		if ($$result[$i]{type} =~ /(French|German|Hebrew|Julian)/)
+		{
+			$date[$i] .= $date[$i] ? " \@#d\U$1\@" : '';
+		}
+
+		$date[$i] .= defined($$result[$i]{day}) ? $date[$i] ? " $$result[$i]{day}" : $$result[$i]{day} : '';
+
+		if ($$result[$i]{month})
+		{
+			if (defined $$result[$i]{day})
+			{
+				$date[$i] .= $date[$i] ? "$separator$$result[$i]{month}" : $$result[$i]{month};
+			}
+			else
+			{
+				$date[$i] .= $date[$i] ? " $$result[$i]{month}" : $$result[$i]{month};
+			}
+		}
+
+		if ($$result[$i]{month})
+		{
+			$date[$i] .= $date[$i] ? "$separator$$result[$i]{year}" : $$result[$i]{year};
+		}
+		else
+		{
+			$date[$i] .= $$result[$i]{year} if (defined $$result[$i]{year});
+		}
+
+		$date[$i] .= "/$$result[$i]{suffix}" if ($$result[$i]{suffix});
+		$date[$i] .= $$result[$i]{bce} ? " $$result[$i]{bce}" : '';
+
+		if ($$result[$i]{phrase})
+		{
+			$date[$i] .= $date[$i] ? " $$result[$i]{phrase}" : $$result[$i]{phrase};
+		}
+	}
+
+	return $#$result > 0 ? "$date[0] $date[1]" : $date[0];
+
+} # End of normalize.
+
 # --------------------------------------------------
 
 sub parse
 {
 	my($self, %args) = @_;
-	my($calendar)    = defined($args{calendar}) ? $args{calendar} : $self -> calendar;
+	my($calendar)    = defined($args{calendar}) ? $args{calendar} : $self -> _calendar;
 	my($date)        = defined($args{date}) ? $args{date} : $self -> date;
 	$date            =~ tr/,/ /s;
 	my($result)      = [];
 
-	$self -> calendar($calendar);
+	$self -> _calendar($calendar);
 	$self -> date($date);
 	$self -> error('');
 	$self -> recce
@@ -699,12 +756,6 @@ Key-value pairs accepted in the parameter list (see corresponding methods for de
 
 =over 4
 
-=item o calendar => $name
-
-The name (case-insensitive) of the calendar to use as the default.
-
-Default: 'Gregorian' aka '@#dgregorian@'. Either format is acceptable.
-
 =item o date => $date
 
 The string to be parsed.
@@ -746,30 +797,6 @@ No lower levels are used.
 Note: The parameters C<calendar> and C<date> can also be passed to L</parse([%args])>.
 
 =head1 Methods
-
-=head2 calendar([$name])
-
-Here, [ and ] indicate an optional parameter.
-
-Gets or sets the name of the default calendar. $name is case-insensitive.
-
-Calendar names of the form '@#d$name@' are converted internally into $name. This means you can
-always just use $name, as in parse(date => 'Julian 1950').
-
-That is: This module allows you to specify the calendar name without the Gedcom-mandated prefix and
-suffix. Obviously, such a format will more likely not be acceptable to other software.
-
-$name in C<< parse(calendar => $name) >> takes precedence over both C<< new(calendar => $name) >>
-and C<calendar($name)>.
-
-Also: If you call C<parse()> as C<< parse(calendar => $name) >>, then the value C<$name> is
-stored so that if you subsequently call C<calendar()>, that value is returned.
-
-See L</What extensions to the Gedcom grammar are supported?> for details.
-
-See also L</What is the meaning of the 'calendar' key in method calls?>.
-
-Note: C<calendar> is a parameter to new().
 
 =head2 date([$date])
 
@@ -842,6 +869,18 @@ See L<Log::Handler::Levels>.
 
 The constructor. See L</Constructor and Initialization>.
 
+=head2 normalize($result)
+
+Here, $result is the result from calling L</parse([%args])>.
+
+Returns the original input string normalized.
+
+Try these:
+
+	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Dez.2015'
+
+	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Dez.2015' -n 1
+
 =head2 parse([%args])
 
 Here, [ and ] indicate an optional parameter.
@@ -861,6 +900,10 @@ value from C<parse()> will contain the valid date but no indicator of the invali
 =head2 Does this module accept Unicode?
 
 Yes.
+
+=head2 Can I change the default calendar?
+
+No. It is always Gregorian.
 
 =head2 What is the format of the value returned by parse()?
 
@@ -1143,7 +1186,25 @@ My policy is to use the lightweight L<Moo> for all modules and applications.
 
 =head1 See Also
 
-L<Genealogy::Gedcom>.
+L<Genealogy::Gedcom>
+
+L<DateTime>
+
+L<DateTimeX::Lite>
+
+L<Time::ParseDate>
+
+L<Time::Piece> is in Perl core. See L<http://perltricks.com/article/59/2014/1/10/Solve-almost-any-datetime-need-with-Time-Piece>
+
+L<Time::Duration> is more sophisticated than L<Time::Elapsed>
+
+L<Time::Moment> implements L<ISO 8601|https://en.wikipedia.org/wiki/ISO_8601>
+
+L<http://blogs.perl.org/users/buddy_burden/2015/09/a-date-with-cpan-part-1-state-of-the-union.html>
+
+L<http://blogs.perl.org/users/buddy_burden/2015/10/a-date-with-cpan-part-2-target-first-aim-afterwards.html>
+
+L<http://blogs.perl.org/users/buddy_burden/2015/10/-a-date-with-cpan-part-3-paving-while-driving.html>
 
 =head1 Machine-Readable Change Log
 

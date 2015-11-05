@@ -27,11 +27,11 @@
       "runtime" : {
          "requires" : {
             "Config" : "0",
-            "DateTime" : "1.18",
-            "DateTime::Infinite" : "1.03",
-            "Moo" : "2.000001",
-            "Test::More" : "1.001014",
-            "Try::Tiny" : "0.12",
+            "Log::Handler" : "0.84",
+            "Marpa::R2" : "3",
+            "Moo" : "2.000002",
+            "Test::Stream" : "1.30202",
+            "Try::Tiny" : "0.22",
             "Type::Tiny" : "1.000005",
             "strict" : "0",
             "warnings" : "0"
