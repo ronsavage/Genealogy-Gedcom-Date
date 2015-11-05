@@ -393,10 +393,10 @@ sub canonical_form
 	for my $i (0 .. $#$result)
 	{
 		$date[$i] = $self -> canonical_date($$result[$i]);
-		$date[$i] = $$result[$i]{flag} ? $date[$i] ? "$$result[$i]{flag} $date[$i]" : $$result[$i]{flag} : '';
+		$date[$i] = $$result[$i]{flag} ? $date[$i] ? "$$result[$i]{flag} $date[$i]" : $$result[$i]{flag} : $date[$i];
 	}
 
-	return $#$result > 0 ? "$date[0] $date[1]" : $date[0];
+	return $date[1] ? "$date[0] $date[1]" : $date[0];
 
 } # End of canonical_form.
 
@@ -673,28 +673,41 @@ Genealogy::Gedcom::Date - Parse GEDCOM dates
 
 =head1 Synopsis
 
-A script:
+A script (scripts/synopsis.pl):
 
 	#!/usr/bin/env perl
 
 	use strict;
 	use warnings;
 
-	use Data::Dumper::Concise;
-
 	use Genealogy::Gedcom::Date;
 
 	# --------------------------
 
-	my($parser) = Genealogy::Gedcom::Date -> new;
+	sub process
+	{
+		my($count, $parser, $date) = @_;
 
-	print '1: ', Dumper($parser -> parse(calendar => 'Julian', date => '1950') );
-	print '2: ', Dumper($parser -> parse(calendar => '@#dJulian@', date => '1951') );
-	print '3: ', Dumper($parser -> parse(date => 'Julian 1952') );
-	print '4: ', Dumper($parser -> parse(date => '@#dJulian@ 1953') );
-	print '5: ', Dumper($parser -> parse(date => 'From @#dJulian@ 1954 to Gregorian 1955/56') );
+		print "$count: $date: ";
 
-See scripts/synopsis.pl.
+		my($result) = $parser -> parse(date => $date);
+
+		print "Canonical date @{[$_ + 1]}: ", $parser -> canonical_date($$result[$_]), ". \n" for (0 .. $#$result);
+		print 'Canonical form: ', $parser -> canonical_form($result), ". \n";
+		print "\n";
+
+	} # End of process.
+
+	# --------------------------
+
+	my($parser) = Genealogy::Gedcom::Date -> new(maxlevel => 'debug');
+	my($date)   =
+
+	process(1, $parser, 'Julian 1950');
+	process(2, $parser, '@#dJulian@ 1951');
+	process(3, $parser, 'From @#dJulian@ 1952 to Gregorian 1953/54');
+	process(4, $parser, 'From @#dFrench r@ 1955 to 1956');
+	process(5, $parser, 'From @#dJulian@ 1957 to German 1.Dez.1958');
 
 One-liners:
 
@@ -702,8 +715,10 @@ One-liners:
 
 Output:
 
+	Return value from parse():
 	[
 	  {
+	    canonical => "1701/02",
 	    flag => "BET",
 	    kind => "Date",
 	    suffix => "02",
@@ -711,6 +726,7 @@ Output:
 	    year => 1701
 	  },
 	  {
+	    canonical => "\@#dJULIAN\@ 1703",
 	    flag => "AND",
 	    kind => "Date",
 	    type => "Julian",
@@ -724,6 +740,7 @@ Output:
 
 	[
 	  {
+	    canonical => "10 Nov 1200 (Approx)",
 	    day => 10,
 	    flag => "INT",
 	    kind => "Date",
@@ -736,8 +753,12 @@ Output:
 
 	perl -Ilib scripts/parse.pl -max debug -d '(Unknown)'
 
+Output:
+
+	Return value from parse():
 	[
 	  {
+	    canonical => "(Unknown)",
 	    kind => "Phrase",
 	    phrase => "(Unknown)",
 	    type => "Phrase"

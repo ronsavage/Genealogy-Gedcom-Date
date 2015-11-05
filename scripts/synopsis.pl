@@ -11,11 +11,11 @@ sub process
 {
 	my($count, $parser, $date) = @_;
 
-	print "$count: ";
+	print "$count: $date: ";
 
 	my($result) = $parser -> parse(date => $date);
 
-	print 'Canonical date: ', $parser -> canonical_date($$result[$_]), ". \n" for (0 .. $#$result);
+	print "Canonical date @{[$_ + 1]}: ", $parser -> canonical_date($$result[$_]), ". \n" for (0 .. $#$result);
 	print 'Canonical form: ', $parser -> canonical_form($result), ". \n";
 	print "\n";
 
