@@ -335,7 +335,7 @@ sub canonical_date
 
 	my($separator);
 
-	if ($$result{type} =~ /(?:French|Gregorian|Hebrew|Julian)/)
+	if ($$result{type} && ($$result{type} =~ /(?:French|Gregorian|Hebrew|Julian)/) )
 	{
 		$separator = ' ';
 	}
@@ -344,7 +344,7 @@ sub canonical_date
 		$separator = '.';
 	}
 
-	if ($$result{type} =~ /(French|German|Hebrew|Julian)/)
+	if ($$result{type} && ($$result{type} =~ /(French|German|Hebrew|Julian)/) )
 	{
 		$date = '@#d' . "\U$1" . '@';
 	}
@@ -366,13 +366,13 @@ sub canonical_date
 	}
 	else
 	{
-		$date .= $$result{year} if (defined $$result{year});
+		$date .= $date ? " $$result{year}" : $$result{year} if (defined $$result{year});
 	}
 
 	$date .= "/$$result{suffix}" if ($$result{suffix});
 	$date .= " $$result{bce}"    if ($$result{bce});
 
-	if ($$result{phrase})
+	if (defined $$result{phrase})
 	{
 		$date .= $date ? " $$result{phrase}" : $$result{phrase};
 	}
@@ -833,6 +833,53 @@ Note: The parameters C<calendar> and C<date> can also be passed to L</parse([%ar
 
 =head1 Methods
 
+=head2 canonical_date($hashref)
+
+$hashref is either element of the arrayref returned by L</parse([%args])>. The hashref may be
+empty.
+
+Returns a date string (or the empty string) normalized in various ways:
+
+=over 4
+
+=item o If Gregorian (in any form) was in the original string, it is discarded
+
+This done because it's the default.
+
+=item o If any other calendar escape was in the original string, it is preserved
+
+And it's in call caps.
+
+=item o If About, etc were in the orginal string, they are discarded
+
+This means the C<flag> key in the hashref is ignored.
+
+=back
+
+Note: This method is called by L</parse([%args])> to populate the C<canonical> key in the arraref
+of hashrefs returned by C<parse()>.
+
+Try:
+
+	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Mär.2015'
+
+	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Mär.2015' -n 0
+
+	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Mär.2015' -n 1
+
+	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Mär.2015' -n 2
+
+=head2 canonical_form($arrayref)
+
+Returns a date string containing zero, one or two dates.
+
+This method calls L</canonical_date($hashref)> for each element in the $arrayref. The arrayref
+may be empty.
+
+Then it adds information from the C<flag> key in each element, if present.
+
+For sample code, see L</canonical_date($hashref)> just above.
+
 =head2 date([$date])
 
 Here, [ and ] indicate an optional parameter.
@@ -885,7 +932,7 @@ Typical values are: 'notice', 'info', 'debug'. The default, 'notice', produces n
 
 The code emits a message with log level 'error' if Marpa throws an exception, and it displays
 the result of the parse at level 'debug' if maxlevel is set that high. The latter display uses
-L<Data::Dumper::Concise>'s function Dumper().
+L<Data::Dumper::Concise>'s function C<Dumper()>.
 
 'maxlevel' is a parameter to L</new()>. See L</Constructor and Initialization> for details.
 
@@ -904,18 +951,6 @@ See L<Log::Handler::Levels>.
 
 The constructor. See L</Constructor and Initialization>.
 
-=head2 normalize($result)
-
-Here, $result is the result from calling L</parse([%args])>.
-
-Returns the original input string normalized.
-
-Try these:
-
-	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Dez.2015'
-
-	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Dez.2015' -n 1
-
 =head2 parse([%args])
 
 Here, [ and ] indicate an optional parameter.
@@ -931,14 +966,6 @@ Warning: The array can contain 1 element when 2 are expected. This can happen if
 value from C<parse()> will contain the valid date but no indicator of the invalid one.
 
 =head1 FAQ
-
-=head2 Does this module accept Unicode?
-
-Yes.
-
-=head2 Can I change the default calendar?
-
-No. It is always Gregorian.
 
 =head2 What is the format of the value returned by parse()?
 
@@ -970,6 +997,10 @@ If the input contains any one of the following (case-insensitive), the C<bce> ke
 =item o 'bce'
 
 =back
+
+=item o canonical => $string
+
+L</parse([%args])> calls L</canonical_date($hashref)> to populate this key.
 
 =item o day => $integer
 
@@ -1109,37 +1140,23 @@ the C<year> key is never "$integer/$two_digits".
 
 =back
 
-=head2 What is the meaning of the 'calendar' key in method calls?
+=head2 Why is '@' escaped with '\' when L<Data::Dumper::Concise>'s C<Dumper()> prints things?
 
-Possible values (case-insensitive):
+That's just how that module handles '@'.
 
-=over 4
+=head2 Does this module accept Unicode?
 
-=item o calendar => 'French'
+Yes.
 
-Expects dates in 'day month year' format, as in the Gedcom spec.
+See t/German.t for sample code.
 
-=item o calendar => 'German'
+Note: Both this file and t/German.t are shipped with the UTF-8 BOM at the start of the file.
 
-=item o calendar => 'Gregorian'
+See L<File::Bom::Utils> for details.
 
-Expects dates in 'day month year' format, as in 'From 1 Jan 2001 to 31 Dec 2002'.
+=head2 Can I change the default calendar?
 
-Expects years in either the 1950 format or the 1950/00 format.
-
-This is the default.
-
-=item o calendar => 'Hebrew'
-
-Expects dates in 'day month year' format, as in the Gedcom spec.
-
-=item o calendar => 'Julian'
-
-Expects dates in 'day month year' format, as in 'From 1 Jan 2001 to 25 Dec 2002'.
-
-Expects years in the 1950 format but never the (Gregorian) 1950/00 format.
-
-=back
+No. It is always Gregorian.
 
 =head2 Are dates massaged before being processed?
 
@@ -1220,6 +1237,8 @@ types I choose as method return values.
 My policy is to use the lightweight L<Moo> for all modules and applications.
 
 =head1 See Also
+
+L<File::Bom::Utils>.
 
 L<Genealogy::Gedcom>
 

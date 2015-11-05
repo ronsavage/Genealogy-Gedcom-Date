@@ -3,16 +3,31 @@
 use strict;
 use warnings;
 
-use Data::Dumper::Concise;
-
 use Genealogy::Gedcom::Date;
 
 # --------------------------
 
-my($parser) = Genealogy::Gedcom::Date -> new;
+sub process
+{
+	my($count, $parser, $date) = @_;
 
-print '1: ', Dumper($parser -> parse(calendar => 'Julian', date => '1950') );
-print '2: ', Dumper($parser -> parse(calendar => '@#dJulian@', date => '1951') );
-print '3: ', Dumper($parser -> parse(date => 'Julian 1952') );
-print '4: ', Dumper($parser -> parse(date => '@#dJulian@ 1953') );
-print '5: ', Dumper($parser -> parse(date => 'From @#dJulian@ 1954 to Gregorian 1955/56') );
+	print "$count: ";
+
+	my($result) = $parser -> parse(date => $date);
+
+	print 'Canonical date: ', $parser -> canonical_date($$result[$_]), ". \n" for (0 .. $#$result);
+	print 'Canonical form: ', $parser -> canonical_form($result), ". \n";
+	print "\n";
+
+} # End of process.
+
+# --------------------------
+
+my($parser) = Genealogy::Gedcom::Date -> new(maxlevel => 'debug');
+my($date)   =
+
+process(1, $parser, 'Julian 1950');
+process(2, $parser, '@#dJulian@ 1951');
+process(3, $parser, 'From @#dJulian@ 1952 to Gregorian 1953/54');
+process(4, $parser, 'From @#dFrench r@ 1955 to 1956');
+process(5, $parser, 'From @#dJulian@ 1957 to German 1.Dez.1958');

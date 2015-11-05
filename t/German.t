@@ -18,40 +18,40 @@ my(@candidates) =
 		result => [{kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Dez.1950',
-		result => [{kind => 'Date', type => 'German', month => 'Dez', year => '1950'}],
+		date   => 'Mär.1950',
+		result => [{kind => 'Date', type => 'German', month => 'Mär', year => '1950'}],
 	},
 	{
-		date   => 'German Dez.1950',
-		result => [{kind => 'Date', type => 'German', month => 'Dez', year => '1950'}],
+		date   => 'German Mär.1950',
+		result => [{kind => 'Date', type => 'German', month => 'Mär', year => '1950'}],
 	},
 	{
-		date   => '21.Dez.1950',
-		result => [{kind => 'Date', type => 'German', day => 21, month => 'Dez', year => '1950'}],
+		date   => '21.Mär.1950',
+		result => [{kind => 'Date', type => 'German', day => 21, month => 'Mär', year => '1950'}],
 	},
 	{
-		date   => 'German 21.Dez.1950',
-		result => [{kind => 'Date', type => 'German', day => 21, month => 'Dez', year => '1950'}],
+		date   => 'German 21.Mär.1950',
+		result => [{kind => 'Date', type => 'German', day => 21, month => 'Mär', year => '1950'}],
 	},
 	{
 		date   => 'Abt German 1950',
 		result => [{flag => 'ABT', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Abt Dez.1950',
-		result => [{flag => 'ABT', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Abt Mär.1950',
+		result => [{flag => 'ABT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Abt German Dez.1950',
-		result => [{flag => 'ABT', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Abt German Mär.1950',
+		result => [{flag => 'ABT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Abt 21.Dez.1950',
-		result => [{day => 21, flag => 'ABT', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Abt 21.Mär.1950',
+		result => [{day => 21, flag => 'ABT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Abt German 21.Dez.1950',
-		result => [{day => 21, flag => 'ABT', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Abt German 21.Mär.1950',
+		result => [{day => 21, flag => 'ABT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Abt German 1950 VCHR',
@@ -62,20 +62,20 @@ my(@candidates) =
 		result => [{flag => 'AFT', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Aft Dez.1950',
-		result => [{flag => 'AFT', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Aft Mär.1950',
+		result => [{flag => 'AFT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Aft German Dez.1950',
-		result => [{flag => 'AFT', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Aft German Mär.1950',
+		result => [{flag => 'AFT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Aft 21.Dez.1950',
-		result => [{day => 21, flag => 'AFT', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Aft 21.Mär.1950',
+		result => [{day => 21, flag => 'AFT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Aft German 21.Dez.1950',
-		result => [{day => 21, flag => 'AFT', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Aft German 21.Mär.1950',
+		result => [{day => 21, flag => 'AFT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Aft German 1950 v.u.z.',
@@ -86,20 +86,20 @@ my(@candidates) =
 		result => [{flag => 'BEF', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Bef Dez.1950',
-		result => [{flag => 'BEF', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Bef Mär.1950',
+		result => [{flag => 'BEF', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Bef German Dez.1950',
-		result => [{flag => 'BEF', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Bef German Mär.1950',
+		result => [{flag => 'BEF', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Bef 21.Dez.1950',
-		result => [{day => 21, flag => 'BEF', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Bef 21.Mär.1950',
+		result => [{day => 21, flag => 'BEF', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Bef German 21.Dez.1950',
-		result => [{day => 21, flag => 'BEF', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Bef German 21.Mär.1950',
+		result => [{day => 21, flag => 'BEF', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Bef German 1950 v.c.',
@@ -166,20 +166,20 @@ my(@candidates) =
 		result => [{flag => 'CAL', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Cal Dez.1950',
-		result => [{flag => 'CAL', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Cal Mär.1950',
+		result => [{flag => 'CAL', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Cal German Dez.1950',
-		result => [{flag => 'CAL', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Cal German Mär.1950',
+		result => [{flag => 'CAL', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Cal 21.Dez.1950',
-		result => [{day => 21, flag => 'CAL', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Cal 21.Mär.1950',
+		result => [{day => 21, flag => 'CAL', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Cal German 21.Dez.1950',
-		result => [{day => 21, flag => 'CAL', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Cal German 21.Mär.1950',
+		result => [{day => 21, flag => 'CAL', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Cal German 1950 v.chr.',
@@ -190,20 +190,20 @@ my(@candidates) =
 		result => [{flag => 'EST', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est Dez.1950',
-		result => [{flag => 'EST', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Est Mär.1950',
+		result => [{flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est German Dez.1950',
-		result => [{flag => 'EST', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Est German Mär.1950',
+		result => [{flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est 21.Dez.1950',
-		result => [{day => 21, flag => 'EST', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Est 21.Mär.1950',
+		result => [{day => 21, flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est German 21.Dez.1950',
-		result => [{day => 21, flag => 'EST', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Est German 21.Mär.1950',
+		result => [{day => 21, flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Est German 1950 vuz',
@@ -214,20 +214,20 @@ my(@candidates) =
 		result => [{flag => 'EST', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est Dez.1950',
-		result => [{flag => 'EST', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Est Mär.1950',
+		result => [{flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est German Dez.1950',
-		result => [{flag => 'EST', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Est German Mär.1950',
+		result => [{flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est 21.Dez.1950',
-		result => [{day => 21, flag => 'EST', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Est 21.Mär.1950',
+		result => [{day => 21, flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est German 21.Dez.1950',
-		result => [{day => 21, flag => 'EST', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'Est German 21.Mär.1950',
+		result => [{day => 21, flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Est German 1950 vc',
@@ -238,20 +238,20 @@ my(@candidates) =
 		result => [{flag => 'FROM', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'From Dez.1950',
-		result => [{flag => 'FROM', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'From Mär.1950',
+		result => [{flag => 'FROM', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'From German Dez.1950',
-		result => [{flag => 'FROM', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'From German Mär.1950',
+		result => [{flag => 'FROM', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'From 21.Dez.1950',
-		result => [{day => 21, flag => 'FROM', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'From 21.Mär.1950',
+		result => [{day => 21, flag => 'FROM', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'From German 21.Dez.1950',
-		result => [{day => 21, flag => 'FROM', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'From German 21.Mär.1950',
+		result => [{day => 21, flag => 'FROM', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'From German 1950 v.chr.',
@@ -262,16 +262,16 @@ my(@candidates) =
 		result => [{flag => 'TO', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'To Dez.1950',
-		result => [{flag => 'TO', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'To Mär.1950',
+		result => [{flag => 'TO', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'To German Dez.1950',
-		result => [{flag => 'TO', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'To German Mär.1950',
+		result => [{flag => 'TO', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'To German 21.Dez.1950',
-		result => [{day => 21, flag => 'TO', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'To German 21.Mär.1950',
+		result => [{day => 21, flag => 'TO', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'To German 1950 vchr',
@@ -314,8 +314,8 @@ my(@candidates) =
 		result => [{flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'To 21.Dez.1950',
-		result => [{day => 21, flag => 'TO', kind => 'Date', month => 'Dez', type => 'German', year => '1950'}],
+		date   => 'To 21.Mär.1950',
+		result => [{day => 21, flag => 'TO', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Bet German 1501 and Julian 1510',
