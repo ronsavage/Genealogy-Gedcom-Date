@@ -28,6 +28,7 @@ my(%params) =
 	PREREQ_PM =>
 	{
 		'Config'       => 0,
+		'Data::Dumper::Concise' => 2.022,
 		'Log::Handler' => 0.84,
 		'Marpa::R2'    => 3.000000,
 		'Moo'          => 2.000002,

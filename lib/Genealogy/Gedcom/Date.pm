@@ -467,12 +467,13 @@ sub log
 sub parse
 {
 	my($self, %args) = @_;
-	my($calendar)    = defined($args{calendar}) ? $args{calendar} : $self -> _calendar;
+	my($canonical)   = defined($args{canonical}) ? $args{canonical} : $self -> canonical;
+	$canonical       = $canonical < 0 ? 0 : $canonical > 2 ? 2 : $canonical;
 	my($date)        = defined($args{date}) ? $args{date} : $self -> date;
 	$date            =~ tr/,/ /s;
 	my($result)      = [];
 
-	$self -> _calendar($calendar);
+	$self -> canonical($canonical);
 	$self -> date($date);
 	$self -> error('');
 	$self -> recce
