@@ -261,6 +261,10 @@ my(@candidates) =
 		date   => 'To German 1950',
 		result => [{canonical => '@#dGERMAN@ 1950', flag => 'TO', kind => 'Date', type => 'German', year => '1950'}],
 	},
+);
+
+@candidates =
+(
 	{
 		date   => 'To Mär.1950',
 		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'TO', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
@@ -281,7 +285,7 @@ my(@candidates) =
 		date   => 'From 1901/02 to German 1903',
 		result =>
 		[
-			{canonical => '1091', flag => 'FROM', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1901'},
+			{canonical => '1901/02', flag => 'FROM', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1901'},
 			{canonical => '@#dGERMAN@ 1903', flag => 'TO', kind => 'Date', type => 'German', year => '1903'},
 		],
 	},
@@ -289,7 +293,7 @@ my(@candidates) =
 		date   => 'From Gregorian 1901/02 to German 1903',
 		result =>
 		[
-			{canonical => '1901', flag => 'FROM', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1901'},
+			{canonical => '1901/02', flag => 'FROM', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1901'},
 			{canonical => '@#dGERMAN@ 1903', flag => 'TO', kind => 'Date', type => 'German', year => '1903'},
 		],
 	},
@@ -297,8 +301,8 @@ my(@candidates) =
 		date   => 'From German 1901 to Gregorian 1903/04',
 		result =>
 		[
-			{canonical => '@#dGERMAN@ 191', flag => 'FROM', kind => 'Date', type => 'German', year => '1901'},
-			{canonical => '1903', flag => 'TO', kind => 'Date', suffix => '04', type => 'Gregorian', year => '1903'},
+			{canonical => '@#dGERMAN@ 1901', flag => 'FROM', kind => 'Date', type => 'German', year => '1901'},
+			{canonical => '1903/04', flag => 'TO', kind => 'Date', suffix => '04', type => 'Gregorian', year => '1903'},
 		],
 	},
 	{
@@ -314,7 +318,7 @@ my(@candidates) =
 		result => [{canonical => '@#dGERMAN@ 1950', flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'To 21.Mär.1950',
+		date   => 'German 21.Mär.1950',
 		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'TO', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
@@ -341,6 +345,14 @@ my(@candidates) =
 			{canonical => '@#dGERMAN@ 1956', flag => 'TO', kind => 'Date', type => 'German', year => '1956'},
 		],
 	},
+	{
+		date   => 'From Julian 1950 to German 1956',
+		result =>
+		[
+			{canonical => '@#dJULIAN@ 1950', flag => 'FROM', kind => 'Date', type => 'Julian', year => '1950'},
+			{canonical => '@#dGERMAN@ 1956', flag => 'TO', kind => 'Date', type => 'German', year => '1956'},
+		],
+	},
 );
 
 my($count)  = 0;
@@ -356,9 +368,10 @@ for my $item (@candidates)
 
 	$result = $parser -> parse(date => $$item{date});
 
-	#print STDERR "Result: \n", Dumper($result);
+	#print STDERR "Expect: \n", Dumper($$item{result});
+	#print STDERR "Got: \n", Dumper($result);
 
-	is($result, $$item{result}, "$count. German: $$item{date}");
+	is($result, $$item{result}, "$count: $$item{date}");
 }
 
 done_testing;

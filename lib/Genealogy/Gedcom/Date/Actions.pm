@@ -305,14 +305,10 @@ sub gregorian_date
 {
 	my($cache, $t1) = @_;
 
-	#$logger -> log(debug => "gregorian_date t1: \n" . Dumper($t1) );
-
 	# Is it a BCE date? If so, it's already a hashref.
 
 	if (ref($$t1[0]) eq 'HASH')
 	{
-		$$t1[0]{bce} = 'BCE';
-
 		return $$t1[0];
 	}
 
@@ -379,7 +375,7 @@ sub gregorian_year_bce
 
 	return
 	{
-		bce  => uc $t2,
+		bce  => $t2,
 		kind => 'Date',
 		type => 'Gregorian',
 		year => $t1,
@@ -412,8 +408,6 @@ sub julian_date
 
 	if (ref($$t1[0]) eq 'HASH')
 	{
-		$$t1[0]{bce} = 'BCE';
-
 		return $$t1[0];
 	}
 

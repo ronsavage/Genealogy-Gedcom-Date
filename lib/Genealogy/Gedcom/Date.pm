@@ -195,7 +195,6 @@ french_date				::= day french_month_name year
 
 german_date				::= day dot german_month_name dot german_year
 							| german_month_name dot german_year
-							| german_month_name german_year
 							| german_year
 
 german_year				::= year
@@ -369,7 +368,7 @@ sub canonical_date
 		$date .= $date ? " $$result{year}" : $$result{year} if (defined $$result{year});
 	}
 
-	$date .= "/$$result{suffix}" if ($$result{suffix});
+	$date .= "/$$result{suffix}" if (defined $$result{suffix});
 	$date .= " $$result{bce}"    if ($$result{bce});
 
 	if (defined $$result{phrase})
