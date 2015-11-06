@@ -1,7 +1,8 @@
-﻿package Genealogy::Gedcom::Date;
+package Genealogy::Gedcom::Date;
 
 use strict;
-use warnings;
+use warnings qw(FATAL utf8); # Fatalize encoding glitches.
+use utf8;
 
 use Config;
 
@@ -1228,10 +1229,6 @@ That's just how that module handles '@'.
 Yes.
 
 See t/German.t for sample code.
-
-Note: Both this file and t/German.t are shipped with the UTF-8 BOM at the start of the file.
-
-See L<File::Bom::Utils> for details.
 
 =head2 Can I change the default calendar?
 

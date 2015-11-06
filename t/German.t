@@ -1,7 +1,8 @@
 ﻿#!/usr/bin/env perl
 
 use strict;
-use warnings;
+use warnings qw(FATAL utf8); # Fatalize encoding glitches.
+use utf8;
 
 use Data::Dumper::Concise; # For Dumper().
 
@@ -261,6 +262,10 @@ my(@candidates) =
 		date   => 'To German 1950',
 		result => [{canonical => '@#dGERMAN@ 1950', flag => 'TO', kind => 'Date', type => 'German', year => '1950'}],
 	},
+	{
+		date   => 'German Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', kind => 'Date', type => 'German', month => 'Mär', year => '1950'}],
+	},
 );
 
 my($count)  = 0;
@@ -276,8 +281,11 @@ for my $item (@candidates)
 
 	$result = $parser -> parse(date => $$item{date});
 
-	#print STDERR "Expect: \n", Dumper($$item{result});
-	#print STDERR "Got: \n", Dumper($result);
+	if ($count == 56)
+	{
+		print STDERR "Expect: \n", Dumper($$item{result});
+		print STDERR "Got: \n", Dumper($result);
+	}
 
 	is($result, $$item{result}, "$count: $$item{date}");
 }
