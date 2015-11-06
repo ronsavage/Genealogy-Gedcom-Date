@@ -13,7 +13,7 @@ use Test::Stream -V1;
 
 my(@candidates) =
 (
-	{
+	{	# 1
 		date   => 'German 1950',
 		result => [{canonical => '@#dGERMAN@ 1950', kind => 'Date', type => 'German', year => '1950'}],
 	},
@@ -49,7 +49,7 @@ my(@candidates) =
 		date   => 'Abt 21.Mär.1950',
 		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'ABT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
-	{
+	{	# 10
 		date   => 'Abt German 21.Mär.1950',
 		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'ABT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
@@ -89,7 +89,7 @@ my(@candidates) =
 		date   => 'Bef Mär.1950',
 		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'BEF', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
-	{
+	{	# 20
 		date   => 'Bef German Mär.1950',
 		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'BEF', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
@@ -153,7 +153,7 @@ my(@candidates) =
 			{canonical => '@#dGERMAN@ 1510', flag => 'AND', kind => 'Date', type => 'German', year => '1510'},
 		],
 	},
-	{
+	{	# 30
 		date   => 'Bet German 1501 and 1510/02',
 		result =>
 		[
@@ -197,7 +197,7 @@ my(@candidates) =
 		date   => 'Est German Mär.1950',
 		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
-	{
+	{	# 40
 		date   => 'Est 21.Mär.1950',
 		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
@@ -237,7 +237,7 @@ my(@candidates) =
 		date   => 'From German 1950',
 		result => [{canonical => '@#dGERMAN@ 1950', flag => 'FROM', kind => 'Date', type => 'German', year => '1950'}],
 	},
-	{
+	{	# 50
 		date   => 'From Mär.1950',
 		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'FROM', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
@@ -257,101 +257,9 @@ my(@candidates) =
 		date   => 'From German 1950 v.chr.',
 		result => [{canonical => '@#dGERMAN@ 1950 v.chr', bce => 'v.chr.', flag => 'FROM', kind => 'Date', type => 'German', year => '1950'}],
 	},
-	{
+	{	# 55
 		date   => 'To German 1950',
 		result => [{canonical => '@#dGERMAN@ 1950', flag => 'TO', kind => 'Date', type => 'German', year => '1950'}],
-	},
-);
-
-@candidates =
-(
-	{
-		date   => 'To Mär.1950',
-		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'TO', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
-	},
-	{
-		date   => 'To German Mär.1950',
-		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'TO', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
-	},
-	{
-		date   => 'To German 21.Mär.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'TO', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
-	},
-	{
-		date   => 'To German 1950 vchr',
-		result => [{canonical => '@#dGERMAN@ 1950 vchr', bce => 'vchr', flag => 'TO', kind => 'Date', type => 'German', year => '1950'}],
-	},
-	{
-		date   => 'From 1901/02 to German 1903',
-		result =>
-		[
-			{canonical => '1901/02', flag => 'FROM', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1901'},
-			{canonical => '@#dGERMAN@ 1903', flag => 'TO', kind => 'Date', type => 'German', year => '1903'},
-		],
-	},
-	{
-		date   => 'From Gregorian 1901/02 to German 1903',
-		result =>
-		[
-			{canonical => '1901/02', flag => 'FROM', kind => 'Date', suffix => '02', type => 'Gregorian', year => '1901'},
-			{canonical => '@#dGERMAN@ 1903', flag => 'TO', kind => 'Date', type => 'German', year => '1903'},
-		],
-	},
-	{
-		date   => 'From German 1901 to Gregorian 1903/04',
-		result =>
-		[
-			{canonical => '@#dGERMAN@ 1901', flag => 'FROM', kind => 'Date', type => 'German', year => '1901'},
-			{canonical => '1903/04', flag => 'TO', kind => 'Date', suffix => '04', type => 'Gregorian', year => '1903'},
-		],
-	},
-	{
-		date   => 'From 1950 to German 1956',
-		result =>
-		[
-			{canonical => '1950', flag => 'FROM', kind => 'Date', type => 'Gregorian', year => '1950'},
-			{canonical => '@#dGERMAN@ 1956', flag => 'TO', kind => 'Date', type => 'German', year => '1956'},
-		],
-	},
-	{
-		date   => 'Int German 1950 (Approx)',
-		result => [{canonical => '@#dGERMAN@ 1950', flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'German', year => '1950'}],
-	},
-	{
-		date   => 'German 21.Mär.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'TO', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
-	},
-	{
-		date   => 'Bet German 1501 and Julian 1510',
-		result =>
-		[
-			{canonical => '@#dGERMAN@ 1501', flag => 'BET', kind => 'Date', type => 'German', year => '1501'},
-			{canonical => '@#dJULIAN@ 1510', flag => 'AND', kind => 'Date', type => 'Julian', year => '1510'},
-		],
-	},
-	{
-		date   => 'From German 1501 to Julian 1510',
-		result =>
-		[
-			{canonical => '@#dGERMAN@ 1501', flag => 'FROM', kind => 'Date', type => 'German', year => '1501'},
-			{canonical => '@#dJULIAN@ 1510', flag => 'TO', kind => 'Date', type => 'Julian', year => '1510'},
-		],
-	},
-	{
-		date   => 'From Julian 1950 to German 1956',
-		result =>
-		[
-			{canonical => '@#dJULIAN@ 1950', flag => 'FROM', kind => 'Date', type => 'Julian', year => '1950'},
-			{canonical => '@#dGERMAN@ 1956', flag => 'TO', kind => 'Date', type => 'German', year => '1956'},
-		],
-	},
-	{
-		date   => 'From Julian 1950 to German 1956',
-		result =>
-		[
-			{canonical => '@#dJULIAN@ 1950', flag => 'FROM', kind => 'Date', type => 'Julian', year => '1950'},
-			{canonical => '@#dGERMAN@ 1956', flag => 'TO', kind => 'Date', type => 'German', year => '1956'},
-		],
 	},
 );
 
