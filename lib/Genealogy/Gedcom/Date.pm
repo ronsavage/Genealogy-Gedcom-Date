@@ -189,22 +189,22 @@ julian_year_bce			::= year bce					action => julian_year_bce
 year					::= number						action => year
 
 french_date				::= day french_month_name year
+							| french_month_name year
 							| year bce
 							| year
-							| french_month_name year
 
-german_date				::= german_year
+german_date				::= day dot german_month_name dot german_year
 							| german_month_name dot german_year
-							| day dot german_month_name dot german_year
 							| german_month_name german_year
+							| german_year
 
 german_year				::= year
 							| year german_bce
 
-#hebrew_date			::= year_bce
+#hebrew_date			::= day hebrew_month_name year
+#							| hebrew_month_name year
+#							| year bce
 #							| year
-#							| hebrew_month year
-#							| day hebrew_month year
 
 lds_ord_date			::= date_value
 
