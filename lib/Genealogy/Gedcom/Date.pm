@@ -343,7 +343,7 @@ sub canonical_date
 		$separator = '.';
 	}
 
-	if ($$result{type} && ($$result{type} =~ /(French|German|Hebrew|Julian)/) )
+	if ($$result{type} && ($$result{type} =~ /(French r|German|Hebrew|Julian)/) )
 	{
 		$date = '@#d' . "\U$1" . '@';
 	}
