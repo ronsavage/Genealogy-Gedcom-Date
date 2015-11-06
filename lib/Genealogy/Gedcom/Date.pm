@@ -1198,6 +1198,27 @@ the C<year> key is never "$integer/$two_digits".
 
 =back
 
+=head2 When should I use a calendar escape?
+
+=over 4
+
+=item o In theory for every non-Gregorian/non-Julian date
+
+In practice, if the month name is unique to a specific language, then the escape is not needed,
+since L<Marpa::R2> and this code automatically handle ambiguity.
+
+The escape is, of course, always inserted into the values returned by the C<canonical> pair of
+methods when they process non-Gregorian/non-Julian dates. That makes their output compatible with
+other software.
+
+=item o When you wish to force the code to provide an unambiguous result
+
+All Gregorian and Julian dates are ambiguous, unless they use the year format 1700/01.
+
+So, to resolve the ambiguity, add the calendar escape.
+
+=back
+
 =head2 Why is '@' escaped with '\' when L<Data::Dumper::Concise>'s C<Dumper()> prints things?
 
 That's just how that module handles '@'.
@@ -1253,9 +1274,11 @@ Check: Are any of these valid?
 
 =over 4
 
-=item o @#djulian
+=item o @#FRENCH@
 
-=item o @#julian@
+=item o @#JULIAN@
+
+=item o @#djulian
 
 =item o @#juliand
 
@@ -1267,7 +1290,7 @@ Check: Are any of these valid?
 
 =back
 
-Yes, the last 2 are valid.
+Yes, the last 2 are accepted by this module, and the last one is accepted by other software.
 
 =item o The date is in American format (month day year)
 
@@ -1278,7 +1301,7 @@ out.
 
 =back
 
-=head2 What happens if C<parse()> is given a string like 'From 2000 to 1999'?
+=head2 What happens if C<parse()> is given a string like 'To 2000 From 1999'?
 
 The code I<does not> reorder the dates.
 
