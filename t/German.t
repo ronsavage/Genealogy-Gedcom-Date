@@ -4,8 +4,6 @@ use strict;
 use utf8;
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
-use Data::Dumper::Concise; # For Dumper().
-
 use Genealogy::Gedcom::Date;
 
 use Test::Stream -V1;
@@ -276,12 +274,6 @@ for my $item (@candidates)
 	$count++;
 
 	$result = $parser -> parse(date => $$item{date});
-
-	if ($count == 56)
-	{
-		print STDERR "Expect: \n", Dumper($$item{result});
-		print STDERR "Got: \n", Dumper($result);
-	}
 
 	is($result, $$item{result}, "$count: $$item{date}");
 }
