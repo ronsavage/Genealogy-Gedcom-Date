@@ -1,8 +1,8 @@
 ﻿#!/usr/bin/env perl
 
 use strict;
-use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 use utf8;
+use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 use Data::Dumper::Concise; # For Dumper().
 
@@ -19,40 +19,40 @@ my(@candidates) =
 		result => [{canonical => '@#dGERMAN@ 1950', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', kind => 'Date', type => 'German', month => 'Feb', year => '1950'}],
+		date   => 'Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', kind => 'Date', type => 'German', month => 'Mär', year => '1950'}],
 	},
 	{
-		date   => 'German Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', kind => 'Date', type => 'German', month => 'Feb', year => '1950'}],
+		date   => 'German Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', kind => 'Date', type => 'German', month => 'Mär', year => '1950'}],
 	},
 	{
-		date   => '21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', kind => 'Date', type => 'German', day => 21, month => 'Feb', year => '1950'}],
+		date   => '21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', kind => 'Date', type => 'German', day => 21, month => 'Mär', year => '1950'}],
 	},
 	{
-		date   => 'German 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', kind => 'Date', type => 'German', day => 21, month => 'Feb', year => '1950'}],
+		date   => 'German 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', kind => 'Date', type => 'German', day => 21, month => 'Mär', year => '1950'}],
 	},
 	{
 		date   => 'Abt German 1950',
 		result => [{canonical => '@#dGERMAN@ 1950', flag => 'ABT', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Abt Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', flag => 'ABT', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Abt Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'ABT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Abt German Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', flag => 'ABT', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Abt German Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'ABT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Abt 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', day => 21, flag => 'ABT', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Abt 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'ABT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{	# 10
-		date   => 'Abt German 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', day => 21, flag => 'ABT', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Abt German 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'ABT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Abt German 1950 VCHR',
@@ -63,20 +63,20 @@ my(@candidates) =
 		result => [{canonical => '@#dGERMAN@ 1950', flag => 'AFT', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Aft Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', flag => 'AFT', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Aft Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'AFT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Aft German Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', flag => 'AFT', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Aft German Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'AFT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Aft 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', day => 21, flag => 'AFT', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Aft 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'AFT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Aft German 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', day => 21, flag => 'AFT', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Aft German 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'AFT', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Aft German 1950 v.u.z.',
@@ -87,20 +87,20 @@ my(@candidates) =
 		result => [{canonical => '@#dGERMAN@ 1950', flag => 'BEF', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Bef Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', flag => 'BEF', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Bef Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'BEF', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{	# 20
-		date   => 'Bef German Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', flag => 'BEF', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Bef German Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'BEF', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Bef 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', day => 21, flag => 'BEF', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Bef 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'BEF', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Bef German 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', day => 21, flag => 'BEF', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Bef German 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'BEF', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Bef German 1950 v.c.',
@@ -167,20 +167,20 @@ my(@candidates) =
 		result => [{canonical => '@#dGERMAN@ 1950', flag => 'CAL', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Cal Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', flag => 'CAL', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Cal Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'CAL', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Cal German Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', flag => 'CAL', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Cal German Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'CAL', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Cal 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', day => 21, flag => 'CAL', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Cal 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'CAL', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Cal German 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', day => 21, flag => 'CAL', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Cal German 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'CAL', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Cal German 1950 v.chr.',
@@ -191,20 +191,20 @@ my(@candidates) =
 		result => [{canonical => '@#dGERMAN@ 1950', flag => 'EST', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', flag => 'EST', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Est Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est German Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', flag => 'EST', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Est German Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{	# 40
-		date   => 'Est 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', day => 21, flag => 'EST', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Est 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est German 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', day => 21, flag => 'EST', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Est German 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Est German 1950 vuz',
@@ -215,20 +215,20 @@ my(@candidates) =
 		result => [{canonical => '@#dGERMAN@ 1950', flag => 'EST', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', flag => 'EST', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Est Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est German Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', flag => 'EST', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Est German Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', day => 21, flag => 'EST', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Est 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'Est German 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', day => 21, flag => 'EST', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'Est German 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'EST', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'Est German 1950 vc',
@@ -239,20 +239,20 @@ my(@candidates) =
 		result => [{canonical => '@#dGERMAN@ 1950', flag => 'FROM', kind => 'Date', type => 'German', year => '1950'}],
 	},
 	{	# 50
-		date   => 'From Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', flag => 'FROM', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'From Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'FROM', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'From German Feb.1950',
-		result => [{canonical => '@#dGERMAN@ Feb.1950', flag => 'FROM', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'From German Mär.1950',
+		result => [{canonical => '@#dGERMAN@ Mär.1950', flag => 'FROM', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'From 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', day => 21, flag => 'FROM', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'From 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'FROM', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
-		date   => 'From German 21.Feb.1950',
-		result => [{canonical => '@#dGERMAN@ 21.Feb.1950', day => 21, flag => 'FROM', kind => 'Date', month => 'Feb', type => 'German', year => '1950'}],
+		date   => 'From German 21.Mär.1950',
+		result => [{canonical => '@#dGERMAN@ 21.Mär.1950', day => 21, flag => 'FROM', kind => 'Date', month => 'Mär', type => 'German', year => '1950'}],
 	},
 	{
 		date   => 'From German 1950 v.chr.',
@@ -261,10 +261,6 @@ my(@candidates) =
 	{	# 55
 		date   => 'To German 1950',
 		result => [{canonical => '@#dGERMAN@ 1950', flag => 'TO', kind => 'Date', type => 'German', year => '1950'}],
-	},
-	{
-		date   => 'German Mär.1950',
-		result => [{canonical => '@#dGERMAN@ Mär.1950', kind => 'Date', type => 'German', month => 'Mär', year => '1950'}],
 	},
 );
 

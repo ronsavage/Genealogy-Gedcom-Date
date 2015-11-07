@@ -1,7 +1,8 @@
 #!/usr/bin/env perl
 
+use open     qw(:std :utf8);    # Undeclared streams in UTF-8.
 use strict;
-use warnings;
+use utf8;
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 use Getopt::Long;
@@ -42,6 +43,8 @@ else
 __END__
 
 =pod
+
+=encoding utf8
 
 =head1 NAME
 
@@ -90,17 +93,21 @@ Default: 0.
 
 Try these:
 
-	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Dez.2015'
+	perl scripts/parse.pl -max debug -d 'From 21 Jun 1950 to @#dGerman@ 05.Dez.2015'
 
-	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Dez.2015' -n 0
+	perl scripts/parse.pl -max debug -d 'From 21 Jun 1950 to @#dGerman@ 05.Dez.2015' -c 0
 
-	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Dez.2015' -n 1
+	perl scripts/parse.pl -max debug -d 'From 21 Jun 1950 to @#dGerman@ 05.Dez.2015' -c 1
 
-	perl -Ilib scripts/parse.pl -d 'From 21 Jun 1950 to @#dGerman@ 05.Dez.2015' -n 2
+	perl scripts/parse.pl -max debug -d 'From 21 Jun 1950 to @#dGerman@ 05.Dez.2015' -c 2
 
 =item o -date aDate
 
 A date in Gedcom format. Protect spaces from the shell by using single-quotes.
+
+Note: You may have trouble with your shell inputting German dates containing 'Mär' on the command
+line. Adding 'use open qw(:std :utf8);' to your script won't help. At least, it does not help me
+on my Debian machine running bash.
 
 This option is mandatory.
 
@@ -115,6 +122,10 @@ Print help and exit.
 This option affects Log::Handler.
 
 See the Log::handler docs.
+
+Typical values are: 'error', 'notice', 'info' and 'debug'.
+
+The default produces no output.
 
 Default: 'notice'.
 

@@ -61,10 +61,10 @@ sub between_date
 	#$logger -> log(debug => "between_date t3: \n" . Dumper($t3) );
 	#$logger -> log(debug => "between_date t4: \n" . Dumper($t4) );
 
-	my($t_2)    = $$t2[1][0];
-	$$t_2{flag} = 'BET';
-	my($t_4)    = $$t4[1][0];
-	$$t_4{flag} = 'AND';
+	my($t5)    = $$t2[1][0];
+	$$t5{flag} = 'BET';
+	my($t6)    = $$t4[1][0];
+	$$t6{flag} = 'AND';
 
 	if (ref $$t2[0] eq 'HASH')
 	{
@@ -84,7 +84,7 @@ sub between_date
 		$t3 = {kind => 'Calendar', type => $calendar};
 	}
 
-	$t1 = [$t1, $t_2, $t3, $t_4];
+	$t1 = [$t1, $t5, $t3, $t6];
 
 	#$logger -> log(debug => "between_date result: \n" . Dumper($t1) );
 
@@ -113,7 +113,7 @@ sub calendar_name
 	$t1 =~ s/\@\#d(.+)\@/$1/; # Zap gobbledegook if present.
 	$t1 = ucfirst lc $t1;
 
-	#$logger -> log(debug => "calendar_name t1: \n" . Dumper($t1) );
+	$logger -> log(debug => "calendar_name t1: \n" . Dumper($t1) );
 
 	return
 	{
@@ -253,7 +253,7 @@ sub german_date
 {
 	my($cache, $t1) = @_;
 
-	#$logger -> log(debug => "german_date t1: \n" . Dumper($t1) );
+	$logger -> log(debug => "german_date t1: \n" . Dumper($t1) );
 
 	my($bce);
 	my($day);
@@ -293,11 +293,65 @@ sub german_date
 	$$result{month} = $month if (defined $month);
 	$result         = [$result];
 
-	#$logger -> log(debug => "german_date result: \n" . Dumper($result) );
+	$logger -> log(debug => "german_date result: \n" . Dumper($result) );
 
 	return $result;
 
 } # End of german_date.
+
+# ------------------------------------------------
+
+sub german_dmy
+{
+	my($cache, $t1, $t2, $t3, $t4) = @_;
+
+	$logger -> log(debug => "german_dmy t1: \n" . Dumper($t1) );
+	$logger -> log(debug => "german_dmy t2: \n" . Dumper($t2) );
+	$logger -> log(debug => "german_dmy t3: \n" . Dumper($t3) );
+	$logger -> log(debug => "german_dmy t4: \n" . Dumper($t4) );
+
+	$t1 = [$t1, $t2, $t3, $t4];
+
+	$logger -> log(debug => "german_dmy result: \n" . Dumper($t1) );
+
+	return $t1;
+
+} # End of german_dmy.
+
+# ------------------------------------------------
+
+sub german_my
+{
+	my($cache, $t1, $t2, $t3) = @_;
+
+	$logger -> log(debug => "german_my t1: \n" . Dumper($t1) );
+	$logger -> log(debug => "german_my t2: \n" . Dumper($t2) );
+	$logger -> log(debug => "german_my t3: \n" . Dumper($t3) );
+
+	$t1 = [$t1, $t2, $t3];
+
+	$logger -> log(debug => "german_my result: \n" . Dumper($t1) );
+
+	return $t1;
+
+} # End of german_my.
+
+# ------------------------------------------------
+
+sub german_y
+{
+	my($cache, $t1, $t2) = @_;
+
+	$logger -> log(debug => "german_y t1: \n" . Dumper($t1) );
+	$logger -> log(debug => "german_y t2: \n" . Dumper($t2) );
+
+	$t1 = [$t1, $t2];
+
+	$logger -> log(debug => "german_y result: \n" . Dumper($t1) );
+
+	return $t1;
+
+} # End of german_y.
 
 # ------------------------------------------------
 

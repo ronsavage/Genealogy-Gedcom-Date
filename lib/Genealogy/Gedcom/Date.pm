@@ -1,8 +1,8 @@
 package Genealogy::Gedcom::Date;
 
 use strict;
-use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 use utf8;
+use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 use Config;
 
@@ -144,7 +144,7 @@ sub BUILD
 
 :default				::= action => [values]
 
-lexeme default			=  latm => 1		# Longest Acceptable Token Match.
+lexeme default			= latm => 1		# Longest Acceptable Token Match.
 
 # Rules, in top-down order (more-or-less).
 
@@ -512,6 +512,7 @@ sub parse
 	catch
 	{
 		$self -> error($_);
+		$self -> log(debug => $self -> error);
 	};
 
 	for my $i (0 .. $#$result)
@@ -770,6 +771,8 @@ Output:
 
 See the L</FAQ> for the explanation of the output arrayrefs.
 
+See also scripts/parse.pl.
+
 Lastly, you are I<strongly> encouraged to peruse t/English.t, t/French.t and t/German.t.
 
 =head1 Description
@@ -862,7 +865,9 @@ See the L<Log::Handler::Levels> docs.
 
 By default nothing is printed.
 
-Typical values are: 'notice', 'info' and 'debug'. The default, 'notice', produces no output.
+Typical values are: 'error', 'notice', 'info' and 'debug'.
+
+The default produces no output.
 
 Default: 'notice'.
 
@@ -1259,11 +1264,31 @@ One of (case-insensitive):
 'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr' | 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' |
 'aav' | 'ell'
 
-=head2 Your module rejected my date!
+=head2 What happens if C<parse()> is given a string like 'To 2000 From 1999'?
 
-There are many possible reasons for this:
+The code I<does not> reorder the dates.
+
+=head2 Why was this module renamed from DateTime::Format::Gedcom?
+
+The L<DateTime> suite of modules aren't designed, IMHO, for GEDCOM-like applications. It was a
+mistake to use that name in the first place.
+
+By releasing under the Genealogy::Gedcom::* namespace, I can be much more targeted in the data
+types I choose as method return values.
+
+=head2 Why did you choose Moo over Moose?
+
+My policy is to use the lightweight L<Moo> for all modules and applications.
+
+=head1 Trouble-shooting
+
+Things to consider:
 
 =over 4
+
+=item o You tried to enter the German month name 'Mär' via the shell
+
+Read more about this by running 'perl scripts/parse.pl -h', where it discusses '-d'.
 
 =item o You mistyped the calendar escape
 
@@ -1283,11 +1308,13 @@ Check: Are any of these valid?
 
 =item o @#dJulian@
 
+=item o Julian
+
 =item o @#dJULIAN@
 
 =back
 
-Yes, the last 2 are accepted by this module, and the last one is accepted by other software.
+Yes, the last 3 are accepted by this module, and the last one is accepted by other software.
 
 =item o The date is in American format (month day year)
 
@@ -1297,22 +1324,6 @@ Dates - such as 1900/01 - which do not fit the Gedcom definition of a Julian yea
 out.
 
 =back
-
-=head2 What happens if C<parse()> is given a string like 'To 2000 From 1999'?
-
-The code I<does not> reorder the dates.
-
-=head2 Why was this module renamed from DateTime::Format::Gedcom?
-
-The L<DateTime> suite of modules aren't designed, IMHO, for GEDCOM-like applications. It was a
-mistake to use that name in the first place.
-
-By releasing under the Genealogy::Gedcom::* namespace, I can be much more targeted in the data
-types I choose as method return values.
-
-=head2 Why did you choose Moo over Moose?
-
-My policy is to use the lightweight L<Moo> for all modules and applications.
 
 =head1 See Also
 
