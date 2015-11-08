@@ -674,7 +674,7 @@ sub process_unambiguous
 
 =head1 NAME
 
-Genealogy::Gedcom::Date - Parse GEDCOM dates in Gregorian/Julian/French/German
+Genealogy::Gedcom::Date - Parse GEDCOM dates in French r/German/Gregorian/Hebrew/Julian
 
 =head1 Synopsis
 
@@ -774,13 +774,17 @@ See the L</FAQ> for the explanation of the output arrayrefs.
 
 See also scripts/parse.pl.
 
-Lastly, you are I<strongly> encouraged to peruse t/English.t, t/French.t and t/German.t.
+Lastly, you are I<strongly> encouraged to peruse t/*.t.
 
 =head1 Description
 
 L<Genealogy::Gedcom::Date> provides a L<Marpa|Marpa::R2>-based parser for GEDCOM dates.
 
-See L<the GEDCOM Specification|http://wiki.webtrees.net/en/Main_Page>.
+Calender escapes supported are (case-insensitive): French r/German/Gregorian/Hebrew/Julian.
+
+Gregorian is the default, and does not need to be used at all.
+
+See L<the GEDCOM Specification|http://wiki.webtrees.net/en/Main_Page>, p 45.
 
 =head1 Installation
 
@@ -890,7 +894,7 @@ Note: The parameters C<canonical> and C<date> can also be passed to L</parse([%a
 
 =head2 canonical([$integer])
 
-Here, the [] indicate an optionall parameter.
+Here, the [] indicate an optional parameter.
 
 Gets or sets the C<canonical> option, which controls what exactly L</parse([%args])> prints when
 L</maxlevel([$string])> is set to C<debug>.
@@ -915,6 +919,8 @@ This is done because it's the default.
 =item o If any other calendar escape was in the original string, it is preserved
 
 And it's output in all caps.
+
+And as a special case, 'FRENCHR' is returned as 'FRENCH R'.
 
 =item o If About, etc were in the orginal string, they are discarded
 
@@ -1032,6 +1038,66 @@ C<parse()> takes the same parameters as C<new()>.
 Warning: The array can contain 1 element when 2 are expected. This can happen if your input contains
 'From ... To ...' or 'Between ... And ...', and one of the dates is invalid. That is, the return
 value from C<parse()> will contain the valid date but no indicator of the invalid one.
+
+=head1 Extensions to the Gedcom specification
+
+This chapter lists exactly how this code differs from the Gedcom spec.
+
+=over 4
+
+=item o Input may be in Unicode
+
+=item o Input may be in any case
+
+=item o Input may omit calendar escapes when the date is unambigous
+
+=item o Any of the following tokens may be used
+
+=over 4
+
+=item o abt, about, circa
+
+=item o aft, after
+
+=item o and
+
+=item o bc, b.c., bce
+
+=item o bef, before
+
+=item o bet, between
+
+=item o cal, calculated
+
+=item o french r, frenchr, german, gregorian, hebrew, julian,
+
+=item o est, estimated
+
+=item o from
+
+=item o German BCE
+
+vc, v.c., v.chr., vchr, vuz, v.u.z.
+
+=item o German month names
+
+jan, feb, mär, maer, mrz, apr, mai, jun, jul, aug, sep, sept, okt, nov, dez
+
+=item o Gregorian month names
+
+jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec
+
+=item o Hebrew month names
+
+tsh, csh, ksl, tvt, shv, adr, ads, nsn, iyr, svn, tmz, aav, ell
+
+=item o int, interpreted
+
+=item o to
+
+=back
+
+=back
 
 =head1 FAQ
 
@@ -1188,6 +1254,8 @@ The C<type> key is always present, and takes one of these case-sensitive values:
 
 =item o Gregorian
 
+=item o Hebrew
+
 =item o Julian
 
 =item o Phrase
@@ -1209,14 +1277,17 @@ the C<year> key is never "$integer/$two_digits".
 
 =over 4
 
-=item o In theory for every non-Gregorian/non-Julian date
+=item o In theory, for every non-Gregorian date
 
 In practice, if the month name is unique to a specific language, then the escape is not needed,
 since L<Marpa::R2> and this code automatically handle ambiguity.
 
+Likewise, if you use a Gregorian year in the form 1700/01, then the calendar escape is obvious.
+
 The escape is, of course, always inserted into the values returned by the C<canonical> pair of
-methods when they process non-Gregorian/non-Julian dates. That makes their output compatible with
-other software.
+methods when they process non-Gregorian dates. That makes their output compatible with
+other software. And no matter what case you use specifying the calendar escape, it is always
+output in upper-case.
 
 =item o When you wish to force the code to provide an unambiguous result
 
@@ -1246,24 +1317,15 @@ Yes. Commas are replaced by spaces.
 
 =head2 French month names
 
-One of (case-insensitive):
-
-'vend' | 'brum' | 'frim' | 'nivo' | 'pluv' | 'vent' | 'germ' | 'flor' | 'prai' | 'mess' | 'ther'
-| 'fruc' | 'comp'.
+See L</Extensions to the Gedcom specification>.
 
 =head2 German month names
 
-One of (case-insensitive):
-
-'jan' | 'feb' | 'mär' | 'maer' | 'mrz' | 'apr' | 'mai' | 'jun' | 'jul' | 'aug' | 'sep' | 'sept'
-| 'okt' | 'nov' | 'dez'.
+See L</Extensions to the Gedcom specification>.
 
 =head2 Hebrew month names
 
-One of (case-insensitive):
-
-'tsh' | 'csh' | 'ksl' | 'tvt' | 'shv' | 'adr' | 'ads' | 'nsn' | 'iyr' | 'svn' | 'tmz' |
-'aav' | 'ell'
+See L</Extensions to the Gedcom specification>.
 
 =head2 What happens if C<parse()> is given a string like 'To 2000 From 1999'?
 
