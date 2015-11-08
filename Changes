@@ -3,7 +3,7 @@ Revision history for Perl extension Genealogy::Gedcom::Date.
 2.01  Mon Nov  9 08:03:00 2015
 	- Make abstract in Makefile.PL match the NAME in the docs.
 	- Fix conversion of commas to spaces, so that commas are preserved inside parentheses.
-	- Vastly expand the set of character allowed inside parentheses. A ')' is still forbidden.
+	- Vastly expand the set of characters allowed inside parentheses. A ')' is still forbidden.
 	- Fix code which was correct but accidentally so. This was used, $self -> recce -> read(\$date),
 		instead of $self -> recce -> read(\$self -> date). Luckily, $date was correct, but after now
 		removing commas differently, it wasn't.
