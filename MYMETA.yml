@@ -20,13 +20,16 @@ provides:
 requires:
   Config: '0'
   Data::Dumper::Concise: '2.022'
+  Getopt::Long: '0'
   Log::Handler: '0.84'
   Marpa::R2: '3'
   Moo: '2.000002'
+  Pod::Usage: '0'
   Test::Stream: '1.30202'
   Try::Tiny: '0.22'
   Type::Tiny: '1.000005'
   strict: '0'
+  utf8: '0'
   warnings: '0'
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
