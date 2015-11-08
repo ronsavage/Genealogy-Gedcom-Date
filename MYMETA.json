@@ -1,5 +1,5 @@
 {
-   "abstract" : "Parse GEDCOM dates",
+   "abstract" : "Parse GEDCOM dates in French r/German/Gregorian/Hebrew/Julian",
    "author" : [
       "Ron Savage <ron@savage.net.au>"
    ],
