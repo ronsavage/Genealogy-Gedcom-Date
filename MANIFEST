@@ -14,4 +14,5 @@ scripts/synopsis.pl
 t/English.t
 t/French.t
 t/German.t
+t/Hebrew.t
 xt/author/pod.t
