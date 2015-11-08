@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-use open     qw(:std :utf8);    # Undeclared streams in UTF-8.
 use strict;
 use utf8;
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
