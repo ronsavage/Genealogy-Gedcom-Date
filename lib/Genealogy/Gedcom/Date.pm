@@ -164,7 +164,7 @@ calendar_date			::= gregorian_date				action => gregorian_date
 							| julian_date				action => julian_date
 							| french_date				action => french_date
 							| german_date				action => german_date
-#							| hebrew_date
+							| hebrew_date				action => hebrew_date
 
 gregorian_date			::= day gregorian_month gregorian_year
 							| gregorian_month gregorian_year
@@ -201,10 +201,10 @@ german_date				::= day dot german_month_name dot german_year
 german_year				::= year
 							| year german_bce
 
-#hebrew_date			::= day hebrew_month_name year
-#							| hebrew_month_name year
-#							| year bce
-#							| year
+hebrew_date				::= day hebrew_month_name year
+							| hebrew_month_name year
+							| year bce
+							| year
 
 lds_ord_date			::= date_value
 
@@ -246,6 +246,7 @@ after					~ 'aft':i
 and						~ 'and':i
 
 bce						~ 'bc':i
+							| 'b.c.':i
 							| 'bce':i
 
 before					~ 'bef':i
@@ -293,8 +294,8 @@ german_month_name		~ 'jan':i | 'feb':i | 'mär':i | 'maer':i | 'mrz':i | 'apr':i
 gregorian_month_name		~ 'jan':i | 'feb':i | 'mar':i | 'apr':i | 'may':i | 'jun':i
 							| 'jul':i | 'aug':i | 'sep':i | 'oct':i | 'nov':i | 'dec':i
 
-#hebrew_month_name		~ 'tsh':i | 'csh':i | 'ksl':i | 'tvt':i | 'shv':i | 'adr':i
-#							| 'ads':i | 'nsn':i | 'iyr':i | 'svn':i | 'tmz':i | 'aav':i | 'ell':i
+hebrew_month_name		~ 'tsh':i | 'csh':i | 'ksl':i | 'tvt':i | 'shv':i | 'adr':i
+							| 'ads':i | 'nsn':i | 'iyr':i | 'svn':i | 'tmz':i | 'aav':i | 'ell':i
 
 interpreted				~ 'int':i
 							| 'interpreted':i

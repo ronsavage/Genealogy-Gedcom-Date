@@ -1,7 +1,8 @@
 #!/usr/bin/env perl
 
 use strict;
-use warnings;
+use utf8;
+use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 use Genealogy::Gedcom::Date;
 
@@ -30,4 +31,4 @@ process(1, $parser, 'Julian 1950');
 process(2, $parser, '@#dJulian@ 1951');
 process(3, $parser, 'From @#dJulian@ 1952 to Gregorian 1953/54');
 process(4, $parser, 'From @#dFrench r@ 1955 to 1956');
-process(5, $parser, 'From @#dJulian@ 1957 to German 1.Dez.1958');
+process(5, $parser, 'From @#dJulian@ 1957 to German 1.Mär.1958');

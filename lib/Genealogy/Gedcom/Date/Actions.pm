@@ -361,6 +361,61 @@ sub gregorian_year_bce
 
 # ------------------------------------------------
 
+sub hebrew_date
+{
+	my($cache, $t1) = @_;
+
+	my($bce);
+	my($day);
+	my($month);
+	my($year);
+
+	# Check for year, month, day.
+
+	if ($#$t1 == 0)
+	{
+		$year = $$t1[0];
+	}
+	elsif ($#$t1 == 1)
+	{
+		# First check for BCE.
+
+		if ($$t1[1] =~ /[0-9]/)
+		{
+			$month = $$t1[0];
+			$year  = $$t1[1];
+		}
+		else
+		{
+			$bce  = $$t1[1];
+			$year = $$t1[0];
+		}
+	}
+	else
+	{
+		$day   = $$t1[0];
+		$month = $$t1[1];
+		$year  = $$t1[2];
+	}
+
+	my($result) =
+	{
+		kind  => 'Date',
+		type  => 'Hebrew',
+		year  => $year,
+	};
+
+	$$result{bce}   = $bce if (defined $bce);
+	$$result{day}   = $day if (defined $day);
+	$$result{month} = $month if (defined $month);
+	$result         = [$result];
+
+	return $result;
+
+} # End of hebrew_date.
+
+# ------------------------------------------------
+
 sub interpreted_date
 {
 	my($cache, $t1) = @_;
