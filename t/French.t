@@ -333,13 +333,25 @@ my(@candidates) =
 			{canonical => '@#dJULIAN@ 1510', flag => 'TO', kind => 'Date', type => 'Julian', year => '1510'},
 		],
 	},
-	{	# 68
+	{
 		date   => 'From Julian 1950 to French r 1956',
 		result =>
 		[
 			{canonical => '@#dJULIAN@ 1950', flag => 'FROM', kind => 'Date', type => 'Julian', year => '1950'},
 			{canonical => '@#dFRENCH R@ 1956', flag => 'TO', kind => 'Date', type => 'French r', year => '1956'},
 		],
+	},
+	{
+		date   => 'Int French r 1950 (Approx)',
+		result => [{canonical => '@#dFRENCH R@ 1950 (Approx)', flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'French r', year => '1950'}],
+	},
+	{	# 70
+		date   => 'Int French r Frim 1950 (Approx)',
+		result => [{canonical => '@#dFRENCH R@ Frim 1950 (Approx)', flag => 'INT', kind => 'Date', month => 'Frim', phrase => '(Approx)', type => 'French r', year => '1950'}],
+	},
+	{	# 71
+		date   => 'Int French r Frim,1950 (Comma in date discarded, but preserved here)',
+		result => [{canonical => '@#dFRENCH R@ Frim 1950 (Comma in date discarded, but preserved here)', flag => 'INT', kind => 'Date', month => 'Frim', phrase => '(Comma in date discarded, but preserved here)', type => 'French r', year => '1950'}],
 	},
 );
 

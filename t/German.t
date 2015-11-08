@@ -256,9 +256,21 @@ my(@candidates) =
 		date   => 'From German 1950 v.chr.',
 		result => [{canonical => '@#dGERMAN@ 1950 v.chr.', bce => 'v.chr.', flag => 'FROM', kind => 'Date', type => 'German', year => '1950'}],
 	},
-	{	# 55
+	{
 		date   => 'To German 1950',
 		result => [{canonical => '@#dGERMAN@ 1950', flag => 'TO', kind => 'Date', type => 'German', year => '1950'}],
+	},
+	{
+		date   => 'Int German 1950 (Approx)',
+		result => [{canonical => '@#dGERMAN@ 1950 (Approx)', flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'German', year => '1950'}],
+	},
+	{
+		date   => 'Int German Okt.1950 (Approx)',
+		result => [{canonical => '@#dGERMAN@ Okt.1950 (Approx)', flag => 'INT', kind => 'Date', month => 'Okt', phrase => '(Approx)', type => 'German', year => '1950'}],
+	},
+	{	# 58
+		date   => 'Int German ,Okt.1950 (Comma in date discarded, but preserved here)',
+		result => [{canonical => '@#dGERMAN@ Okt.1950 (Comma in date discarded, but preserved here)', flag => 'INT', kind => 'Date', month => 'Okt', phrase => '(Comma in date discarded, but preserved here)', type => 'German', year => '1950'}],
 	},
 );
 

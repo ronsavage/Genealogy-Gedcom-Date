@@ -256,9 +256,21 @@ my(@candidates) =
 		date   => 'From Hebrew 1950 b.c.',
 		result => [{canonical => '@#dHEBREW@ 1950 b.c.', bce => 'b.c.', flag => 'FROM', kind => 'Date', type => 'Hebrew', year => '1950'}],
 	},
-	{	# 55
+	{
 		date   => 'To Hebrew 1950',
 		result => [{canonical => '@#dHEBREW@ 1950', flag => 'TO', kind => 'Date', type => 'Hebrew', year => '1950'}],
+	},
+	{
+		date   => 'Int Hebrew 1950 (Approx)',
+		result => [{canonical => '@#dHEBREW@ 1950 (Approx)', flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'Hebrew', year => '1950'}],
+	},
+	{
+		date   => 'Int Hebrew Aav 1950 (Approx)',
+		result => [{canonical => '@#dHEBREW@ Aav 1950 (Approx)', flag => 'INT', kind => 'Date', month => 'Aav', phrase => '(Approx)', type => 'Hebrew', year => '1950'}],
+	},
+	{	# 58
+		date   => 'Int Hebrew ,Aav 1950 (Comma in date discarded, but preserved here)',
+		result => [{canonical => '@#dHEBREW@ Aav 1950 (Comma in date discarded, but preserved here)', flag => 'INT', kind => 'Date', month => 'Aav', phrase => '(Comma in date discarded, but preserved here)', type => 'Hebrew', year => '1950'}],
 	},
 );
 

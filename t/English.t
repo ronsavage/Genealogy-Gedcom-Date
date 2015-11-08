@@ -792,8 +792,8 @@ my(@candidates) =
 		result => [{canonical => '1950 (Approx)', flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'Gregorian', year => '1950'}],
 	},
 	{
-		date   => 'Int Julian 1950 (Approx)',
-		result => [{canonical => '@#dJULIAN@ 1950 (Approx)', flag => 'INT', kind => 'Date', phrase => '(Approx)', type => 'Julian', year => '1950'}],
+		date   => 'Int Julian Jun,1950 (Comma in date discarded, but preserved here)',
+		result => [{canonical => '@#dJULIAN@ Jun 1950 (Comma in date discarded, but preserved here)', flag => 'INT', kind => 'Date', month => 'Jun', phrase => '(Comma in date discarded, but preserved here)', type => 'Julian', year => '1950'}],
 	},
 	{
 		date   => 'Int 1950/00 (Approx)',

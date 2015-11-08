@@ -108,7 +108,7 @@ has result =>
 	required => 0,
 );
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 # ------------------------------------------------
 
@@ -265,7 +265,7 @@ calendar_name			~ 'french r':i
 							| 'hebrew':i
 							| 'julian':i
 
-date_text				~ [\w ]+
+date_text				~ [^)\x{0a}\x{0b}\x{0c}\x{0d}]+
 
 digit					~ [0-9]
 
@@ -471,11 +471,29 @@ sub parse
 	my($canonical)   = defined($args{canonical}) ? $args{canonical} : $self -> canonical;
 	$canonical       = $canonical < 0 ? 0 : $canonical > 2 ? 2 : $canonical;
 	my($date)        = defined($args{date}) ? $args{date} : $self -> date;
-	$date            =~ tr/,/ /s;
-	my($result)      = [];
+
+	# Now we have the date, zap any commas outside any ().
+
+	my(@chars)    = split(//, $date);
+	my($i)        = 0;
+	my($finished) = $#chars < $i ? 1 : 0;
+
+	while (! $finished)
+	{
+		if ( ($i > $#chars) || ($chars[$i] eq '(') )
+		{
+			$finished = 1;
+		}
+		else
+		{
+			$chars[$i] = ' ' if ($chars[$i] eq ',');
+
+			$i++;
+		}
+	}
 
 	$self -> canonical($canonical);
-	$self -> date($date);
+	$self -> date(join('', @chars) );
 	$self -> error('');
 	$self -> recce
 	(
@@ -487,9 +505,11 @@ sub parse
 		})
 	);
 
+	my($result) = [];
+
 	try
 	{
-		$self -> recce -> read(\$date);
+		$self -> recce -> read(\$self -> date);
 
 		my($ambiguity_metric) = $self -> recce -> ambiguity_metric;
 
