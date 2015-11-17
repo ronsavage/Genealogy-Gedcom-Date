@@ -1,5 +1,12 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+2.02  Tue Nov 17 20:06:00 2015
+	_ UNRELEASED!
+	- No code changes. All tests still work.
+	- Add annotations (comments) to rule actions, listing the params to each action sub.
+	- Remove action day() which just returned its param, and use the reserved action ::first.
+	- Fix version # within Actions.pm. It was still 1.08.
+
 2.01  Mon Nov  9 08:03:00 2015
 	- Make abstract in Makefile.PL match the NAME in the docs.
 	- Fix conversion of commas to spaces, so that commas are preserved inside parentheses.

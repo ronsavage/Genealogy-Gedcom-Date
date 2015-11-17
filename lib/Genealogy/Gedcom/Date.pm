@@ -108,7 +108,7 @@ has result =>
 	required => 0,
 );
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 # ------------------------------------------------
 
@@ -156,38 +156,38 @@ gedcom_date				::= date
 date					::= calendar_escape calendar_date
 
 calendar_escape			::=
-calendar_escape			::= calendar_name 					action => calendar_name
-							| ('@#d') calendar_name ('@')	action => calendar_name
-							| ('@#D') calendar_name ('@')	action => calendar_name
+calendar_escape			::= calendar_name 					action => calendar_name		# ($t1)
+							| ('@#d') calendar_name ('@')	action => calendar_name		#   "
+							| ('@#D') calendar_name ('@')	action => calendar_name		#   "
 
-calendar_date			::= gregorian_date				action => gregorian_date
-							| julian_date				action => julian_date
-							| french_date				action => french_date
-							| german_date				action => german_date
-							| hebrew_date				action => hebrew_date
+calendar_date			::= gregorian_date					action => gregorian_date	# ($t1)
+							| julian_date					action => julian_date		# ($t1)
+							| french_date					action => french_date		# ($t1)
+							| german_date					action => german_date		# ($t1)
+							| hebrew_date					action => hebrew_date		# ($t1)
 
 gregorian_date			::= day gregorian_month gregorian_year
 							| gregorian_month gregorian_year
 							| gregorian_year_bce
 							| gregorian_year
 
-day						::= one_or_two_digits			action => day
+day						::= one_or_two_digits				action => ::first			# ($t1)
 
-gregorian_month			::= gregorian_month_name		action => gregorian_month
+gregorian_month			::= gregorian_month_name			action => gregorian_month	# ($t1)
 
-gregorian_year			::= number						action => year
-							| number ('/') two_digits	action => year
+gregorian_year			::= number							action => year				# ($t1, $t2)
+							| number ('/') two_digits		action => year				#     "
 
-gregorian_year_bce		::= gregorian_year bce			action => gregorian_year_bce
+gregorian_year_bce		::= gregorian_year bce				action => gregorian_year_bce # ($t1, $t2)
 
 julian_date				::= day gregorian_month_name year
 							| gregorian_month_name year
 							| julian_year_bce
 							| year
 
-julian_year_bce			::= year bce					action => julian_year_bce
+julian_year_bce			::= year bce						action => julian_year_bce	# ($t1, $t2)
 
-year					::= number						action => year
+year					::= number							action => year				# ($t1, $t2)
 
 french_date				::= day french_month_name year
 							| french_month_name year
@@ -211,24 +211,24 @@ lds_ord_date			::= date_value
 date_value				::= date_period
 							| date_range
 							| approximated_date
-							| interpreted_date			action => interpreted_date
-							| ('(') date_phrase (')')	action => date_phrase
+							| interpreted_date				action => interpreted_date	# ($t1)
+							| ('(') date_phrase (')')		action => date_phrase		# ($t1)
 
 date_period				::= from_date to_date
 							| from_date
 							| to_date
 
-from_date				::= from date					action => from_date
+from_date				::= from date						action => from_date			# ($t1, $t2)
 
-to_date					::= to date			 			action => to_date
+to_date					::= to date			 				action => to_date			# ($t1, $t2)
 
-date_range				::= before date					action => before_date
-							| after date				action => after_date
-							| between date and date		action => between_date
+date_range				::= before date						action => before_date		# ($t1, $t2)
+							| after date					action => after_date		# ($t1, $t2)
+							| between date and date			action => between_date		# ($t1, $t2, $t3, $t4)
 
-approximated_date		::= about date					action => about_date
-							| calculated date			action => calculated_date
-							| estimated date			action => estimated_date
+approximated_date		::= about date						action => about_date		# ($t1, $t2)
+							| calculated date				action => calculated_date	# ($t1, $t2)
+							| estimated date				action => estimated_date	# ($t1, $t2)
 
 interpreted_date		::= interpreted date ('(') date_phrase (')')
 
@@ -269,7 +269,7 @@ date_text				~ [^)\x{0a}\x{0b}\x{0c}\x{0d}]+
 
 digit					~ [0-9]
 
-dot					~ '.'
+dot						~ '.'
 
 estimated				~ 'est':i
 							| 'estimated':i
@@ -291,7 +291,7 @@ german_month_name		~ 'jan':i | 'feb':i | 'mär':i | 'maer':i | 'mrz':i | 'apr':i
 							| 'jun':i | 'jul':i | 'aug':i | 'sep':i | 'sept':i | 'okt':i
 							| 'nov':i | 'dez':i
 
-gregorian_month_name		~ 'jan':i | 'feb':i | 'mar':i | 'apr':i | 'may':i | 'jun':i
+gregorian_month_name	~ 'jan':i | 'feb':i | 'mar':i | 'apr':i | 'may':i | 'jun':i
 							| 'jul':i | 'aug':i | 'sep':i | 'oct':i | 'nov':i | 'dec':i
 
 hebrew_month_name		~ 'tsh':i | 'csh':i | 'ksl':i | 'tvt':i | 'shv':i | 'adr':i
