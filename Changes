@@ -1,10 +1,16 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
-2.02  Tue Nov 17 20:06:00 2015
+2.02  2015-11-17T20:06:00
 	- No (detectable) code changes.
 	- Add annotations (comments) to rule actions, listing the params to each action sub.
 	- Remove action day() which just returned its param, and use the reserved action ::first.
 	- Fix version # within Actions.pm. It was still 1.08.
+	- Reformat version-date lines in Changes from:
+		2.02  Tue Nov 17 20:06:00 2015
+	  to:
+		2.02  2015-11-17T20:06:00.
+	- Write (local) git.tag.pl to auto-add tag during (local) build.module.sh.
+	- Start pushing tags to repo.
 
 2.01  Mon Nov  9 08:03:00 2015
 	- Make abstract in Makefile.PL match the NAME in the docs.
@@ -15,7 +21,7 @@ Revision history for Perl extension Genealogy::Gedcom::Date.
 		removing commas differently, it wasn't.
 	- Add 'Int $date ($text)' tests to French.t, German.t and Hebrew.t.
 
-2.00  Tue Oct 13 20:43:00 2015
+2.00  2015-10-13T20:43:00
 	- Re-write using Marpa::R2, which uses the Gedcom grammar to define dates.
 	- Remove methods: parse_approximate_date(), parse_date_escape(), parse_datetime(),
 		parse_date_period(), parse_date_range(), parse_date_value(), parse_interpreted_date(),
@@ -33,7 +39,7 @@ Revision history for Perl extension Genealogy::Gedcom::Date.
 	- Rewrite all tests. See t/English.t, etc.
 	- Reduce the max line length of this file, and of the docs, to (an arbitrary) 100 chars.
 
-1.16  Wed Sep 30 10:14:00 2015
+1.16  2015-09-30T10:14:00
 	- Expand parse_datetime() so it accepts either a string or a hash.
 	- Expand docs to match.
 	- Expand t/date.t to test both an American date and the above.
@@ -41,18 +47,18 @@ Revision history for Perl extension Genealogy::Gedcom::Date.
 		See t/date.t for this case: December 13,1668. Zapping the ',' gives December 131668!
 	- Correct FAQ re Hash::FieldHash since I now use Moo.
 
-1.15  Mon Sep 28 08:58:00 2015
+1.15  2015-09-28T08:58:00
 	- Remove \n from all die messages, as suggested by Nigel Horne. See discussion in #RT107354.
 		I'm doing this assuming well-written code will capture all the dies, so the issue of
 		leaking information to users of CGI scripts does not arise.
 
-1.14  Fri Aug 28 11:34:00 2015
+1.14  2015-08-28T11:34:00
 	- Change logic of how we proceed after all parse methods have died, so that our own object
 		can still be used.
 		Thanx to Nigel Horne for reporting this. See RT#106705.
 	- Add below thanx to Nigel for reporting the locale issue (see V 1.13), and the code fix.
 
-1.13  Fri Aug 28 10:08:00 2015
+1.13  2015-08-28T10:08:00
 	- Honour the $ENV{LANG} value, if set, when creating DateTime objects.
 		Thanx to Nigel Horne for reporting this. See RT#106703.
 	- Add a note about $ENV{LANG} at the start of the FAQ.
@@ -61,20 +67,20 @@ Revision history for Perl extension Genealogy::Gedcom::Date.
 	- Add repo to docs.
 	- Remove Build.PL.
 
-1.12  Sun May 10 12:00:00 2015
+1.12  2015-05-10T12:00:00
 	- No code changes.
 	- Bump required version of DateTime from V 1.03 to V 1.18, hoping this fixes all the
 		CPAN tester fail reports. This change /really/ should have been in the last version.
 
-1.11  Tue Apr 28 17:14:00 2015
+1.11  2015-04-28T17:14:00
 	- Use Config.pm to tell us which version of Perl is being used, and if it's >= 5.21.11,
 		then use 'Inf' and '-Inf', otherwise use 'inf' and '-inf'.
 	- Test with Perls V 5.10.1, 5.20.2 and 5.21.11.
 
-1.10  Tue Apr 28 16:06:00 2015
+1.10  2015-04-28T16:06:00
 	- Update META.json and META.yml.
 
-1.09  Tue Apr 28 11:14:20 2015
+1.09  2015-04-28T11:14:20
 	- Test under Perl V 5.21.11. See RT#103959.
 	- Deal with test failures relating to Inf under Perl V 5.21.11.
 		This involves using 'Inf' instead of 'inf', and '-Inf' instead of '-inf'.
@@ -82,17 +88,17 @@ Revision history for Perl extension Genealogy::Gedcom::Date.
 	- Add github repo Genealogy-Gedcom-Date. This involves updating Build.PL and Makefile.PL.
 	- Move t/pod.t to xt/author/pod.t. This involves making Test::Pod optional.
 
-1.08  Wed Jun 26 11:00:00 2013
+1.08  2013-06-26T11:00:00
 	- Rename CHANGES to Changes as per CPAN::Changes::SPEC.
 	- Update pre-preqs' version #s, especially for DateTime and DateTime::Infinite, to see if that
 		fixes mysterious CPAN Tester failures with t/date.t's use of '15 Jul 1954'.
 
-1.07  Fri Mar 23 16:51:00 2012
+1.07  2012-03-23T16:51:00
 	- Patch code and tests for Solaris, where Data::Infinite::(Past, Future) return '-Infinity' and
 		'Infinity'.
 	- Turn off debug in tests.
 
-1.06  Thu Mar 22 09:18:00 2012
+1.06  2012-03-22T09:18:00
 	- No code changes. No need to upgrade.
 	- The only patch is that debug is enabled in all test scripts. The point is to report as much
 		information as possible when CPAN Testers using Solaris run tests. Unfortunately, no CPAN
@@ -102,18 +108,18 @@ Revision history for Perl extension Genealogy::Gedcom::Date.
 		turned off again, along with a Solaris fix. After that, I never want to hear about this
 		problem again.
 
-1.05  Sat Mar 17 17:29:00 2012
+1.05  2012-03-17T17:29:00
 	- CPAN testing showed more cases where the patches in V 1.02 had to be applied.
 
-1.04  Fri May 16 14:37:00 2012
+1.04  2012-05-16T14:37:00
 	- Aggghhhh. Fix tests to match fix in V 1.03. Tests worked under Debian of course.
 
-1.03  Wed Mar 14 17:16:00 2012
+1.03  2012-03-14T17:16:00
 	- Add complexity to the fix for problems to Data::Infinite::(Past, Future) for OSes:
 		o Win32::GetOSName = Win7
 		o Win32::GetOSName = WinXP/.Net
 
-1.02  Tue Mar 13 08:57:00 2012
+1.02  2012-03-13T08:57:00
 	- Bump pre-reqs for DateTime and DateTime::Inifinite from V 0.70 to V 0.72, since these are the
 		latest (today).
 	- Fix sub _init_flags() for systems where DateTime::Infinite::Past is returned as '-1.#INF'
@@ -122,14 +128,14 @@ Revision history for Perl extension Genealogy::Gedcom::Date.
 		For end users of course, the change in sub _init_flags() is what matters.
 	- Update the docs to explain that '-inf' is returned even when the system returns '-1.#INF'.
 
-1.01  Wed Feb 29 09:35:00 2012
+1.01  2012-02-29T09:35:00
 	  - No code changes.
 	  - Update pre-req Hash::FieldHash from V 0.10 to V 0.12, in presumably hopeless attempt to
 		rectify a CPAN Tester report about failure under MS Windows.
 	  	See: http://www.cpantesters.org/cpan/report/9c177958-6ca0-1014-a634-88fc0063837e. The code
 		tests perfectly on my Debian stable system.
 
-1.00  Thu Sep 20 13:47:00 2011
+1.00  2011-09-20T13:47:00
 	  - Initial release. This is an updated version of DateTime::Format::Gedcom V 1.00.
 	  	This latter module is deprecated. Details in the FAQ.
 	  - Changes since DateTime::Format::Gedcom:
