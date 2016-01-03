@@ -1,4 +1,4 @@
-package Genealogy::Gedcom::Date;
+﻿package Genealogy::Gedcom::Date;
 
 use strict;
 use utf8;
@@ -108,7 +108,7 @@ has result =>
 	required => 0,
 );
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 # ------------------------------------------------
 
@@ -526,7 +526,13 @@ sub parse
 		if ($ambiguity_metric <= 0)
 		{
 			my($line, $column)	= $self -> recce -> line_column();
-			my($message)		= "Call to ambiguity_metric() returned $ambiguity_metric. Current location within input string: Line: $line, column: $column";
+			my($whole_length)	= length $date;
+			my($suffix)			= substr($date, ($whole_length - 100) );
+			my($suffix_length)	= length $suffix;
+			my($s)				= $suffix_length == 1 ? 'char' : "$suffix_length chars";
+			my($message)		= "Call to ambiguity_metric() returned $ambiguity_metric. \n"
+				. "Marpa exited at (line, column) = ($line, $column) within the input string. \n"
+				. "Input length: $whole_length. Last $s of input: '$suffix'";
 
 			$self -> error($message);
 
@@ -1381,6 +1387,14 @@ My policy is to use the lightweight L<Moo> for all modules and applications.
 Things to consider:
 
 =over 4
+
+=item o Error message: Marpa exited at (line, column) = ($line, $column) within the input string
+
+Consider the possibility that the parse ends without a C<successful> parse, but the input is the
+prefix of some input that C<can> lead to a successful parse.
+
+Marpa is not reporting a problem during the read(), because you can add more to the input string,
+and Marpa does not know that you do not plan to do this.
 
 =item o You tried to enter the German month name 'Mär' via the shell
 

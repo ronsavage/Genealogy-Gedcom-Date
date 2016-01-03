@@ -1,5 +1,12 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+2.04  2016-01-04T09:08:00
+	- Considerably expand the new ambiguity_metric() error message discussed below under V 2.03.
+		Note: The message is now so detailed it contains 2 newline chars and hence 3 lines.
+	- Add an item to the Trouble-shooting part of the docs explaining why you might get this error.
+	- Use bommer.pl, which ships are part of File::BOM::Utils, to add a UTF-8 BOM to the source
+		file lib/Genealogy/Gedcom/Date.pm.
+
 2.03  2016-01-03T11:56:00
 	- Check the input for undef and the empty string. If found, parse() returns [] and sets the
 		error string to 'Input is the empty string'.
