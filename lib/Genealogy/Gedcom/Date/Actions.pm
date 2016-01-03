@@ -9,7 +9,7 @@ our $calendar;
 
 our $logger;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 # ------------------------------------------------
 

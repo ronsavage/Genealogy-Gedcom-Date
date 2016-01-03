@@ -1,5 +1,11 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+2.03  2016-01-03T11:56:00
+	- Check the input for undef and the empty string. If found, parse() returns [] and sets the
+		error string to 'Input is the empty string'.
+	- If, after calling Marpa's parse() method, the call to ambiguity_metric() returns <= 0, then
+		the error string now includes the line and column Marpa was up to within the input stream.
+
 2.02  2015-11-17T20:06:00
 	- No (detectable) code changes.
 	- Add annotations (comments) to rule actions, listing the params to each action sub.

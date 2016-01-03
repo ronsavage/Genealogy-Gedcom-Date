@@ -108,7 +108,7 @@ has result =>
 	required => 0,
 );
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 # ------------------------------------------------
 
@@ -467,10 +467,11 @@ sub log
 
 sub parse
 {
-	my($self, %args) = @_;
-	my($canonical)   = defined($args{canonical}) ? $args{canonical} : $self -> canonical;
-	$canonical       = $canonical < 0 ? 0 : $canonical > 2 ? 2 : $canonical;
-	my($date)        = defined($args{date}) ? $args{date} : $self -> date;
+	my($self, %args)	= @_;
+	my($canonical)		= defined($args{canonical}) ? $args{canonical} : $self -> canonical;
+	$canonical			= $canonical < 0 ? 0 : $canonical > 2 ? 2 : $canonical;
+	my($date)			= defined($args{date}) ? $args{date} : $self -> date;
+	$date				= '' if (! defined $date);
 
 	# Now we have the date, zap any commas outside any ().
 
@@ -492,8 +493,10 @@ sub parse
 		}
 	}
 
+	$date = join('', @chars);
+
 	$self -> canonical($canonical);
-	$self -> date(join('', @chars) );
+	$self -> date($date);
 	$self -> error('');
 	$self -> recce
 	(
@@ -507,15 +510,23 @@ sub parse
 
 	my($result) = [];
 
+	if (length($date) == 0)
+	{
+		$self -> error('Input is the empty string');
+
+		return $result;
+	}
+
 	try
 	{
-		$self -> recce -> read(\$self -> date);
+		$self -> recce -> read(\$date);
 
 		my($ambiguity_metric) = $self -> recce -> ambiguity_metric;
 
 		if ($ambiguity_metric <= 0)
 		{
-			my($message) = "Call to ambiguity_metric() returned $ambiguity_metric";
+			my($line, $column)	= $self -> recce -> line_column();
+			my($message)		= "Call to ambiguity_metric() returned $ambiguity_metric. Current location within input string: Line: $line, column: $column";
 
 			$self -> error($message);
 
@@ -1052,6 +1063,8 @@ Here, [ and ] indicate an optional parameter.
 C<parse()> returns an arrayref. See the L</FAQ> for details.
 
 If the arrayref is empty, call L</error()> to retrieve the error message.
+
+In particular, the arrayref will be empty if the input date is the empty string.
 
 C<parse()> takes the same parameters as C<new()>.
 
