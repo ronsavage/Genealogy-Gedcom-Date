@@ -8,9 +8,11 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
+scripts/compare.pl
 scripts/parse.pl
 scripts/pod2html.sh
 scripts/synopsis.pl
+t/compare.t
 t/English.t
 t/French.t
 t/German.t
