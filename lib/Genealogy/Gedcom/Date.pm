@@ -18,7 +18,7 @@ use Moo;
 
 use Try::Tiny;
 
-use Types::Standard qw/Any Bool Int HashRef Str/;
+use Types::Standard qw/Any ArrayRef Bool Int HashRef Str/;
 
 has bnf =>
 (
@@ -102,13 +102,13 @@ has recce =>
 
 has result =>
 (
-	default  => sub{return ''},
+	default  => sub{return []},
 	is       => 'rw',
-	isa      => Str,
+	isa      => ArrayRef,
 	required => 0,
 );
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 # ------------------------------------------------
 
@@ -414,6 +414,75 @@ sub clean_calendar
 
 } # End of clean_calendar.
 
+# --------------------------------------------------
+
+sub compare
+{
+	my($self, $other)	= @_;
+	my($result_1)		= $self -> result;
+	my($date_1)			= $self -> normalize_date($#$result_1 < 0 ? {} : $$result_1[0]);
+	my($result_2)		= $other -> result;
+	my($date_2)			= $self -> normalize_date($#$result_2 < 0 ? {} : $$result_2[0]);
+
+	# Return:
+	# o 0 if the dates have different date escapes.
+	# o 1 if $date_1 < $date_2.
+	# o 2 if $date_1 = $date_2.
+	# o 3 if $date_1 > $date_2.
+
+	my($result);
+
+	if ( ($$date_1{kind} ne $$date_2{kind}) || ($$date_1{type} ne $$date_2{type}) )
+	{
+		$result = 0;
+	}
+	elsif ($$date_1{bce} && ($$date_2{bce} eq '') )
+	{
+		# We don't care what the value of 'bce' is. We only care if it has been set or not.
+
+		$result = 1;
+	}
+	elsif ( ($$date_1{bce} eq '') && $$date_2{bce})
+	{
+		$result = 3;
+	}
+	else
+	{
+		my($format)	= '%4d-%4s-%02d';
+		my($form_1)	= sprintf($format, $$date_1{year}, $$date_1{month}, $$date_1{day});
+		my($form_2)	= sprintf($format, $$date_2{year}, $$date_2{month}, $$date_2{day});
+
+		if ($form_1 eq $form_2)
+		{
+			$result = 2;
+		}
+		elsif ($$date_1{bce})
+		{
+			# Ahhhggg. BCE! Reverse sense of test.
+
+			if ($form_1 lt $form_2)
+			{
+				$result = 3;
+			}
+			else
+			{
+				$result = 1;
+			}
+		}
+		elsif ($form_1 lt $form_2)
+		{
+			$result = 1;
+		}
+		else
+		{
+			$result = 3;
+		}
+	}
+
+	return $result;
+
+} # End of compare.
+
 # ------------------------------------------------
 
 sub decode_result
@@ -462,6 +531,23 @@ sub log
 	$self -> logger -> log($level => $s) if ($self -> logger);
 
 } # End of log.
+
+# ------------------------------------------------
+
+sub normalize_date
+{
+	my($self, $date)	= @_;
+	$$date{bce}			= ''	if (! defined $$date{bce});
+	$$date{day}			= 0		if (! defined $$date{day} || ($$date{day} !~ /^\d+$/) );
+	$$date{month}		= ''	if (! defined $$date{month});
+	$$date{type}		= ''	if (! defined $$date{type});
+	$$date{year}		= 0		if (! defined $$date{year});
+	my($index)			= index($$date{year}, '/');
+	$$date{year}		= substr($$date{year}, 0, $index - 1) if ($index >= 0);
+
+	return $date;
+
+} # End of normalize_date.
 
 # --------------------------------------------------
 
@@ -530,7 +616,7 @@ sub parse
 			my($suffix)			= substr($date, ($whole_length - 100) );
 			my($suffix_length)	= length $suffix;
 			my($s)				= $suffix_length == 1 ? 'char' : "$suffix_length chars";
-			my($message)		= "Call to ambiguity_metric() returned $ambiguity_metric. \n"
+			my($message)		= "Call to ambiguity_metric() returned $ambiguity_metric (i.e. an error). \n"
 				. "Marpa exited at (line, column) = ($line, $column) within the input string. \n"
 				. "Input length: $whole_length. Last $s of input: '$suffix'";
 
@@ -572,6 +658,7 @@ sub parse
 	}
 
 	$self -> error("Unable to parse '" . $self -> date . "'") if ($#$result < 0);
+	$self -> result($result);
 
 	return $result;
 
@@ -689,7 +776,7 @@ sub process_unambiguous
 
 		if ($calendar eq $$value[1]{type})
 		{
-			$result = [$$value[1]];
+			$result = [$$value[1] ];
 		}
 	}
 	elsif ( ($$value[0]{type} eq $calendar) && ($$value[1]{type} eq $calendar) )
@@ -743,7 +830,6 @@ A script (scripts/synopsis.pl):
 	# --------------------------
 
 	my($parser) = Genealogy::Gedcom::Date -> new(maxlevel => 'debug');
-	my($date)   =
 
 	process(1, $parser, 'Julian 1950');
 	process(2, $parser, '@#dJulian@ 1951');
@@ -809,7 +895,7 @@ Output:
 
 See the L</FAQ> for the explanation of the output arrayrefs.
 
-See also scripts/parse.pl.
+See also scripts/parse.pl and scripts/compare.pl for sample code.
 
 Lastly, you are I<strongly> encouraged to peruse t/*.t.
 
@@ -820,6 +906,11 @@ L<Genealogy::Gedcom::Date> provides a L<Marpa|Marpa::R2>-based parser for GEDCOM
 Calender escapes supported are (case-insensitive): French r/German/Gregorian/Hebrew/Julian.
 
 Gregorian is the default, and does not need to be used at all.
+
+Comparison of 2 C<Genealogy::Gedcom::Date>-based objects is supported by calling the sub
+L</compare($other_object)> method on one object and passing the other object as the parameter.
+
+Note: C<compare()> can return any one of four (4) values.
 
 See L<the GEDCOM Specification|http://wiki.webtrees.net/en/Main_Page>, p 45.
 
@@ -989,6 +1080,25 @@ Then it adds information from the C<flag> key in each element, if present.
 
 For sample code, see L</canonical_date($hashref)> just above.
 
+=head2 compare($other_object)
+
+Returns an integer 0 .. 3 (sic) indicating the temporal relationship between the invoking object
+($self) and $other_object.
+
+Returns one of these values:
+
+	0 if the dates have different date escapes.
+	1 if $date_1 < $date_2.
+	2 if $date_1 = $date_2.
+	3 if $date_1 > $date_2.
+
+Note: Gregorian years like 1510/02 are converted into 1510 before the dates are compared. Create a
+sub-class and override L</normalize_date($date_hash)> if desired.
+
+See scripts/compare.pl for sample code.
+
+See also L</normalize_date($date_hash)>.
+
 =head2 date([$date])
 
 Here, [ and ] indicate an optional parameter.
@@ -1061,6 +1171,12 @@ See L<Log::Handler::Levels>.
 =head2 new([%args])
 
 The constructor. See L</Constructor and Initialization>.
+
+=head2 normalize_date($date_hash)
+
+Normalizes $date_hash for each date during a call to L</compare($other_object)>.
+
+Override in a sub-class if you wish to change the normalization technique.
 
 =head2 parse([%args])
 

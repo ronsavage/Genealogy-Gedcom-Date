@@ -25,7 +25,6 @@ sub process
 # --------------------------
 
 my($parser) = Genealogy::Gedcom::Date -> new(maxlevel => 'debug');
-my($date)   =
 
 process(1, $parser, 'Julian 1950');
 process(2, $parser, '@#dJulian@ 1951');
