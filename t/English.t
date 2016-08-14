@@ -822,7 +822,7 @@ for my $item (@candidates)
 
 	$result = $parser -> parse(date => $$item{date});
 
-	is($result, $$item{result}, "$count: English: $$item{date}");
+	is(@$result, @{$$item{result} }, "$count: English: $$item{date}");
 }
 
 done_testing;
