@@ -30,23 +30,27 @@ my(%params) =
 		'Config'       => 0,
 		'Data::Dumper::Concise' => 2.022,
 		'Getopt::Long' => 0,
-		'Log::Handler' => 0.84,
+		'Log::Handler' => 0.88,
 		'Marpa::R2'    => 3.000000,
-		'Moo'          => 2.000002,
+		'Moo'          => 2.003004,
 		'Pod::Usage'   => 0,
 		'strict'       => 0,
-		'Test::Stream' => 1.302020,
-		'Try::Tiny'    => 0.22,
+		'Try::Tiny'    => 0.24,
 		'Type::Tiny'   => 1.000005,
 		'utf8'         => 0,
 		'warnings'     => 0,
+	},
+	TEST_REQUIRES =>
+	{
+		'Test::Pod'			=> 1.51,
+		'Test::Simple'		=> 1.302052, # For Test::More.
 	},
 	VERSION_FROM => 'lib/Genealogy/Gedcom/Date.pm',
 );
 
 if ( ($ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/) && ($ExtUtils::MakeMaker::VERSION > 6.30) )
 {
-	$params{LICENSE} = 'artistic_2';
+	$params{LICENSE} = 'perl';
 }
 
 if ($ExtUtils::MakeMaker::VERSION ge '6.46')

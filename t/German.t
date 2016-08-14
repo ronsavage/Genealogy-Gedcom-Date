@@ -6,7 +6,7 @@ use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 use Genealogy::Gedcom::Date;
 
-use Test::Stream -V1;
+use Test::More;
 
 # ------------------------------------------------
 

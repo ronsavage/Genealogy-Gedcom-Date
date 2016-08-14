@@ -7,7 +7,7 @@ use Data::Dumper::Concise; # For Dumper().
 
 use Genealogy::Gedcom::Date;
 
-use Test::Stream -V1;
+use Test::More;
 
 # ------------------------------------------------
 

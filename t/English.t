@@ -5,7 +5,7 @@ use warnings;
 
 use Genealogy::Gedcom::Date;
 
-use Test::Stream -V1;
+use Test::More;
 
 # ------------------------------------------------
 

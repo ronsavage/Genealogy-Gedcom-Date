@@ -1,5 +1,15 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+2.06  2016-08-14T11:33:00
+	- Stop using Test::Stream. Use Test::More shipped in the Test::Simple distro.
+		See RT#116933. Thanx to Chad Granum.
+	- Update version #s in pre-reqs.
+	- Adopt new repo structure. For details, see
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Update .gitignore and MANIFEST.SKIP.
+	- Change licence from Artistic to Perl.
+	- Move Test::Pod and Test::Simple to TEST_REQUIRES.
+
 2.05  2016-01-10T16:34:00
 	- Add method compare($other_object) for comparing dates. Returns a value in the range
 		0 .. 3 (sic). See RT#110333. Thanx to Nigel Horne for the suggestion.
