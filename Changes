@@ -1,5 +1,9 @@
 Revision history for Perl extension Genealogy::Gedcom::Date.
 
+2.07  2016-09-14T08:35:00
+	- Wind down Moo pre-req version # from 2.003004 (a typo!) to 2.003004. See RT#117821.
+		Thanx to Nigel Horne for the report.
+
 2.06  2016-08-14T11:33:00
 	- Stop using Test::Stream. Use Test::More shipped in the Test::Simple distro.
 		See RT#116934. Thanx to Chad Granum.
