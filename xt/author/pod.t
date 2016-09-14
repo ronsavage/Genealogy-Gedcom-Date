@@ -1,4 +1,4 @@
-use Test::Stream -V1;
+use Test::More;
 
 eval "use Test::Pod 1.45";
 
