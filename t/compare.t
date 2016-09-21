@@ -1,7 +1,8 @@
 #!/usr/bin/env perl
 
 use strict;
-use warnings;
+use utf8;
+use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 use Genealogy::Gedcom::Date;
 
@@ -25,9 +26,17 @@ sub process
 
 		$parser_1 -> parse(date => $$item{date}[0]);
 
+		my($error) = $parser_1 -> error;
+
+		diag "Parsing $$item{date}[0]. $error\n" if ($error);
+
 		my($parser_2) = Genealogy::Gedcom::Date -> new;
 
 		$parser_2 -> parse(date => $$item{date}[1]);
+
+		$error = $parser_2 -> error;
+
+		diag "Parsing $$item{date}[0]. $error\n" if ($error);
 
 		$result = $parser_1 -> compare($parser_2);
 
