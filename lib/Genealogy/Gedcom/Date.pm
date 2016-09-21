@@ -539,6 +539,7 @@ sub normalize_date
 	my($self, $date)	= @_;
 	$$date{bce}			= ''	if (! defined $$date{bce});
 	$$date{day}			= 0		if (! defined $$date{day} || ($$date{day} !~ /^\d+$/) );
+	$$date{kind}		= ''	if (! defined $$date{kind});
 	$$date{month}		= ''	if (! defined $$date{month});
 	$$date{type}		= ''	if (! defined $$date{type});
 	$$date{year}		= 0		if (! defined $$date{year});
@@ -635,7 +636,9 @@ sub parse
 	}
 	catch
 	{
-		$self -> error($_);
+		my($error) = $_;
+
+		$self -> error($error);
 		$self -> log(debug => $self -> error);
 	};
 
@@ -657,7 +660,7 @@ sub parse
 		$self -> log(debug => $self -> canonical_date($$result[$_]) ) for (0 .. $#$result);
 	}
 
-	$self -> error("Unable to parse '" . $self -> date . "'") if ($#$result < 0);
+	$self -> error("Unable to parse '" . $self -> date . "'") if ( (! $self -> error) && $#$result < 0);
 	$self -> result($result);
 
 	return $result;
