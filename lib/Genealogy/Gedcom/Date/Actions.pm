@@ -9,6 +9,8 @@ our $calendar;
 
 our $logger;
 
+our $verbose = 0;
+
 our $VERSION = '2.08';
 
 # ------------------------------------------------
@@ -16,6 +18,9 @@ our $VERSION = '2.08';
 sub about_date
 {
 	my($cache, $t1, $t2) = @_;
+
+	print STDERR '#=== about_date() action: ', Dumper($t1), Dumper($t2) if ($verbose);
+
 	my($t3)    = $$t2[1];
 	$t3        = $$t3[0] if (ref $t3 eq 'ARRAY');
 	$$t3{flag} = 'ABT';
@@ -29,6 +34,9 @@ sub about_date
 sub after_date
 {
 	my($cache, $t1, $t2) = @_;
+
+	print STDERR '#=== after_date() action: ', Dumper($t1), Dumper($t2) if ($verbose);
+
 	my($t3)    = $$t2[1];
 	$t3        = $$t3[0] if (ref $t3 eq 'ARRAY');
 	$$t3{flag} = 'AFT';
@@ -42,6 +50,9 @@ sub after_date
 sub before_date
 {
 	my($cache, $t1, $t2) = @_;
+
+	print STDERR '#=== before_date() action: ', Dumper($t1), Dumper($t2) if ($verbose);
+
 	my($t3)    = $$t2[1];
 	$t3        = $$t3[0] if (ref $t3 eq 'ARRAY');
 	$$t3{flag} = 'BEF';
@@ -55,6 +66,9 @@ sub before_date
 sub between_date
 {
 	my($cache, $t1, $t2, $t3, $t4) = @_;
+
+	print STDERR '#=== between_date() action: ', Dumper($t1), Dumper($t2), Dumper($t3), Dumper($t4) if ($verbose);
+
 	my($t5)    = $$t2[1][0];
 	$$t5{flag} = 'BET';
 	my($t6)    = $$t4[1][0];
@@ -89,6 +103,9 @@ sub between_date
 sub calculated_date
 {
 	my($cache, $t1, $t2) = @_;
+
+	print STDERR '#=== calculated_date() action: ', Dumper($t1), Dumper($t2) if ($verbose);
+
 	my($t3)    = $$t2[1];
 	$t3        = $$t3[0] if (ref $t3 eq 'ARRAY');
 	$$t3{flag} = 'CAL';
@@ -102,6 +119,9 @@ sub calculated_date
 sub calendar_name
 {
 	my($cache, $t1) = @_;
+
+	print STDERR '#=== calendar_name() action: ', Dumper($t1) if ($verbose);
+
 	$t1 =~ s/\@\#d(.+)\@/$1/; # Zap gobbledegook if present.
 	$t1 = ucfirst lc $t1;
 
@@ -119,6 +139,8 @@ sub date_phrase
 {
 	my($cache, $t1) = @_;
 
+	print STDERR '#=== date_phrase() action: ', Dumper($t1) if ($verbose);
+
 	return
 	{
 		kind   => 'Phrase',
@@ -133,6 +155,9 @@ sub date_phrase
 sub estimated_date
 {
 	my($cache, $t1, $t2) = @_;
+
+	print STDERR '#=== estimated_date() action: ', Dumper($t1), Dumper($t2) if ($verbose);
+
 	my($t3)    = $$t2[1];
 	$t3        = $$t3[0] if (ref $t3 eq 'ARRAY');
 	$$t3{flag} = 'EST';
@@ -146,6 +171,8 @@ sub estimated_date
 sub french_date
 {
 	my($cache, $t1) = @_;
+
+	print STDERR '#=== french_date() action: ', Dumper($t1) if ($verbose);
 
 	my($bce);
 	my($day);
@@ -201,6 +228,9 @@ sub french_date
 sub from_date
 {
 	my($cache, $t1, $t2) = @_;
+
+	print STDERR '#=== from_date() action: ', Dumper($t1), Dumper($t2) if ($verbose);
+
 	my($t3)    = $$t2[0];
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
@@ -222,6 +252,8 @@ sub from_date
 sub german_date
 {
 	my($cache, $t1) = @_;
+
+	print STDERR '#=== german_date() action: ', Dumper($t1) if ($verbose);
 
 	my($bce);
 	my($day);
@@ -270,6 +302,8 @@ sub german_date
 sub gregorian_date
 {
 	my($cache, $t1) = @_;
+
+	print STDERR '#=== gregorian_date() action: ', Dumper($t1) if ($verbose);
 
 	# Is it a BCE date? If so, it's already a hashref.
 
@@ -327,6 +361,9 @@ sub gregorian_date
 sub gregorian_month
 {
 	my($cache, $t1) = @_;
+
+	print STDERR '#=== gregorian_month() action: ', Dumper($t1) if ($verbose);
+
 	$t1 = $$t1[0] if (ref $t1);
 
 	return $t1;
@@ -338,6 +375,8 @@ sub gregorian_month
 sub gregorian_year_bce
 {
 	my($cache, $t1, $t2) = @_;
+
+	print STDERR '#=== gregorian_year_bce() action: ', Dumper($t1), Dumper($t2) if ($verbose);
 
 	return
 	{
@@ -354,6 +393,8 @@ sub gregorian_year_bce
 sub hebrew_date
 {
 	my($cache, $t1) = @_;
+
+	print STDERR '#=== hebrew_date() action: ', Dumper($t1) if ($verbose);
 
 	my($bce);
 	my($day);
@@ -409,6 +450,9 @@ sub hebrew_date
 sub interpreted_date
 {
 	my($cache, $t1) = @_;
+
+	print STDERR '#=== interpreted_date() action: ', Dumper($t1) if ($verbose);
+
 	my($t2)      = $$t1[1][1][0];
 	$$t2{flag}   = 'INT';
 	$$t2{phrase} = "($$t1[2][0])";
@@ -422,6 +466,8 @@ sub interpreted_date
 sub julian_date
 {
 	my($cache, $t1) = @_;
+
+	print STDERR '#=== julian_date() action: ', Dumper($t1) if ($verbose);
 
 	# Is it a BCE date? If so, it's already a hashref.
 
@@ -473,6 +519,8 @@ sub julian_year_bce
 {
 	my($cache, $t1, $t2) = @_;
 
+	print STDERR '#=== julian_year_bce() action: ', Dumper($t1), Dumper($t2) if ($verbose);
+
 	return
 	{
 		bce  => $t2,
@@ -488,6 +536,9 @@ sub julian_year_bce
 sub to_date
 {
 	my($cache, $t1, $t2) = @_;
+
+	print STDERR '#=== to_date() action: ', Dumper($t1), Dumper($t2) if ($verbose);
+
 	my($t3)    = $$t2[0];
 	$t2        = $$t2[1];
 	$t2        = $$t2[0] if (ref $t2 eq 'ARRAY');
@@ -509,6 +560,9 @@ sub to_date
 sub year
 {
 	my($cache, $t1, $t2) = @_;
+
+	print STDERR '#=== year() action: ', Dumper($t1), Dumper($t2) if ($verbose);
+
 	$t1 = "$t1/$t2" if (defined $t2);
 
 	return $t1;
