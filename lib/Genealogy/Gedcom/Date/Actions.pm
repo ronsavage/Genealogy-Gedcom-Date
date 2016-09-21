@@ -11,7 +11,7 @@ our $logger;
 
 our $verbose = 0;
 
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 
 # ------------------------------------------------
 
