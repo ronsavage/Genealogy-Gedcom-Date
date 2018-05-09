@@ -5,20 +5,21 @@ use warnings;
 
 # I tried 'require'-ing modules but that did not work.
 
-use Regexp::Parsertron; # For the version #.
+use Genealogy::Gedcom::Date; # For the version #.
 
 use Test::More;
 
-use Capture::Tiny;
-use Data::Section::Simple;
-use File::Slurper;
+use Config;
+use Data::Dumper::Concise;
+use Getopt::Long;
+use Log::Handler;
 use Marpa::R2;
 use Moo;
-use Scalar::Does;
+use Pod::Usage;
 use strict;
-use Tree;
 use Try::Tiny;
 use Types::Standard;
+use utf8;
 use warnings;
 
 # ----------------------
@@ -27,20 +28,21 @@ pass('All external modules loaded');
 
 my(@modules) = qw
 /
-	Capture::Tiny
-	Data::Section::Simple
-	File::Slurper
+	Config
+	Data::Dumper::Concise
+	Getopt::Long
+	Log::Handler
 	Marpa::R2
 	Moo
-	Scalar::Does
+	Pod::Usage
 	strict
-	Tree
 	Try::Tiny
 	Types::Standard
+	utf8
 	warnings
 /;
 
-diag "Testing Regexp::Parsertron V $Regexp::Parsertron::VERSION";
+diag "Testing Genealogy::Gedcom::Date V $Genealogy::Gedcom::Date::VERSION";
 
 for my $module (@modules)
 {

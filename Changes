@@ -4,6 +4,7 @@ Revision history for Perl extension Genealogy::Gedcom::Date.
 	- Accept git pull request from Soren Lund as part of the CPAN Pull Request Challenge.
 		With thanx.
 		I moved his t/pod.t into xt/author/, overwriting my version, and slightly reformatted it.
+	- Add t/00.versions.t and t/00.versions.tx.
 
 2.09  2016-09-21T16:33:00
 	- Clean up pre-reqs in Makefile.PL.
